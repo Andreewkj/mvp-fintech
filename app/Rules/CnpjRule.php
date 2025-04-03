@@ -2,11 +2,11 @@
 
 namespace App\Rules;
 
-use App\Models\Entities\Cpf;
+use App\Models\Entities\Cnpj;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-class CpfRule implements ValidationRule
+class CnpjRule implements ValidationRule
 {
     /**
      * Run the validation rule.
@@ -16,7 +16,7 @@ class CpfRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         try {
-            (new Cpf($value));
+            (new Cnpj($value));
         } catch (\InvalidArgumentException $e) {
             $fail($e->getMessage());
         }

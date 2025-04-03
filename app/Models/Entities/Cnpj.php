@@ -2,7 +2,7 @@
 
 namespace App\Models\Entities;
 
-readonly class Cnpj
+class Cnpj
 {
     public function __construct(
         private string $cnpj,
@@ -12,13 +12,32 @@ readonly class Cnpj
 
     private function validate(string $cnpj): void
     {
-        //TODO conferir regra depois
-        if (!filter_var($cnpj, FILTER_VALIDATE_REGEXP, [
-            'options' => [
-                'regexp' => '/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/',
-            ],
-        ])) {
-            throw new \InvalidArgumentException('Invalid cnpj');
+        $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
+
+        if (strlen($cnpj) != 14) {
+            throw new \InvalidArgumentException('Invalid CNPJ length');
+        }
+
+        if (preg_match('/(\d)\1{13}/', $cnpj)) {
+            throw new \InvalidArgumentException('Invalid CNPJ format');
+        }
+
+        $this->validateFirstDigit($cnpj);
+
+        $this->cnpj = $cnpj;
+    }
+
+    private function validateFirstDigit(string $cnpj): void
+    {
+        for ($t = 12; $t < 14; $t++) {
+            for ($d = 0, $p = 5, $c = 0; $c < $t; $c++) {
+                $d += $cnpj[$c] * $p;
+                $p = ($p < 3) ? 9 : --$p;
+            }
+            $d = ((10 * $d) % 11) % 10;
+            if ($cnpj[$c] != $d) {
+                throw new \InvalidArgumentException('Invalid CNPJ format');
+            }
         }
     }
 

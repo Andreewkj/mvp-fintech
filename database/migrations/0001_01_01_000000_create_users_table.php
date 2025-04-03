@@ -15,8 +15,8 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->string('full_name');
             $table->string('email')->unique();
-            $table->char('cpf', 11)->unique();
-            $table->char('cnpj', 14)->unique();
+            $table->char('cpf', 11)->unique()->nullable();
+            $table->char('cnpj', 14)->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
