@@ -2,7 +2,7 @@
 
 namespace App\Rules;
 
-use App\Models\Entities\Cnpj;
+use App\Domain\Entities\Cnpj;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 

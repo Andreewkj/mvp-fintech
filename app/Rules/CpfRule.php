@@ -2,7 +2,7 @@
 
 namespace App\Rules;
 
-use App\Models\Entities\Cpf;
+use App\Domain\Entities\Cpf;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
