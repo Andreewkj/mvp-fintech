@@ -2,46 +2,82 @@
 
 namespace App\Domain\Services;
 
+use App\Domain\Entities\Account;
+use App\Domain\Interfaces\BankAdapterInterface;
 use App\Domain\Repositories\WalletRepository;
-use App\Models\User;
+use App\Jobs\AuthorizeTransfer;
 use App\Models\Wallet;
-use Illuminate\Support\Facades\Log;
 
 class WalletService
 {
     protected WalletRepository $walletRepository;
 
-    public function __construct()
+    public function __construct(private readonly BankAdapterInterface $bankAdapter)
     {
         $this->walletRepository = new WalletRepository();
     }
 
-    public function makeTransfer(User $payee, User $payer, int $value): void
+    public function transferBetweenWallets(Wallet $payeeWallet, Wallet $payerWallet, int $value): void
     {
-        $this->updatePayeeWallet($payee, $value);
-        $this->updatePayerWallet($payer, $value);
+        $userService = new UserService();
 
-        (new TransferService())->register([
-            'payee_id'  => $payee->id,
-            'payer_id'  => $payer->id,
+        $this->updatePayeeWallet($payeeWallet, $value);
+        $this->updatePayerWallet($payerWallet, $value);
+
+        $transfer = (new TransferService())->register([
+            'payee_id'  => $userService->findUserByWalletId($payeeWallet->id)->id,
+            'payer_id'  => $userService->findUserByWalletId($payerWallet->id)->id,
             'amount'    => $value
         ]);
+
+        AuthorizeTransfer::dispatch($transfer, $this->bankAdapter);
     }
 
-    private function updatePayeeWallet(User $payee, int $value): void
+    private function updatePayeeWallet(Wallet $payeeWallet, int $value): void
     {
         // Preciso validar em caso de erro
-        $this->walletRepository->updatePayeeWallet($payee, $value);
+        $this->walletRepository->updatePayeeWallet($payeeWallet, $value);
     }
 
-    private function updatePayerWallet(User $payer, int $value): void
+    private function updatePayerWallet(Wallet $payerWallet, int $value): void
     {
         // Preciso validar em caso de erro
-        $this->walletRepository->updatePayerWallet($payer, $value);
+        $this->walletRepository->updatePayerWallet($payerWallet, $value);
     }
 
     public function createWallet(array $data) : Wallet
     {
-        return $this->walletRepository->create($data);
+        $data['account'] = (new Account())->getValue();
+        //Here probably should be post to bank and get account
+
+        $this->validate($data);
+        $wallet = $this->walletRepository->create($data);
+
+        (new UserService())->updateUserWallet($data['user_id'], $wallet->id);
+
+        return $wallet;
+    }
+
+    public function findWalletByUserId(string $id) : Wallet
+    {
+        return $this->walletRepository->findWalletByUserId($id);
+    }
+
+    private function validate(array $data): void
+    {
+        //Todo: validar classe de erro
+        if ($this->walletRepository->userWalletExist($data['user_id'])) {
+            throw new \Exception('Wallet already exists');
+        }
+    }
+
+    public function chargebackPayeeAmount(string $payeeId, int $amount): void
+    {
+        $this->walletRepository->chargebackPayeeAmount($payeeId, $amount);
+    }
+
+    public function chargebackPayerAmount(string $payerId, int $amount): void
+    {
+        $this->walletRepository->chargebackPayerAmount($payerId, $amount);
     }
 }

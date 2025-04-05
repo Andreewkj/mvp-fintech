@@ -6,7 +6,6 @@ use App\Domain\Entities\Cnpj;
 use App\Domain\Entities\Cpf;
 use App\Domain\Repositories\UserRepository;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
@@ -24,12 +23,18 @@ class UserService
 
         $data['cpf'] = $cpf;
         $data['cnpj'] = $cnpj;
+        $data['email'] = strTolower($data['email']);
 
         return $this->userRepository->create($data);
     }
 
-    public function findUserById(string $payee): User
+    public function updateUserWallet(string $userId, string $walletId): void
     {
-        return User::find($payee);
+        $this->userRepository->updateUserWallet($userId, $walletId);
+    }
+
+    public function findUserByWalletId(string $id): User
+    {
+        return $this->userRepository->findUserByWalletId($id);
     }
 }

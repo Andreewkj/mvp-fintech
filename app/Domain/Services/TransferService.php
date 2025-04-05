@@ -2,42 +2,42 @@
 
 namespace App\Domain\Services;
 
+use App\Domain\Adapters\PicPayAdapter;
 use App\Domain\Repositories\TransferRepository;
 use App\Enums\WalletTypeEnum;
-use App\Models\User;
-use Illuminate\Http\JsonResponse;
+use App\Models\Transfer;
+use App\Models\Wallet;
+use Illuminate\Support\Facades\Log;
 
 class TransferService
 {
-    protected TransferRepository $trasferRepository;
+    protected TransferRepository $transferRepository;
+    protected WalletService $walletService;
 
     const MINIMUM_TRANSFER_VALUE = 0;
 
     public function __construct()
     {
-        $this->trasferRepository = new TransferRepository();
+        $this->walletService = new WalletService(new PicPayAdapter());
+        $this->transferRepository = new TransferRepository();
     }
 
     public function transfer(array $data): void
     {
-        $userService = new UserService();
-        $walletService = new WalletService();
-
-        $payee = $userService->findUserById($data['payee']);
-        $payer = $userService->findUserById($data['payer']);
+        $payeeWallet = $this->walletService->findWalletByUserId($data['payee_id']);
+        $payerWallet = $this->walletService->findWalletByUserId(auth()->user()->id);
         $value = filter_var($data['value'], FILTER_VALIDATE_INT);
         $value = $value ?? 0;
 
-        $this->validateTransfer($payee, $payer, $value);
+        $this->validateTransfer($payeeWallet, $payerWallet, $value);
 
-        $walletService->makeTransfer($payee, $payer, $value);
+        $this->walletService->transferBetweenWallets($payeeWallet, $payerWallet, $value);
     }
 
-    private function validateTransfer(User $payee, User $payer, int $amount): void
+    private function validateTransfer(Wallet $payeeWallet, Wallet $payerWallet, int $amount): void
     {
         //TODO: Revisar a classe do erro
-
-        if ($payer->wallet->type === WalletTypeEnum::SHOP_KEEPER->value) {
+        if ($payeeWallet->type === WalletTypeEnum::SHOP_KEEPER->value) {
             throw new \InvalidArgumentException('Shop keeper cannot make transfers');
         }
 
@@ -45,17 +45,35 @@ class TransferService
             throw new \InvalidArgumentException('Value must be greater than 0');
         }
 
-        if ($payee->wallet->balance < $amount) {
+        if ($payeeWallet->balance < $amount) {
             throw new \InvalidArgumentException('Insufficient balance');
         }
 
-        if ($payee->id === $payer->id) {
+        if ($payeeWallet->id === $payerWallet->id) {
             throw new \InvalidArgumentException('Payee and payer cannot be the same');
         }
     }
 
-    public function register(array $array): void
+    public function register(array $array): Transfer
     {
-        $this->trasferRepository->register($array);
+        return $this->transferRepository->register($array);
+    }
+
+    private function updateTransferToRefund(Transfer $transfer): void
+    {
+        $this->transferRepository->updateTransferToRefund($transfer);
+    }
+
+    public function refundTransfer(Transfer $transfer): void
+    {
+        try {
+            $this->walletService->chargebackPayeeAmount($transfer->payee_id, $transfer->amount);
+            $this->walletService->chargebackPayerAmount($transfer->payer_id, $transfer->amount);
+            $this->updateTransferToRefund($transfer);
+            // verificar logica da notificação
+        } catch (\Throwable $e) {
+            Log::Critical("Error rolling back transfer from user: {$transfer->payer_id} to user: {$transfer->payee_id} with value: {$transfer->amount}, error: {$e->getMessage()}");
+            throw $e;
+        }
     }
 }

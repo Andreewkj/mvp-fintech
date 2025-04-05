@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Adapters\PicPayAdapter;
 use App\Domain\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,9 +16,9 @@ class WalletController extends Controller
         $data['user_id'] = auth()->user()->id;
 
         try {
-            (new WalletService())->createWallet($data);
+            (new WalletService(new PicPayAdapter()))->createWallet($data);
             return response()->json([
-                'message' => "transfer completed successfully"
+                'message' => "Wallet was created successfully"
             ], 201);
         } catch (\Exception $e) {
             Log::error("Error creating wallet for user: {$data['user_id']}, error: {$e->getMessage()}");

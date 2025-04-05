@@ -14,6 +14,7 @@ class Transfer extends Model
         'amount',
         'payer_id',
         'payee_id',
+        'reversed_at'
     ];
 
     public function payer(): BelongsTo
