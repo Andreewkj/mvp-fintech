@@ -44,7 +44,7 @@ class WalletRepository
     public function chargebackPayeeAmount(string $payeeId, int $amount): void
     {
         DB::transaction(function () use ($payeeId, $amount) {
-            Wallet::where('id', $payeeId)->update([
+            Wallet::where('user_id', $payeeId)->update([
                 'balance' => DB::raw("balance - {$amount}")
             ]);
         });
@@ -53,7 +53,7 @@ class WalletRepository
     public function chargebackPayerAmount(string $payerId, int $amount): void
     {
         DB::transaction(function () use ($payerId, $amount) {
-            Wallet::where('id', $payerId)->update([
+            Wallet::where('user_id', $payerId)->update([
                 'balance' => DB::raw("balance + {$amount}")
             ]);
         });

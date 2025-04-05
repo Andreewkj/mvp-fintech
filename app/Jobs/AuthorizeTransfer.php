@@ -4,12 +4,13 @@ namespace App\Jobs;
 
 use App\Domain\Interfaces\BankAdapterInterface;
 use App\Domain\Services\TransferService;
+use App\Enums\TransferStatusEnum;
 use App\Models\Transfer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 
-class AuthorizeTransfer implements ShouldQueue
+class AuthorizeTransfer
 {
     use Queueable;
 
@@ -21,8 +22,8 @@ class AuthorizeTransfer implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        private Transfer $transfer,
-        private BankAdapterInterface $bankAdapter
+        private readonly Transfer             $transfer,
+        private readonly BankAdapterInterface $bankAdapter
     )
     {
         //
@@ -34,6 +35,10 @@ class AuthorizeTransfer implements ShouldQueue
     public function handle(): void
     {
         try {
+            if ($this->transfer->status === TransferStatusEnum::STATUS_REFUND->value) {
+                throw new \Exception('Transfer already refunded');
+            }
+
             $this->bankAdapter->authorizeTransfer($this->transfer);
         } catch (\Throwable $e) {
             if ($this->attempts() >= $this->tries) {
