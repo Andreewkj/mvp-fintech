@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Entities;
 
-readonly class Email
+class Email
 {
     public function __construct(
         private string $email,
@@ -17,6 +17,8 @@ readonly class Email
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new \InvalidArgumentException('Invalid email');
         }
+
+        $this->email = strTolower($email);
     }
 
     public function getValue(): string

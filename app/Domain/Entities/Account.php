@@ -19,7 +19,6 @@ class Account
             $this->generate();
         }
 
-        //TODO : veriicar classe de erro
         if (strlen($this->account) !== 15) {
             throw new \InvalidArgumentException('Invalid account length');
         }

@@ -20,13 +20,6 @@ class UserService
 
     public function createUser(array $data): User
     {
-        $cpf = isset($data['cpf']) ? (new Cpf($data['cpf']))->getValue() : null;
-        $cnpj = isset($data['cnpj']) ? (new Cnpj($data['cpf']))->getValue() : null;
-
-        $data['cpf'] = $cpf;
-        $data['cnpj'] = $cnpj;
-        $data['email'] = strTolower($data['email']);
-
         return $this->userRepository->create($data);
     }
 
@@ -35,13 +28,28 @@ class UserService
         $this->userRepository->updateUserWallet($userId, $walletId);
     }
 
-    public function findUserByWalletId(string $id): User
+    public function findUserByWalletId(string $id): ?User
     {
         return $this->userRepository->findUserByWalletId($id);
     }
 
-    public function findUserById(string $id): User
+    public function findUserById(string $id): ?User
     {
         return $this->userRepository->findUserById($id);
+    }
+
+    public function findUserByCpf(string $cpf): ?User
+    {
+        return $this->userRepository->findUserByCpf($cpf);
+    }
+
+    public function findUserByEmail(string $cpf): ?User
+    {
+        return $this->userRepository->findUserByEmail($cpf);
+    }
+
+    public function findUserByCnpj(string $cnpj) : ?User
+    {
+        return $this->userRepository->findUserByCnpj($cnpj);
     }
 }

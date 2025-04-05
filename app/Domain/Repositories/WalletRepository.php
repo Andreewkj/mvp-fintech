@@ -28,7 +28,7 @@ class WalletRepository
         return Wallet::create($data);
     }
 
-    public function findWalletByUserId(string $id) : Wallet
+    public function findWalletByUserId(string $id) : ?Wallet
     {
         return Wallet::where('user_id', $id)->first();
     }

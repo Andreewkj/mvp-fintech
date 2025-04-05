@@ -15,7 +15,7 @@ readonly class Password
     public function validate(string $password): void
     {
         if (strlen($password) < 6) {
-            throw new \InvalidArgumentException('Invalid password');
+            throw new \InvalidArgumentException('The password must have at least 6 characters');
         }
     }
 

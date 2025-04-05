@@ -31,7 +31,13 @@ class NotifyPayee
      */
     public function handle(TransferWasCompleted $event): void
     {
-        $payee = (new UserService())->findUserById($event->transfer->payee_id);
+        $id = $event->transfer->payee_id;
+        $payee = (new UserService())->findUserById($id);
+
+        if (is_null($payee)) {
+            throw new \Exception("Payee ID {$payee->id} not found to notify");
+        }
+
         $event->notifyAdapter->notifyByEmail($payee);
         $event->notifyAdapter->notifyBySms($payee);
     }

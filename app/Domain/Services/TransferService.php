@@ -7,6 +7,8 @@ namespace App\Domain\Services;
 use App\Domain\Adapters\PicPayAdapter;
 use App\Domain\Repositories\TransferRepository;
 use App\Enums\WalletTypeEnum;
+use App\Exceptions\TransferException;
+use App\Exceptions\WalletException;
 use App\Models\Transfer;
 use App\Models\Wallet;
 use Illuminate\Support\Facades\DB;
@@ -26,13 +28,22 @@ class TransferService
     }
 
     /**
-     * @throws \Exception
+     * @throws TransferException
+     * @throws WalletException
      */
     public function transfer(array $data): void
     {
         $payeeWallet = $this->walletService->findWalletByUserId($data['payee_id']);
         $payerWallet = $this->walletService->findWalletByUserId(auth()->user()->id);
         $value = $data['value'];
+
+        if ($payeeWallet === null) {
+            throw new TransferException('Payee wallet not found');
+        }
+
+        if ($payerWallet === null) {
+            throw new TransferException('Payer wallet not found');
+        }
 
         $this->validateTransfer($payeeWallet, $payerWallet, $value);
 
@@ -41,21 +52,20 @@ class TransferService
 
     private function validateTransfer(Wallet $payeeWallet, Wallet $payerWallet, int $amount): void
     {
-        //TODO: Revisar a classe do erro
         if ($payeeWallet->type === WalletTypeEnum::SHOP_KEEPER->value) {
-            throw new \InvalidArgumentException('Shop keeper cannot make transfers');
+            throw new TransferException('Shop keeper cannot make transfers');
         }
 
         if ($amount <= self::MINIMUM_TRANSFER_VALUE) {
-            throw new \InvalidArgumentException('Value must be greater than 0');
+            throw new TransferException('Value must be greater than 0');
         }
 
         if ($payeeWallet->balance < $amount) {
-            throw new \InvalidArgumentException('Insufficient balance');
+            throw new TransferException('Insufficient balance');
         }
 
         if ($payeeWallet->id === $payerWallet->id) {
-            throw new \InvalidArgumentException('Payee and payer cannot be the same');
+            throw new TransferException('Payee and payer cannot be the same');
         }
     }
 
@@ -81,25 +91,6 @@ class TransferService
             // Might be a refund notification here
         } catch (\Throwable $e) {
             Log::Critical("Error rolling back transfer id: {$transfer->id}, error: {$e->getMessage()}");
-        }
-    }
-
-    public function validateRequest(array $data): void
-    {
-        if (empty($data['payee_id'])) {
-            throw new \InvalidArgumentException('Payee id is required');
-        }
-
-        if (empty($data['value'])) {
-            throw new \InvalidArgumentException('Value is required');
-        }
-
-        if (gettype($data['value']) !== 'integer') {
-            throw new \InvalidArgumentException('Value must be an integer');
-        }
-
-        if (gettype($data['payee_id']) !== 'string') {
-            throw new \InvalidArgumentException('Payee id must be a string');
         }
     }
 }

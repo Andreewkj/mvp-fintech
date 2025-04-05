@@ -20,26 +20,46 @@ class Cnpj
             throw new \InvalidArgumentException('Invalid CNPJ length');
         }
 
-        if (preg_match('/(\d)\1{13}/', $cnpj)) {
-            throw new \InvalidArgumentException('Invalid CNPJ format');
-        }
-
-        $this->validateFirstDigit($cnpj);
+        $this->validateCheckDigits($cnpj);
 
         $this->cnpj = $cnpj;
     }
 
-    private function validateFirstDigit(string $cnpj): void
+    private function validateCheckDigits(string $cnpj): void
     {
-        for ($t = 12; $t < 14; $t++) {
-            for ($d = 0, $p = 5, $c = 0; $c < $t; $c++) {
-                $d += $cnpj[$c] * $p;
-                $p = ($p < 3) ? 9 : --$p;
+        $length = strlen($cnpj) - 2;
+        $numbers = substr($cnpj, 0, $length);
+        $digits = substr($cnpj, $length);
+        $sum = 0;
+        $pos = $length - 7;
+
+        for ($i = $length; $i >= 1; $i--) {
+            $sum += $numbers[$length - $i] * $pos--;
+            if ($pos < 2) {
+                $pos = 9;
             }
-            $d = ((10 * $d) % 11) % 10;
-            if ($cnpj[$c] != $d) {
-                throw new \InvalidArgumentException('Invalid CNPJ format');
+        }
+
+        $result = $sum % 11 < 2 ? 0 : 11 - $sum % 11;
+        if ($result != $digits[0]) {
+            throw new \InvalidArgumentException("Invalid CNPJ");
+        }
+
+        $length += 1;
+        $numbers = substr($cnpj, 0, $length);
+        $sum = 0;
+        $pos = $length - 7;
+        for ($i = $length; $i >= 1; $i--) {
+            $sum += $numbers[$length - $i] * $pos--;
+            if ($pos < 2) {
+                $pos = 9;
             }
+        }
+
+        $result = $sum % 11 < 2 ? 0 : 11 - $sum % 11;
+
+        if ($result != $digits[1]) {
+            throw new \InvalidArgumentException("Invalid CNPJ");
         }
     }
 
