@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->foreignUlid('wallet_id')->nullable()->references('id')->on('wallets');
+            // TODO: add validation to phone
+            $table->string('phone');
         });
     }
 
@@ -23,6 +25,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign(['wallet_id']);
+            $table->dropColumn(['wallet_id', 'phone']);
         });
     }
 };

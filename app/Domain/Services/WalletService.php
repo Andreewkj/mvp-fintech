@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domain\Services;
 
 use App\Domain\Entities\Account;
@@ -7,6 +9,7 @@ use App\Domain\Interfaces\BankAdapterInterface;
 use App\Domain\Repositories\WalletRepository;
 use App\Jobs\AuthorizeTransfer;
 use App\Models\Wallet;
+use Illuminate\Support\Facades\DB;
 
 class WalletService
 {
@@ -19,18 +22,31 @@ class WalletService
 
     public function transferBetweenWallets(Wallet $payeeWallet, Wallet $payerWallet, int $value): void
     {
-        $userService = new UserService();
+        try {
+            $transfer = null;
 
-        $this->updatePayeeWallet($payeeWallet, $value);
-        $this->updatePayerWallet($payerWallet, $value);
+            DB::transaction(function () use ($payeeWallet, $payerWallet, $value, &$transfer) {
+                $userService = new UserService();
 
-        $transfer = (new TransferService())->register([
-            'payee_id'  => $userService->findUserByWalletId($payeeWallet->id)->id,
-            'payer_id'  => $userService->findUserByWalletId($payerWallet->id)->id,
-            'amount'    => $value
-        ]);
+                $this->updatePayeeWallet($payeeWallet, $value);
+                $this->updatePayerWallet($payerWallet, $value);
 
-        AuthorizeTransfer::dispatch($transfer, $this->bankAdapter);
+                $transfer = (new TransferService())->register([
+                    'payee_id'  => $userService->findUserByWalletId($payeeWallet->id)->id,
+                    'payer_id'  => $userService->findUserByWalletId($payerWallet->id)->id,
+                    'amount'    => $value
+                ]);
+            });
+
+            if (is_null($transfer)) {
+                throw new \Exception('Transfer could not be created');
+            }
+
+            AuthorizeTransfer::dispatch($transfer, $this->bankAdapter);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     private function updatePayeeWallet(Wallet $payeeWallet, int $value): void

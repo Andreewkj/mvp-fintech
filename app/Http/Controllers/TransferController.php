@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Domain\Services\TransferService;
@@ -25,8 +27,7 @@ class TransferController extends Controller
             ], 400);
         }
         catch (\Exception $e) {
-            throw $e;
-            Log::error("Error creating transfer for user: {$data['payee']}, error: {$e->getMessage()}");
+            Log::error("Error creating transfer for user: {$data['payee_id']}, error: {$e->getMessage()}");
             return response()->json([
                 'message' => "Apparently something went wrong with your transfer, but don't worry, we will rollback the values for you"
             ], 500);

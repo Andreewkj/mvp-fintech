@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domain\Adapters;
 
 use App\Domain\Interfaces\BankAdapterInterface;
 use App\Models\Transfer;
-use App\Models\Wallet;
 use GuzzleHttp\Client;
 
 class PicPayAdapter implements BankAdapterInterface

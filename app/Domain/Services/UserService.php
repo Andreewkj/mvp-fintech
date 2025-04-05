@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domain\Services;
 
 use App\Domain\Entities\Cnpj;
@@ -36,5 +38,10 @@ class UserService
     public function findUserByWalletId(string $id): User
     {
         return $this->userRepository->findUserByWalletId($id);
+    }
+
+    public function findUserById(string $id): User
+    {
+        return $this->userRepository->findUserById($id);
     }
 }

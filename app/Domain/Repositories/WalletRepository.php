@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domain\Repositories;
 
 use App\Models\Wallet;
@@ -9,20 +11,16 @@ class WalletRepository
 {
     public function updatePayeeWallet(Wallet $payeeWallet, int $value) : void
     {
-        DB::transaction(function () use ($payeeWallet, $value) {
-            Wallet::where('id', $payeeWallet->id)->update([
-                'balance' => DB::raw("balance + {$value}")
-            ]);
-        });
+        Wallet::where('id', $payeeWallet->id)->update([
+            'balance' => DB::raw("balance + {$value}")
+        ]);
     }
 
     public function updatePayerWallet(Wallet $payerWallet, int $value) : void
     {
-        DB::transaction(function () use ($payerWallet, $value) {
-            Wallet::where('id', $payerWallet->id)->update([
-                'balance' => DB::raw("balance - {$value}")
-            ]);
-        });
+        Wallet::where('id', $payerWallet->id)->update([
+            'balance' => DB::raw("balance - {$value}")
+        ]);
     }
 
     public function create(array $data) : Wallet
@@ -43,19 +41,15 @@ class WalletRepository
 
     public function chargebackPayeeAmount(string $payeeId, int $amount): void
     {
-        DB::transaction(function () use ($payeeId, $amount) {
-            Wallet::where('user_id', $payeeId)->update([
-                'balance' => DB::raw("balance - {$amount}")
-            ]);
-        });
+        Wallet::where('user_id', $payeeId)->update([
+            'balance' => DB::raw("balance - {$amount}")
+        ]);
     }
 
     public function chargebackPayerAmount(string $payerId, int $amount): void
     {
-        DB::transaction(function () use ($payerId, $amount) {
-            Wallet::where('user_id', $payerId)->update([
-                'balance' => DB::raw("balance + {$amount}")
-            ]);
-        });
+        Wallet::where('user_id', $payerId)->update([
+            'balance' => DB::raw("balance + {$amount}")
+        ]);
     }
 }

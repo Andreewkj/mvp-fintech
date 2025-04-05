@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domain\Services;
 
 use App\Domain\Adapters\PicPayAdapter;
@@ -7,6 +9,7 @@ use App\Domain\Repositories\TransferRepository;
 use App\Enums\WalletTypeEnum;
 use App\Models\Transfer;
 use App\Models\Wallet;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class TransferService
@@ -22,6 +25,9 @@ class TransferService
         $this->transferRepository = new TransferRepository();
     }
 
+    /**
+     * @throws \Exception
+     */
     public function transfer(array $data): void
     {
         $payeeWallet = $this->walletService->findWalletByUserId($data['payee_id']);
@@ -67,10 +73,13 @@ class TransferService
     public function refundTransfer(Transfer $transfer): void
     {
         try {
-            $this->walletService->chargebackPayeeAmount($transfer->payee_id, $transfer->amount);
-            $this->walletService->chargebackPayerAmount($transfer->payer_id, $transfer->amount);
-            $this->updateTransferToRefund($transfer);
-            // verificar logica da notificação
+            DB::transaction(function () use ($transfer) {
+                $this->walletService->chargebackPayeeAmount($transfer->payee_id, $transfer->amount);
+                $this->walletService->chargebackPayerAmount($transfer->payer_id, $transfer->amount);
+                $this->updateTransferToRefund($transfer);
+            });
+
+            // Might be a refund notification here
         } catch (\Throwable $e) {
             Log::Critical("Error rolling back transfer from user: {$transfer->payer_id} to user: {$transfer->payee_id} with value: {$transfer->amount}, error: {$e->getMessage()}");
             throw $e;
