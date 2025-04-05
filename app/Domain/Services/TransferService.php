@@ -32,8 +32,7 @@ class TransferService
     {
         $payeeWallet = $this->walletService->findWalletByUserId($data['payee_id']);
         $payerWallet = $this->walletService->findWalletByUserId(auth()->user()->id);
-        $value = filter_var($data['value'], FILTER_VALIDATE_INT);
-        $value = $value ?? 0;
+        $value = $data['value'];
 
         $this->validateTransfer($payeeWallet, $payerWallet, $value);
 
@@ -81,8 +80,26 @@ class TransferService
 
             // Might be a refund notification here
         } catch (\Throwable $e) {
-            Log::Critical("Error rolling back transfer from user: {$transfer->payer_id} to user: {$transfer->payee_id} with value: {$transfer->amount}, error: {$e->getMessage()}");
-            throw $e;
+            Log::Critical("Error rolling back transfer id: {$transfer->id}, error: {$e->getMessage()}");
+        }
+    }
+
+    public function validateRequest(array $data): void
+    {
+        if (empty($data['payee_id'])) {
+            throw new \InvalidArgumentException('Payee id is required');
+        }
+
+        if (empty($data['value'])) {
+            throw new \InvalidArgumentException('Value is required');
+        }
+
+        if (gettype($data['value']) !== 'integer') {
+            throw new \InvalidArgumentException('Value must be an integer');
+        }
+
+        if (gettype($data['payee_id']) !== 'string') {
+            throw new \InvalidArgumentException('Payee id must be a string');
         }
     }
 }

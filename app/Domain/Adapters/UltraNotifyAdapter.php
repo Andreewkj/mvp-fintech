@@ -21,16 +21,23 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
 
     public function notifyByEmail(User $user): void
     {
-        dd('ara ara');
-        $this->client->post($this->url, [
+        $response = $this->client->post($this->url, [
             $user->email
         ]);
+
+        if ($response->getStatusCode() !== 204) {
+            throw new \Exception('Error sending email to user: ' . $user->email);
+        }
     }
 
     public function notifyBySms(User $user): void
     {
-        $this->client->post($this->url, [
+        $response = $this->client->post($this->url, [
             $user->phone
         ]);
+
+        if ($response->getStatusCode() !== 204) {
+            throw new \Exception('Error sending email to user: ' . $user->email);
+        }
     }
 }

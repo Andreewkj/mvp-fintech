@@ -11,13 +11,20 @@ use Illuminate\Support\Facades\Log;
 
 class TransferController extends Controller
 {
+    private TransferService $transferService;
+    public function __construct()
+    {
+        $this->transferService = new TransferService();
+    }
+
     // TODO: implementar Request
     public function makeTransfer(Request $request): JsonResponse
     {
         $data = $request->all();
 
         try {
-            (new TransferService())->transfer($data);
+            $this->transferService->validateRequest($data);
+            $this->transferService->transfer($data);
             return response()->json([
                 'message' => "transfer completed successfully"
             ], 201);

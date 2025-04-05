@@ -48,8 +48,9 @@ class AuthorizeTransfer
             event(new TransferWasCompleted($this->transfer, new UltraNotifyAdapter()));
             //Use notify to send notification, because if in the future we want to use another notification adapter, just change here
         } catch (\Throwable $e) {
+            $adapterName = get_class($this->bankAdapter);
             if ($this->attempts() >= $this->tries) {
-                Log::Critical("Error authorizing transfer from user: {$this->transfer->payer_id} to user: {$this->transfer->payee_id} with value: {$this->transfer->amount}, error: {$e->getMessage()}");
+                Log::Critical("Error authorizing transfer id: {$this->transfer->id} with adapter: {$adapterName}, error: {$e->getMessage()}");
                 (new TransferService())->refundTransfer($this->transfer);
             }
 
