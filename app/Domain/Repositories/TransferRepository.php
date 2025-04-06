@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class TransferRepository
 {
-    public function register(array $array): Transfer
+    public function register(array $array): ?Transfer
     {
         // TODO: verificar horaio registrado
         return Transfer::create($array);

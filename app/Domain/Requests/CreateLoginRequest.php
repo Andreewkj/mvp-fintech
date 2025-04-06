@@ -2,10 +2,10 @@
 
 namespace App\Domain\Requests;
 
-use App\Domain\Entities\Cnpj;
-use App\Domain\Entities\Cpf;
-use App\Domain\Entities\Email;
-use App\Domain\Entities\Password;
+use App\Domain\VO\Cnpj;
+use App\Domain\VO\Cpf;
+use App\Domain\VO\Email;
+use App\Domain\VO\Password;
 use App\Domain\Interfaces\RequestValidateInterface;
 use App\Domain\Services\UserService;
 

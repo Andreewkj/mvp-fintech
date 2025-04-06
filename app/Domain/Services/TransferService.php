@@ -6,6 +6,7 @@ namespace App\Domain\Services;
 
 use App\Domain\Adapters\PicPayAdapter;
 use App\Domain\Repositories\TransferRepository;
+use App\Domain\Repositories\WalletRepository;
 use App\Enums\WalletTypeEnum;
 use App\Exceptions\TransferException;
 use App\Exceptions\WalletException;
@@ -23,7 +24,13 @@ class TransferService
 
     public function __construct()
     {
-        $this->walletService = new WalletService(new PicPayAdapter());
+        $this->walletService = new WalletService(
+            new WalletRepository(),
+            new UserService(),
+            new TransferService(),
+            new PicPayAdapter()
+        );
+
         $this->transferRepository = new TransferRepository();
     }
 
@@ -69,7 +76,7 @@ class TransferService
         }
     }
 
-    public function register(array $array): Transfer
+    public function register(array $array): ?Transfer
     {
         return $this->transferRepository->register($array);
     }

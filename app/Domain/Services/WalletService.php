@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Services;
 
-use App\Domain\Entities\Account;
+use App\Domain\VO\Account;
 use App\Domain\Interfaces\BankAdapterInterface;
 use App\Domain\Repositories\WalletRepository;
 use App\Exceptions\WalletException;
@@ -14,12 +14,14 @@ use Illuminate\Support\Facades\DB;
 
 class WalletService
 {
-    protected WalletRepository $walletRepository;
 
-    public function __construct(private readonly ?BankAdapterInterface $bankAdapter = null)
-    {
-        $this->walletRepository = new WalletRepository();
-    }
+    public function __construct(
+        private WalletRepository      $walletRepository,
+        private UserService           $userService,
+        private TransferService       $transferService,
+        private ?BankAdapterInterface $bankAdapter = null
+    )
+    {}
 
     public function transferBetweenWallets(Wallet $payeeWallet, Wallet $payerWallet, int $value): void
     {
@@ -27,15 +29,16 @@ class WalletService
             $transfer = null;
 
             DB::transaction(function () use ($payeeWallet, $payerWallet, $value, &$transfer) {
-                $userService = new UserService();
-
                 $this->updatePayeeWallet($payeeWallet, $value);
                 $this->updatePayerWallet($payerWallet, $value);
 
-                $transfer = (new TransferService())->register([
-                    'payee_id'  => $userService->findUserByWalletId($payeeWallet->id)->id,
-                    'payer_id'  => $userService->findUserByWalletId($payerWallet->id)->id,
-                    'amount'    => $value
+                $payeeUser = $this->userService->findUserByWalletId($payeeWallet->id);
+                $payerUser = $this->userService->findUserByWalletId($payerWallet->id);
+
+                $transfer = $this->transferService->register([
+                    'payee_id' => $payeeUser->id,
+                    'payer_id' => $payerUser->id,
+                    'amount'   => $value
                 ]);
             });
 
@@ -71,7 +74,7 @@ class WalletService
         $this->validateIfAccountAlreadyExist($data);
         $wallet = $this->walletRepository->create($data);
 
-        (new UserService())->updateUserWallet($data['user_id'], $wallet->id);
+        $this->userService->updateUserWallet($data['user_id'], $wallet->id);
 
         return $wallet;
     }

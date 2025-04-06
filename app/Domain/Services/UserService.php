@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Services;
 
-use App\Domain\Entities\Cnpj;
-use App\Domain\Entities\Cpf;
+use App\Domain\VO\Cnpj;
+use App\Domain\VO\Cpf;
 use App\Domain\Repositories\UserRepository;
 use App\Models\User;
 
