@@ -1,4 +1,4 @@
-name: tests.yml
+name: CI
 
 on:
   push:
@@ -14,10 +14,12 @@ jobs:
 
     services:
       mysql:
-        image: mysql/mysql-server:8.0
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: test
+          MYSQL_DATABASE: laravel
+          MYSQL_USER: sail
+          MYSQL_PASSWORD: password
         ports:
           - 3306:3306
         options: >-
@@ -37,8 +39,16 @@ jobs:
           extensions: mbstring, pdo_mysql
           tools: composer, phpunit
 
-      - name: Copy .env
-        run: cp .env.example .env
+      - name: Setup .env
+        run: |
+          cp .env.example .env
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=laravel" >> .env
+          echo "DB_USERNAME=sail" >> .env
+          echo "DB_PASSWORD=password" >> .env
+          echo "REDIS_HOST=127.0.0.1" >> .env
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
@@ -54,4 +64,3 @@ jobs:
 
       - name: Run tests
         run: php artisan test
-
