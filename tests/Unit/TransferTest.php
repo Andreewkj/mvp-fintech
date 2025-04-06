@@ -5,7 +5,6 @@ namespace Tests\Unit;
 use App\Domain\Services\TransferService;
 use App\Domain\Services\WalletService;
 use App\Exceptions\TransferException;
-use App\Exceptions\WalletException;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -35,7 +34,7 @@ class TransferTest extends TestCase
 
         $transferService = new TransferService($mockWalletService);
 
-        $this->expectException(WalletException::class);
+        $this->expectException(TransferException::class);
         $this->expectExceptionMessage('Payee wallet not found');
 
         $transferService->transfer([
