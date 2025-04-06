@@ -26,11 +26,11 @@ class TransferController extends Controller
         $this->walletService = new WalletService(
             new WalletRepository(),
             new UserService(),
-            new TransferService(),
+            null,
             new PicPayAdapter()
         );
 
-        $this->transferService = new TransferService();
+        $this->transferService = new TransferService($this->walletService);
     }
 
     public function makeTransfer(Request $request): JsonResponse

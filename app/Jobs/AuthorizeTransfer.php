@@ -4,34 +4,38 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Domain\Adapters\UltraNotifyAdapter;
+use App\Domain\Adapters\PicPayAdapter;
 use App\Domain\Interfaces\BankAdapterInterface;
+use App\Domain\Repositories\WalletRepository;
 use App\Domain\Services\TransferService;
+use App\Domain\Services\WalletService;
 use App\Enums\TransferStatusEnum;
-use App\Events\TransferWasCompleted;
 use App\Models\Transfer;
+use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class AuthorizeTransfer
+class AuthorizeTransfer implements ShouldQueue
 {
     use Queueable;
+    use InteractsWithSockets, SerializesModels;
 
     public int $tries = 3;
 
     public int $backoff = 5;
 
+    private TransferService $transferService;
+
+    private BankAdapterInterface $bankAdapter;
     /**
      * Create a new job instance.
      */
     public function __construct(
-        private readonly Transfer             $transfer,
-        private readonly BankAdapterInterface $bankAdapter
+        private readonly Transfer $transfer,
     )
-    {
-        //
-    }
+    {}
 
     /**
      * Execute the job.
@@ -39,19 +43,24 @@ class AuthorizeTransfer
     public function handle(): void
     {
         try {
+            $this->transferService = new TransferService(
+                new WalletService(new WalletRepository())
+            );
+
+            $this->bankAdapter = new PicPayAdapter();
+
             if ($this->transfer->status === TransferStatusEnum::STATUS_REFUND->value) {
                 throw new \Exception('Transfer already refunded');
             }
 
             $this->bankAdapter->authorizeTransfer($this->transfer);
 
-            event(new TransferWasCompleted($this->transfer, new UltraNotifyAdapter()));
-            //Use notify to send notification, because if in the future we want to use another notification adapter, just change here
+            NotifyPayee::dispatch($this->transfer->payee_id);
         } catch (\Throwable $e) {
             $adapterName = get_class($this->bankAdapter);
             if ($this->attempts() >= $this->tries) {
                 Log::Critical("Error authorizing transfer id: {$this->transfer->id} with adapter: {$adapterName}, error: {$e->getMessage()}");
-                (new TransferService())->refundTransfer($this->transfer);
+                $this->transferService->refundTransfer($this->transfer);
             }
 
             throw $e;

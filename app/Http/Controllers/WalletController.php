@@ -16,14 +16,15 @@ use Illuminate\Support\Facades\Log;
 
 class WalletController extends Controller
 {
-    private WalletService $walletService;
+    protected WalletService $walletService;
 
     public function __construct()
     {
         $this->walletService = new WalletService(
             new WalletRepository(),
             new UserService(),
-            new TransferService()
+            null,
+            null
         );
     }
 

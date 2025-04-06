@@ -2,8 +2,6 @@
 
 namespace App\Domain\Requests;
 
-use App\Domain\VO\Cnpj;
-use App\Domain\VO\Cpf;
 use App\Domain\VO\Email;
 use App\Domain\VO\Password;
 use App\Domain\Interfaces\RequestValidateInterface;
@@ -31,10 +29,6 @@ class CreateLoginRequest implements RequestValidateInterface
         $this->data['password'] = (new Password($this->data['password']))->getValue();
 
         $this->data['email'] = (new Email($this->data['email']))->getValue();
-
-        if ($this->userService->findUserByEmail($this->data['email']) !== null) {
-            throw new \InvalidArgumentException('User already registered');
-        }
 
         return $this->data;
     }

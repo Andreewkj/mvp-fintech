@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Events\TransferWasCompleted;
-use App\Listeners\NotifyPayee;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
 
@@ -22,9 +20,6 @@ use Illuminate\Support\Facades\Event;
      */
     public function boot(): void
     {
-        Event::listen(
-            TransferWasCompleted::class,
-            NotifyPayee::class,
-        );
+        //
     }
 }

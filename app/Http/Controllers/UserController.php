@@ -17,16 +17,29 @@ class UserController extends Controller
 {
     public function login(Request $request): JsonResponse
     {
-        $credentials = (new CreateLoginRequest(
-            $request->only('email', 'password')
-        ))->validate();
+        try {
+            $credentials = (new CreateLoginRequest(
+                $request->only('email', 'password')
+            ))->validate();
 
-        if (Auth::attempt($credentials)) {
-            $token = $request->user()->createToken('apiToken')->plainTextToken;
-            return response()->json(['token' => $token], 200);
+            if (Auth::attempt($credentials)) {
+                $token = $request->user()->createToken('apiToken')->plainTextToken;
+                return response()->json(['token' => $token], 200);
+            }
+
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 400);
+        } catch (\Exception $e) {
+            Log::error("Error logging in user, error: {$e->getMessage()}");
+            return response()->json([
+                'message' => "Error logging in your user"
+            ], 500);
         }
-
-        return response()->json(['error' => 'The provided credentials do not match our records.'], 401);
     }
 
     public function store(Request $request): User | JsonResponse

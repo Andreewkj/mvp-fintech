@@ -28,8 +28,7 @@ class TransferService
         $this->walletService = new WalletService(
             new WalletRepository(),
             new UserService(),
-            $this,
-            new PicPayAdapter()
+            $this
         );
 
         $this->transferRepository = new TransferRepository();
@@ -44,6 +43,8 @@ class TransferService
         $payeeWallet = $this->walletService->findWalletByUserId($data['payee_id']);
         $payerWallet = $this->walletService->findWalletByUserId(auth()->user()->id);
         $value = $data['value'];
+
+        dd($payeeWallet);
 
         if ($payeeWallet === null) {
             throw new TransferException('Payee wallet not found');

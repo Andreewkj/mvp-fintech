@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Domain\Services;
 
 use App\Domain\VO\Account;
-use App\Domain\Interfaces\BankAdapterInterface;
 use App\Domain\Repositories\WalletRepository;
 use App\Exceptions\WalletException;
 use App\Jobs\AuthorizeTransfer;
@@ -17,9 +16,8 @@ class WalletService
 {
     public function __construct(
         private WalletRepository      $walletRepository,
-        private UserService           $userService,
-        private TransferService       $transferService,
-        private ?BankAdapterInterface $bankAdapter = null
+        private ?UserService          $userService = null,
+        private ?TransferService      $transferService = null
     )
     {}
 
@@ -46,7 +44,7 @@ class WalletService
                 throw new WalletException('Transfer could not be created');
             }
 
-            AuthorizeTransfer::dispatch($transfer, $this->bankAdapter);
+            AuthorizeTransfer::dispatch($transfer);
 
             return $transfer;
         } catch (WalletException $e) {
@@ -75,7 +73,6 @@ class WalletService
 
         $this->validateIfAccountAlreadyExist($data);
         $wallet = $this->walletRepository->create($data);
-
         $this->userService->updateUserWallet($data['user_id'], $wallet->id);
 
         return $wallet;

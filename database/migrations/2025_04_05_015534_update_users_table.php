@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->foreignUlid('wallet_id')->nullable()->references('id')->on('wallets');
-            // TODO: add validation to phone
-            $table->string('phone');
+            $table->string('phone', 11)->after('cnpj');
         });
     }
 

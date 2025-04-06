@@ -8,6 +8,7 @@ use App\Domain\VO\Email;
 use App\Domain\VO\Password;
 use App\Domain\Interfaces\RequestValidateInterface;
 use App\Domain\Services\UserService;
+use App\Domain\VO\Phone;
 
 class CreateUserRequest implements RequestValidateInterface
 {
@@ -26,6 +27,12 @@ class CreateUserRequest implements RequestValidateInterface
             throw new \InvalidArgumentException('Email is required');
         }
 
+        $this->data['email'] = (new Email($this->data['email']))->getValue();
+
+        if ($this->userService->findUserByEmail($this->data['email']) !== null) {
+            throw new \InvalidArgumentException('User already registered');
+        }
+
         if (empty($this->data['full_name'])) {
             throw new \InvalidArgumentException('Full name is required');
         }
@@ -33,6 +40,19 @@ class CreateUserRequest implements RequestValidateInterface
         if (empty($this->data['cpf']) && empty($this->data['cnpj'])) {
             throw new \InvalidArgumentException('Cpf or Cnpj is required');
         }
+
+        if (empty($this->data['phone'])) {
+            throw new \InvalidArgumentException('phone is required');
+        }
+
+        $this->data['phone'] = (new Phone($this->data['phone']))->getValue();
+
+
+        if (empty($this->data['password'])) {
+            throw new \InvalidArgumentException('Password is required');
+        }
+
+        $this->data['password'] = (new Password($this->data['password']))->getValue();
 
         if (!empty($this->data['cnpj'])) {
             $this->data['cnpj'] = (new Cnpj($this->data['cnpj']))->getValue();
@@ -42,7 +62,6 @@ class CreateUserRequest implements RequestValidateInterface
             }
 
             $this->data['cpf'] = null;
-
         }
 
         if (!empty($this->data['cpf'])) {
@@ -54,18 +73,6 @@ class CreateUserRequest implements RequestValidateInterface
 
             $this->data['cnpj'] = null;
         }
-
-        $this->data['email'] = (new Email($this->data['email']))->getValue();
-
-        if ($this->userService->findUserByEmail($this->data['email']) !== null) {
-            throw new \InvalidArgumentException('User already registered');
-        }
-
-        if (empty($this->data['password'])) {
-            throw new \InvalidArgumentException('Password is required');
-        }
-
-        $this->data['password'] = (new Password($this->data['password']))->getValue();
 
         return $this->data;
     }

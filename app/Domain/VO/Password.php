@@ -12,7 +12,7 @@ readonly class Password
         $this->validate($password);
     }
 
-    public function validate(string $password): void
+    private function validate(string $password): void
     {
         if (strlen($password) < 6) {
             throw new \InvalidArgumentException('The password must have at least 6 characters');
