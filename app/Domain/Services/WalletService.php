@@ -9,12 +9,12 @@ use App\Domain\Interfaces\BankAdapterInterface;
 use App\Domain\Repositories\WalletRepository;
 use App\Exceptions\WalletException;
 use App\Jobs\AuthorizeTransfer;
+use App\Models\Transfer;
 use App\Models\Wallet;
 use Illuminate\Support\Facades\DB;
 
 class WalletService
 {
-
     public function __construct(
         private WalletRepository      $walletRepository,
         private UserService           $userService,
@@ -23,7 +23,7 @@ class WalletService
     )
     {}
 
-    public function transferBetweenWallets(Wallet $payeeWallet, Wallet $payerWallet, int $value): void
+    public function transferBetweenWallets(Wallet $payeeWallet, Wallet $payerWallet, int $value): Transfer
     {
         try {
             $transfer = null;
@@ -47,6 +47,8 @@ class WalletService
             }
 
             AuthorizeTransfer::dispatch($transfer, $this->bankAdapter);
+
+            return $transfer;
         } catch (WalletException $e) {
             DB::rollBack();
             throw $e;

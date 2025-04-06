@@ -13,17 +13,14 @@ use App\Models\Transfer;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class WalletTest extends TestCase
 {
-    private $walletRepository;
-    private $userService;
-    private $transferService;
-    private $bankAdapter;
-    private $walletService;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -102,45 +99,51 @@ class WalletTest extends TestCase
         $this->walletService->transferBetweenWallets($payeeWallet, $payerWallet, $value);
     }
 
-//    public function testTransferBetweenWalletsSuccessfully()
-//    {
-//        $payeeId = Str::ulid()->toString();
-//        $payeeWalletId = Str::ulid()->toString();
-//        $payeeWallet = new Wallet(['id' => $payeeWalletId, 'user_id' => $payeeId, 'balance' => 10000, 'type' => WalletTypeEnum::COMMON->value]);
-//        $payeeWallet->id = $payeeWalletId;
-//
-//        $payerId = Str::ulid()->toString();
-//        $payerWalletId = Str::ulid()->toString();
-//        $payerWallet = new Wallet(['id' => $payerWalletId, 'user_id' => $payerId, 'balance' => 10000, 'type' => WalletTypeEnum::COMMON->value]);
-//        $payerWallet->id = $payerWalletId;
-//
-//        $transferId = Str::ulid()->toString();
-//        $transfer = new Transfer(['id' => $transferId, 'payee_id' => $payeeId, 'payer_id' => $payerId, 'amount' => 10000]);
-//        $transfer->id = $transferId;
-//
-//        $payeeUser = new User(['id' => $payeeId, 'name' => 'payee', 'email' => 'mFk2w@example.com', 'phone' => '1234567890']);
-//        $payeeUser->id = $payeeId;
-//
-//        $payerUser = new User(['id' => $payerId, 'name' => 'payer', 'email' => 'mFk2w@example.com', 'phone' => '1234567890']);
-//        $payerUser->id = $payerId;
-//
-//        $value = 100;
-//
-//        $this->userService->method('findUserByWalletId')
-//            ->willReturnOnConsecutiveCalls($payeeUser, $payerUser);
-//
-//        $this->walletService->transferBetweenWallets($payeeWallet, $payerWallet, $value);
-//
-//        //TODO: falta testar essa porte
-////        Queue::assertPushed(AuthorizeTransfer::class, function ($job) use ($transfer) {
-////            return $job->transfer === 'transferId';
-////        });
-//
-//        //TODO: testar esse metodo de validação separado
-////        $this->transferService->expects($this->once())
-////            ->method('validateTransfer')
-////            ->with($this->equalTo($userId), $this->equalTo($walletId));
-//
-//        // Assert other internal methods were called if needed
-//    }
+    public function testTransferBetweenWalletsSuccessfully()
+    {
+        Bus::fake();
+
+        $payeeId = Str::ulid()->toString();
+        $payeeWalletId = Str::ulid()->toString();
+        $payeeWallet = new Wallet(['id' => $payeeWalletId, 'user_id' => $payeeId, 'balance' => 10000, 'type' => WalletTypeEnum::COMMON->value]);
+        $payeeWallet->id = $payeeWalletId;
+
+        $payerId = Str::ulid()->toString();
+        $payerWalletId = Str::ulid()->toString();
+        $payerWallet = new Wallet(['id' => $payerWalletId, 'user_id' => $payerId, 'balance' => 10000, 'type' => WalletTypeEnum::COMMON->value]);
+        $payerWallet->id = $payerWalletId;
+
+        $transferId = Str::ulid()->toString();
+        $transfer = new Transfer(['id' => $transferId, 'payee_id' => $payeeId, 'payer_id' => $payerId, 'amount' => 10000]);
+        $transfer->id = $transferId;
+
+        $payeeUser = new User(['id' => $payeeId, 'name' => 'payee', 'email' => 'mFk2w@example.com', 'phone' => '1234567890']);
+        $payeeUser->id = $payeeId;
+
+        $payerUser = new User(['id' => $payerId, 'name' => 'payer', 'email' => 'mFk2w@example.com', 'phone' => '1234567890']);
+        $payerUser->id = $payerId;
+
+        $value = 100;
+
+        $transferId = Str::ulid()->toString();
+        $transfer = new Transfer(['id' => $transferId, 'payee_id' => $payeeId, 'payer_id' => $payerId, 'amount' => 10000]);
+        $transfer->id = $transferId;
+
+        $this->transferService->method('register')
+            ->willReturn($transfer);
+
+        $this->userService->method('findUserByWalletId')
+            ->willReturnCallback(function ($id) use ($payeeUser, $payerUser, $payeeWallet, $payerWallet) {
+                if ($id === $payeeWallet->id) {
+                    return $payeeUser;
+                } elseif ($id === $payerWallet->id) {
+                    return $payerUser;
+                }
+                return null;
+            });
+
+        $result = $this->walletService->transferBetweenWallets($payeeWallet, $payerWallet, $value);
+
+        $this->assertInstanceOf(Transfer::class, $result);
+    }
 }

@@ -18,16 +18,17 @@ use Illuminate\Support\Facades\Log;
 class TransferService
 {
     protected TransferRepository $transferRepository;
-    protected WalletService $walletService;
 
     const MINIMUM_TRANSFER_VALUE = 0;
 
-    public function __construct()
+    public function __construct(
+        protected WalletService $walletService
+    )
     {
         $this->walletService = new WalletService(
             new WalletRepository(),
             new UserService(),
-            new TransferService(),
+            $this,
             new PicPayAdapter()
         );
 
@@ -38,7 +39,7 @@ class TransferService
      * @throws TransferException
      * @throws WalletException
      */
-    public function transfer(array $data): void
+    public function transfer(array $data): Transfer
     {
         $payeeWallet = $this->walletService->findWalletByUserId($data['payee_id']);
         $payerWallet = $this->walletService->findWalletByUserId(auth()->user()->id);
@@ -54,7 +55,7 @@ class TransferService
 
         $this->validateTransfer($payeeWallet, $payerWallet, $value);
 
-        $this->walletService->transferBetweenWallets($payeeWallet, $payerWallet, $value);
+        return $this->walletService->transferBetweenWallets($payeeWallet, $payerWallet, $value);
     }
 
     private function validateTransfer(Wallet $payeeWallet, Wallet $payerWallet, int $amount): void
