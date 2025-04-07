@@ -78,6 +78,23 @@ php artisan key:generate
 
 php artisan migrate:fresh --seed
 ```
+#### Usuários do seeder
+Type : Common
+Balance : 100000
+```bash
+{
+	"email": "andreew@gmail.com",
+	"password": "123456"
+}
+```
+Type : shop_kepeer
+Balance : 0
+```bash
+{
+	"email": "alecssander@gmail.com",
+	"password": "123456"
+}
+```
 
 ## Endpois do projeto
 
