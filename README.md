@@ -1,66 +1,204 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Fintech MVP
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Sobre o projeto
 
-## About Laravel
+O principal UseCase do projeto é a transferência entre dois usuários, no caso serão um usuário comun e um logista, antes de finalizar a transfêrencia, deve ser consultado um serviço externo e verificar se podemos aprovar a transferência.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Caso a transferência seja aprovada, é feito um envio de notificação por email e por sms.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Em caso de erro na transfêrencia, deve ser feito um estorno para conta do usuário pagador e a dedução do valor na conta do recebedor.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## A Minha interpretação do requisitos
 
-## Learning Laravel
+Ao ler a descrição deu a entender que a intenção é mostrar uma solução do desenvolvedor sem depender totalmente do fremework.
+Dito isso optei pelo uso do DDD, utilizando muito do Objects calistenics, linguagem ubiqua, utilizei os Value Objects para ajudar com a obsessão por tipos primitivos e tratamento de requests fora do framework.
+Meu objetivo é desacoplar o máximo possível e entregar uma solução agnostiva ao framework.
+Uma das parte que acabei utilizando do Framework foi o ORM, mas continuo estudando pra conseguir não depender dele no futuro.
+Para a chamada dos provedores de atualização e notificação, entendi que poderia ser feito umas tentativas a mais antes de de fato cancelar então o job tem 3 tentativas antes da falha.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Regras de negocio da implementação
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+ - Um usuário precisa ter Nome Completo, CPF/CNPJ (unico), EMAIL (unico), Telefone, Senha (Min 6 Caracteres).
+ - Após o utilizador ser criado ele deve chamar a rota de criação da carteira(Create/Wallet) passando o tipo de carteira desejada.
+ - Atualmente é criada uma carteira fake mas no mundo real acredito que nessa rota também seriam enviados documentos e uma requisição para um provedor bancário.
+ - O que difere um lojista de um utilizador comum é a sua carteira, já que hoje é possivel fazer operações como lojista apenas com o CPF.
+ - Não há rota de saldo mas basta ir até a tabela coluna balance da tabela wallets para adicionar.
+ - A principal regra da transferência é que o Logista só pode receber valores, e o usuário comum recebe e envia.
+ - Para fazer a transference o usuário precisa apenas passar o id do usuário que irá receber, pois é necessário que o pagador esteja logado, pois com o usuário logado, já possuimos as suas informações
+ - Caso a transferência não tenha sucesso o mesmo job que faz a chamada do serviço de autorização, vai devolver os valores para o pagador e para o recebedor e atualizar a transação como type='refund'
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Configuração do Projeto
 
-## Laravel Sponsors
+Dentro da pasta do projeto temos duas opções, configurar o sail, ou utilizar o docker compose.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Configuração Sail
 
-### Premium Partners
+```bash
+docker run --rm --interactive --tty \
+  --volume $PWD:/app \
+  --user $(id -u):$(id -g) \
+  composer install
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Para subir o ail
 
-## Contributing
+```bash
+./vendor/bin/sail up -d
+```
+Configurações iniciais
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+./vendor/bin/sail up -d artisan composer install
 
-## Code of Conduct
+./vendor/bin/sail up -d artisan key:generate
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+./vendor/bin/sail up -d artisan migrate:fresh --seed
+```
 
-## Security Vulnerabilities
+## Configuração Docker Compose
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Para subir o Docker
 
-## License
+```bash
+sudo docker compose up
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Configurações iniciais
+
+Execute os comandos abaixo dentro do contâiner **mvp-fintech-laravel.test-1**
+
+```bash
+sudo docker exec -it mvp-fintech-laravel.test-1 bash
+```
+
+```bash
+php artisan composer install
+
+php artisan key:generate
+
+php artisan migrate:fresh --seed
+```
+
+## Endpois do projeto
+
+Criei uma pasta na raiz do projeto com o nome de 'Dev' onde está o arquivo de exportação do insominia, mas também deixarei as rotas abaixo.
+
+### Criação de usuário
+Url: http://localhost/api/user/create
+Request body
+```bash
+{
+	"full_name": "Andreew Kennedy",
+	"email": "ak@gmail.com",
+	"cpf": "01822850657",
+	"phone": "31993920011",
+	"password": "123456"
+}
+```
+Curl
+
+```bash
+curl --request POST \
+  --url http://localhost/api/user/create \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"full_name": "Andreew Kennedy",
+	"email": "ak@gmail.com",
+	"cpf": "01822850657",
+	"phone": "31993920011",
+	"password": "123456"
+}'
+```
+### Login
+Url: http://localhost/api/user/login
+Request body
+```bash
+{
+	"email": "ak@gmail.com",
+	"password": "123456"
+}
+```
+
+```bash
+curl --request POST \
+  --url http://localhost/api/user/login \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' \
+  --header 'User-Agent: insomnia/11.0.1' \
+  --data '{
+	"email": "ak@gmail.com",
+	"password": "123456"
+}'
+```
+
+### Criação da Carteira
+Url: http://localhost/api/wallet/create
+Request body
+Os tipos de carteira são: common e shop_keeper
+*Necessário estar logado
+```bash
+{
+	"type": "common"
+}
+```
+
+```bash
+curl --request POST \
+  --url http://localhost/api/wallet/create \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer 5|K06KKyxjWxNS8VuJqLGuLKqjGf7IMfgRv6TpFJ12efa38699' \
+  --header 'Content-Type: application/json' \
+  --header 'User-Agent: insomnia/11.0.1' \
+  --data '{
+	"type": "common"
+}'
+```
+### Transferência
+Url: http://localhost/api/transfer/create
+Request body
+*Necessário estar logado
+```bash
+{
+	"value": 5000,
+	"payee_id": "01jr6vqyf825nx0hyxpg037hpt"
+}
+```
+
+```bash
+curl --request POST \
+  --url http://localhost/api/transfer/create \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer 5|K06KKyxjWxNS8VuJqLGuLKqjGf7IMfgRv6TpFJ12efa38699' \
+  --header 'Content-Type: application/json' \
+  --header 'User-Agent: insomnia/11.0.1' \
+  --data '{
+	"value": 5000,
+	"payee_id": "01jr6vqyf825nx0hyxpg037hpt"
+}'
+```
+
+## Testes
+
+Para executar os testes basta rodar o comando abaixo
+No docker
+```bash
+php artisan test
+```
+No sail
+```bash
+./vendor/bin/sail artisan test
+```
+
+## Filas
+
+Para executar as filas basta rodar o comando abaixo
+
+No docker
+```bash
+php artisan queue:work
+```
+No sail
+```bash
+./vendor/bin/sail queue:work
+```

@@ -1,0 +1,248 @@
+type: collection.insomnia.rest/5.0
+name: mvp fintech
+meta:
+  id: wrk_54ed02d65f1b40f9863bff050680e43a
+  created: 1743653305802
+  modified: 1743653305802
+collection:
+  - name: Transfer
+    meta:
+      id: fld_9c68f6b54dd94293bcd36421d314fe49
+      created: 1743733881034
+      modified: 1743733897041
+      sortKey: -1743733881034
+    children:
+      - url: http://localhost/api/transfer/create
+        name: Transfer
+        meta:
+          id: req_35c2562a3cd844e797fea78b23b095da
+          created: 1743733930002
+          modified: 1743987262926
+          isPrivate: false
+          sortKey: -1743733933606
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"value": 5000,
+            	"payee_id": "01jr6vqyf825nx0hyxpg037hpt"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_97b92f1dcdff4e6dae31ef9c464e85a8
+          - name: User-Agent
+            value: insomnia/11.0.1
+            id: pair_a400c5a03ef048668cd1c5b6a74bb30f
+          - id: pair_884d66d4132b4a039a0326e900c17033
+            name: Accept
+            value: application/json
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_81e5009c13ba415d90f3e0d11d23e1cf',
+            'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+          disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: User
+    meta:
+      id: fld_54d16b553ab149c7866d64f29b2ef075
+      created: 1743733906150
+      modified: 1743733906150
+      sortKey: -1743733906151
+    children:
+      - url: http://localhost/api/user/create
+        name: Register
+        meta:
+          id: req_f1dcd069de144f009e52df50dcebca31
+          created: 1743653314760
+          modified: 1743996364612
+          isPrivate: false
+          sortKey: -1743733923822
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"full_name": "Andreew Kennedy",
+            	"email": "ak@gmail.com",
+            	"cpf": "01822850657",
+            	"phone": "31993920011",
+            	"password": "123456"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - id: pair_ec6252a19d854dea88cc978694efa48f
+            name: Accept
+            value: application/json
+            disabled: false
+          - id: pair_39a73d45d394413c9aebadea68389b8d
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost/api/user/login
+        name: Login
+        meta:
+          id: req_81e5009c13ba415d90f3e0d11d23e1cf
+          created: 1743813698942
+          modified: 1743995775511
+          isPrivate: false
+          sortKey: -1743733923922
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"email": "ak@gmail.com",
+            	"password": "123456"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_cd709bb82c21439b89eab17b88c22f55
+          - name: User-Agent
+            value: insomnia/11.0.1
+            id: pair_cd4e64ae5f7f4413a378e6d0930920df
+          - id: pair_fef214a529f242b697c2cfcd2884d729
+            name: Accept
+            value: application/json
+            disabled: false
+        authentication:
+          type: bearer
+          token: 1|TcU7jB2Y0uUI55tjQBkDBf8FyszGd2xcsoJklbPE9b634f4b
+          disabled: true
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Wallet
+    meta:
+      id: fld_f158b24fa3ab44c08d903c188fa4a240
+      created: 1743734922716
+      modified: 1743734922716
+      sortKey: -1743734922716
+    children:
+      - url: http://localhost/api/wallet/create
+        name: Create
+        meta:
+          id: req_fad79fbfe3aa4c2dbd659deadb930b80
+          created: 1743734927734
+          modified: 1743987235675
+          isPrivate: false
+          sortKey: -1743734949528
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"type": "common"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.1
+            id: pair_04e1a5f8d7e44859a45a145b760be1ef
+          - id: pair_d8f55994f567411a89b6f144d7b9ad15
+            name: Accept
+            value: application/json
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_81e5009c13ba415d90f3e0d11d23e1cf',
+            'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Providers
+    meta:
+      id: fld_9945a3d4609a48188cf3e12be2f390cb
+      created: 1743883292507
+      modified: 1743883292507
+      sortKey: -1743883292507
+    children:
+      - url: https://util.devi.tools/api/v2/authorize
+        name: Authorize
+        meta:
+          id: req_8e543579ab674746a16188d3f37deea3
+          created: 1743883300268
+          modified: 1743995764376
+          isPrivate: false
+          sortKey: -1743883300268
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://util.devi.tools/api/v1/notify
+        name: Notify
+        meta:
+          id: req_4af3bf6765f5400995059b2574bdebce
+          created: 1743883401378
+          modified: 1743995759826
+          isPrivate: false
+          sortKey: -1743883401378
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"email" : "andreew@gmail.com"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_26c5c4e341e7a364bc2566152287ba663a1af5ac
+    created: 1743653305804
+    modified: 1743653305804
+environments:
+  name: Base Environment
+  meta:
+    id: env_26c5c4e341e7a364bc2566152287ba663a1af5ac
+    created: 1743653305803
+    modified: 1743653305803
+    isPrivate: false
