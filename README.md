@@ -180,6 +180,7 @@ curl --request POST \
 
 ## Testes
 
+Os testes têm uma automação para rodar assim que um commit for feito na branch main, mas também podem ser rodados manualmente.
 Para executar os testes basta rodar o comando abaixo
 No docker
 ```bash
