@@ -10,9 +10,9 @@ interface UserRepositoryInterface
 
     public function updateUserWallet(string $userId, string $walletId): void;
 
-    public function findUserByWalletId(string $id): ?User;
+    public function findUserByWalletId(string $walletId): ?User;
 
-    public function findUserById(string $id): ?User;
+    public function findUserById(string $userId): ?User;
 
     public function findUserByCpf(string $cpf): ?User;
 

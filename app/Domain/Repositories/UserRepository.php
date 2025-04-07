@@ -26,14 +26,14 @@ class UserRepository implements UserRepositoryInterface
         $this->model->where('id', $userId)->update(['wallet_id' => $walletId]);
     }
 
-    public function findUserByWalletId(string $id): ?User
+    public function findUserByWalletId(string $walletId): ?User
     {
-        return $this->model->where('wallet_id', $id)->first();
+        return $this->model->where('wallet_id', $walletId)->first();
     }
 
-    public function findUserById(string $id): ?User
+    public function findUserById(string $userId): ?User
     {
-        return $this->model->find($id);
+        return $this->model->find($userId);
     }
 
     public function findUserByCpf(string $cpf): ?User

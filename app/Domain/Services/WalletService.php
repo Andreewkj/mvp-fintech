@@ -78,9 +78,9 @@ class WalletService
         return $wallet;
     }
 
-    public function findWalletByUserId(string $id) : ?Wallet
+    public function findWalletByUserId(string $userId) : ?Wallet
     {
-        return $this->walletRepository->findWalletByUserId($id);
+        return $this->walletRepository->findWalletByUserId($userId);
     }
 
     private function validateIfAccountAlreadyExist(array $data): void

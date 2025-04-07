@@ -11,6 +11,7 @@ use App\Domain\Services\TransferService;
 use App\Domain\Services\WalletService;
 use App\Enums\TransferStatusEnum;
 use App\Models\Transfer;
+use Exception;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -25,7 +26,7 @@ class AuthorizeTransfer implements ShouldQueue
 
     public int $tries = 3;
 
-    public int $backoff = 5;
+    public int $backoff = 2;
 
     private TransferService $transferService;
 
@@ -52,7 +53,7 @@ class AuthorizeTransfer implements ShouldQueue
             $this->bankAdapter = new PicPayAdapter();
 
             if ($this->transfer->status === TransferStatusEnum::STATUS_REFUND->value) {
-                throw new \Exception('Transfer already refunded');
+                throw new Exception('Transfer already refunded');
             }
 
             $this->bankAdapter->authorizeTransfer($this->transfer);

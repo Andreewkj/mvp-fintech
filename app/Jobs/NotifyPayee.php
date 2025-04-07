@@ -17,7 +17,7 @@ class NotifyPayee implements ShouldQueue
 
     public int $tries = 3;
 
-    public int $backoff = 5;
+    public int $backoff = 2;
 
     private NotifyAdapterInterface $notifyAdapter;
 

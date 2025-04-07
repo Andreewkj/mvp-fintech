@@ -13,9 +13,9 @@ interface WalletRepositoryInterface
 
     public function create(array $data) : Wallet;
 
-    public function findWalletByUserId(string $id) : ?Wallet;
+    public function findWalletByUserId(string $userId) : ?Wallet;
 
-    public function userWalletExist(string $id) : bool;
+    public function userWalletExist(string $userId) : bool;
 
     public function chargebackPayeeAmount(string $payeeId, int $amount): void;
 

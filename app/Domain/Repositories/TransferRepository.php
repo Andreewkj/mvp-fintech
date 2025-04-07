@@ -24,9 +24,8 @@ class TransferRepository implements TransferRepositoryInterface
 
     public function updateTransferToRefund(Transfer $transfer): void
     {
-        $this->model->where('id', $transfer->id)->update([
-            'status' => TransferStatusEnum::STATUS_REFUND->value,
-            'refunded_at' => now()->format('Y-m-d H:i:s')
-        ]);
+        $transfer->status = TransferStatusEnum::STATUS_REFUND->value;
+        $transfer->refunded_at = now()->format('Y-m-d H:i:s');
+        $transfer->save();
     }
 }

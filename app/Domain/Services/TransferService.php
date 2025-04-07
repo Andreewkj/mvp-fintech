@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domain\Services;
 
-use App\Domain\Adapters\PicPayAdapter;
 use App\Domain\Repositories\TransferRepository;
 use App\Domain\Repositories\WalletRepository;
 use App\Enums\WalletTypeEnum;
@@ -59,7 +58,7 @@ class TransferService
 
     private function validateTransfer(Wallet $payeeWallet, Wallet $payerWallet, int $amount): void
     {
-        if ($payeeWallet->type === WalletTypeEnum::SHOP_KEEPER->value) {
+        if ($payerWallet->type === WalletTypeEnum::SHOP_KEEPER->value) {
             throw new TransferException('Shop keeper cannot make transfers');
         }
 
@@ -67,7 +66,7 @@ class TransferService
             throw new TransferException('Value must be greater than 0');
         }
 
-        if ($payeeWallet->balance < $amount) {
+        if ($payerWallet->balance < $amount) {
             throw new TransferException('Insufficient balance');
         }
 
@@ -86,6 +85,9 @@ class TransferService
         $this->transferRepository->updateTransferToRefund($transfer);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function refundTransfer(Transfer $transfer): void
     {
         try {
@@ -97,7 +99,9 @@ class TransferService
 
             // Might be a refund notification here
         } catch (\Throwable $e) {
+            DB::rollBack();
             Log::Critical("Error rolling back transfer id: {$transfer->id}, error: {$e->getMessage()}");
+            throw $e;
         }
     }
 }

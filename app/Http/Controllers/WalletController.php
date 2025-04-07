@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 
 use App\Domain\Repositories\WalletRepository;
 use App\Domain\Requests\CreateWalletRequest;
-use App\Domain\Services\TransferService;
 use App\Domain\Services\UserService;
 use App\Domain\Services\WalletService;
 use App\Exceptions\WalletException;
@@ -24,7 +23,6 @@ class WalletController extends Controller
             new WalletRepository(),
             new UserService(),
             null,
-            null
         );
     }
 

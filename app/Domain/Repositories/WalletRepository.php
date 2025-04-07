@@ -6,7 +6,6 @@ namespace App\Domain\Repositories;
 
 use App\Domain\Interfaces\WalletRepositoryInterface;
 use App\Models\Wallet;
-use Illuminate\Support\Facades\DB;
 
 class WalletRepository implements WalletRepositoryInterface
 {
@@ -19,16 +18,14 @@ class WalletRepository implements WalletRepositoryInterface
 
     public function updatePayeeWallet(Wallet $payeeWallet, int $value) : void
     {
-        $this->model->where('id', $payeeWallet->id)->update([
-            'balance' => DB::raw("balance + {$value}")
-        ]);
+        $payeeWallet->balance += $value;
+        $payeeWallet->save();
     }
 
     public function updatePayerWallet(Wallet $payerWallet, int $value) : void
     {
-        $this->model->where('id', $payerWallet->id)->update([
-            'balance' => DB::raw("balance - {$value}")
-        ]);
+        $payerWallet->balance -= $value;
+        $payerWallet->save();
     }
 
     public function create(array $data) : Wallet
@@ -36,28 +33,27 @@ class WalletRepository implements WalletRepositoryInterface
         return $this->model->create($data);
     }
 
-    public function findWalletByUserId(string $id) : ?Wallet
+    public function findWalletByUserId(string $userId) : ?Wallet
     {
-        return $this->model->where('user_id', $id)->first();
+        return $this->model->where('user_id', $userId)->first();
     }
 
-
-    public function userWalletExist(string $id) : bool
+    public function userWalletExist(string $userId) : bool
     {
-        return $this->model->where('user_id', $id)->exists();
+        return $this->model->where('user_id', $userId)->exists();
     }
 
     public function chargebackPayeeAmount(string $payeeId, int $amount): void
     {
-        $this->model->where('user_id', $payeeId)->update([
-            'balance' => DB::raw("balance - {$amount}")
-        ]);
+        $wallet = $this->model->where('user_id', $payeeId)->first();
+        $wallet->balance -= $amount;
+        $wallet->save();
     }
 
     public function chargebackPayerAmount(string $payerId, int $amount): void
     {
-        $this->model->where('user_id', $payerId)->update([
-            'balance' => DB::raw("balance + {$amount}")
-        ]);
+        $wallet = $this->model->where('user_id', $payerId)->first();
+        $wallet->balance += $amount;
+        $wallet->save();
     }
 }
