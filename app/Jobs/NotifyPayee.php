@@ -5,9 +5,11 @@ namespace App\Jobs;
 use App\Domain\Adapters\UltraNotifyAdapter;
 use App\Domain\Interfaces\NotifyAdapterInterface;
 use App\Domain\Services\UserService;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class NotifyPayee implements ShouldQueue
 {
@@ -29,6 +31,7 @@ class NotifyPayee implements ShouldQueue
 
     /**
      * Execute the job.
+     * @throws Throwable
      */
     public function handle(): void
     {
@@ -37,12 +40,12 @@ class NotifyPayee implements ShouldQueue
             $payee = (new UserService())->findUserById($this->userId);
 
             if (is_null($payee)) {
-                throw new \Exception("Payee ID {$payee->id} not found to notify");
+                throw new Exception("Payee ID {$payee->id} not found to notify");
             }
 
             $this->notifyAdapter->notifyByEmail($payee);
             $this->notifyAdapter->notifyBySms($payee);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $adapterName = get_class($this->notifyAdapter);
             if ($this->attempts() >= $this->tries) {
                 Log::Error("Error sending notification to payee id: {$this->userId} with adapter: {$adapterName}, error: {$e->getMessage()}");

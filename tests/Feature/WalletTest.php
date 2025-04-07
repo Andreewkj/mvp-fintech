@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Feature;
 
 use App\Domain\Repositories\WalletRepository;
 use App\Domain\Services\TransferService;

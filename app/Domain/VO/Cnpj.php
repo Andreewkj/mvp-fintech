@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\VO;
 
+use InvalidArgumentException;
+
 class Cnpj
 {
     public function __construct(
@@ -17,7 +19,7 @@ class Cnpj
         $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
 
         if (strlen($cnpj) != 14) {
-            throw new \InvalidArgumentException('Invalid CNPJ length');
+            throw new InvalidArgumentException('Invalid CNPJ length');
         }
 
         $this->validateCheckDigits($cnpj);
@@ -42,7 +44,7 @@ class Cnpj
 
         $result = $sum % 11 < 2 ? 0 : 11 - $sum % 11;
         if ($result != $digits[0]) {
-            throw new \InvalidArgumentException("Invalid CNPJ");
+            throw new InvalidArgumentException("Invalid CNPJ");
         }
 
         $length += 1;
@@ -59,7 +61,7 @@ class Cnpj
         $result = $sum % 11 < 2 ? 0 : 11 - $sum % 11;
 
         if ($result != $digits[1]) {
-            throw new \InvalidArgumentException("Invalid CNPJ");
+            throw new InvalidArgumentException("Invalid CNPJ");
         }
     }
 

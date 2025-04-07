@@ -2,6 +2,8 @@
 
 namespace App\Domain\VO;
 
+use InvalidArgumentException;
+
 class Phone
 {
     public function __construct(
@@ -15,7 +17,7 @@ class Phone
         $phone = preg_replace('/[^0-9]/', '', $phone);
 
         if (strlen($phone) < 10 || strlen($phone) > 11) {
-            throw new \InvalidArgumentException('Invalid phone length');
+            throw new InvalidArgumentException('Invalid phone length');
         }
 
         $this->phone = $phone;

@@ -9,6 +9,7 @@ use App\Domain\VO\Password;
 use App\Domain\Interfaces\RequestValidateInterface;
 use App\Domain\Services\UserService;
 use App\Domain\VO\Phone;
+use InvalidArgumentException;
 
 class CreateUserRequest implements RequestValidateInterface
 {
@@ -24,32 +25,32 @@ class CreateUserRequest implements RequestValidateInterface
     public function validate(): array
     {
         if (empty($this->data['email'])) {
-            throw new \InvalidArgumentException('Email is required');
+            throw new InvalidArgumentException('Email is required');
         }
 
         $this->data['email'] = (new Email($this->data['email']))->getValue();
 
         if ($this->userService->findUserByEmail($this->data['email']) !== null) {
-            throw new \InvalidArgumentException('User already registered');
+            throw new InvalidArgumentException('User already registered');
         }
 
         if (empty($this->data['full_name'])) {
-            throw new \InvalidArgumentException('Full name is required');
+            throw new InvalidArgumentException('Full name is required');
         }
 
         if (empty($this->data['cpf']) && empty($this->data['cnpj'])) {
-            throw new \InvalidArgumentException('Cpf or Cnpj is required');
+            throw new InvalidArgumentException('Cpf or Cnpj is required');
         }
 
         if (empty($this->data['phone'])) {
-            throw new \InvalidArgumentException('phone is required');
+            throw new InvalidArgumentException('phone is required');
         }
 
         $this->data['phone'] = (new Phone($this->data['phone']))->getValue();
 
 
         if (empty($this->data['password'])) {
-            throw new \InvalidArgumentException('Password is required');
+            throw new InvalidArgumentException('Password is required');
         }
 
         $this->data['password'] = (new Password($this->data['password']))->getValue();
@@ -58,7 +59,7 @@ class CreateUserRequest implements RequestValidateInterface
             $this->data['cnpj'] = (new Cnpj($this->data['cnpj']))->getValue();
 
             if ($this->userService->findUserByCnpj($this->data['cnpj']) !== null) {
-                throw new \InvalidArgumentException('User already registered');
+                throw new InvalidArgumentException('User already registered');
             }
 
             $this->data['cpf'] = null;
@@ -68,7 +69,7 @@ class CreateUserRequest implements RequestValidateInterface
             $this->data['cpf'] = (new Cpf($this->data['cpf']))->getValue();
 
             if ($this->userService->findUserByCpf($this->data['cpf']) !== null) {
-                throw new \InvalidArgumentException('User already registered');
+                throw new InvalidArgumentException('User already registered');
             }
 
             $this->data['cnpj'] = null;

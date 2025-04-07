@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Domain\Adapters\PicPayAdapter;
 use App\Domain\Repositories\WalletRepository;
 use App\Domain\Requests\CreateTransferRequest;
 use App\Domain\Services\TransferService;
@@ -15,6 +14,7 @@ use App\Exceptions\WalletException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 
 class TransferController extends Controller
 {
@@ -27,7 +27,6 @@ class TransferController extends Controller
             new WalletRepository(),
             new UserService(),
             null,
-            new PicPayAdapter()
         );
 
         $this->transferService = new TransferService($this->walletService);
@@ -42,7 +41,7 @@ class TransferController extends Controller
             return response()->json([
                 'message' => "transfer completed successfully"
             ], 201);
-        }catch (\InvalidArgumentException | WalletException | TransferException $e) {
+        }catch (InvalidArgumentException | WalletException | TransferException $e) {
             return response()->json([
                 'message' => $e->getMessage()
             ], 400);

@@ -16,6 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class AuthorizeTransfer implements ShouldQueue
 {
@@ -39,6 +40,7 @@ class AuthorizeTransfer implements ShouldQueue
 
     /**
      * Execute the job.
+     * @throws Throwable
      */
     public function handle(): void
     {
@@ -56,7 +58,7 @@ class AuthorizeTransfer implements ShouldQueue
             $this->bankAdapter->authorizeTransfer($this->transfer);
 
             NotifyPayee::dispatch($this->transfer->payee_id);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $adapterName = get_class($this->bankAdapter);
             if ($this->attempts() >= $this->tries) {
                 Log::Critical("Error authorizing transfer id: {$this->transfer->id} with adapter: {$adapterName}, error: {$e->getMessage()}");

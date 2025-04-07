@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\VO;
 
+use InvalidArgumentException;
+
 class Account
 {
     const DIGITAL_AGENCY = '0001';
@@ -20,7 +22,7 @@ class Account
         }
 
         if (strlen($this->account) !== 15) {
-            throw new \InvalidArgumentException('Invalid account length');
+            throw new InvalidArgumentException('Invalid account length');
         }
 
     }

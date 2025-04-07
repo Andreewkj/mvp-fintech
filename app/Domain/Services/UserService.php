@@ -28,14 +28,14 @@ class UserService
         $this->userRepository->updateUserWallet($userId, $walletId);
     }
 
-    public function findUserByWalletId(string $id): ?User
+    public function findUserByWalletId(string $walletId): ?User
     {
-        return $this->userRepository->findUserByWalletId($id);
+        return $this->userRepository->findUserByWalletId($walletId);
     }
 
-    public function findUserById(string $id): ?User
+    public function findUserById(string $userId): ?User
     {
-        return $this->userRepository->findUserById($id);
+        return $this->userRepository->findUserById($userId);
     }
 
     public function findUserByCpf(string $cpf): ?User

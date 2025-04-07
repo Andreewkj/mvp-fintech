@@ -7,6 +7,9 @@ namespace App\Domain\Adapters;
 use App\Domain\Interfaces\BankAdapterInterface;
 use App\Models\Transfer;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Symfony\Component\HttpFoundation\Response;
+use Exception;
 
 class PicPayAdapter implements BankAdapterInterface
 {
@@ -18,8 +21,17 @@ class PicPayAdapter implements BankAdapterInterface
         $this->client = new Client();
         $this->url = env('PICPAY_API_URL');
     }
-    public function authorizeTransfer(Transfer $transfer) : void
+
+    /**
+     * @throws GuzzleException
+     * @throws Exception
+     */
+    public function authorizeTransfer(Transfer $transfer): void
     {
-        $this->client->get($this->url);
+        $response = $this->client->get($this->url);
+
+        if ($response->getStatusCode() !== Response::HTTP_OK) {
+            throw new Exception('Error authorizing transfer id: ' . $transfer->id);
+        }
     }
 }

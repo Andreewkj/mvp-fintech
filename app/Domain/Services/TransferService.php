@@ -44,8 +44,6 @@ class TransferService
         $payerWallet = $this->walletService->findWalletByUserId(auth()->user()->id);
         $value = $data['value'];
 
-        dd($payeeWallet);
-
         if ($payeeWallet === null) {
             throw new TransferException('Payee wallet not found');
         }

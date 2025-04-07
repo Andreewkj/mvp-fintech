@@ -7,6 +7,8 @@ namespace App\Domain\Adapters;
 use App\Domain\Interfaces\NotifyAdapterInterface;
 use App\Models\User;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Exception;
 
 class UltraNotifyAdapter implements NotifyAdapterInterface
 {
@@ -19,6 +21,10 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
         $this->url = env('ULTRA_NOTIFY_API_URL');
     }
 
+    /**
+     * @throws GuzzleException
+     * @throws Exception
+     */
     public function notifyByEmail(User $user): void
     {
         $response = $this->client->post($this->url, [
@@ -26,10 +32,14 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
         ]);
 
         if ($response->getStatusCode() !== 204) {
-            throw new \Exception('Error sending email to user: ' . $user->email);
+            throw new Exception('Error sending email to user: ' . $user->email);
         }
     }
 
+    /**
+     * @throws GuzzleException
+     * @throws Exception
+     */
     public function notifyBySms(User $user): void
     {
         $response = $this->client->post($this->url, [
@@ -37,7 +47,7 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
         ]);
 
         if ($response->getStatusCode() !== 204) {
-            throw new \Exception('Error sending email to user: ' . $user->email);
+            throw new Exception('Error sending email to user: ' . $user->email);
         }
     }
 }

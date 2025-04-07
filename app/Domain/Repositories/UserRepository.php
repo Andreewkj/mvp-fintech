@@ -4,42 +4,50 @@ declare(strict_types=1);
 
 namespace App\Domain\Repositories;
 
+use App\Domain\Interfaces\UserRepositoryInterface;
 use App\Models\User;
 
-class UserRepository
+class UserRepository implements UserRepositoryInterface
 {
+    protected User $model;
+
+    public function __construct()
+    {
+        $this->model = new User();
+    }
+
     public function create(array $data): User
     {
-        return User::create($data);
+        return $this->model->create($data);
     }
 
     public function updateUserWallet(string $userId, string $walletId): void
     {
-        User::where('id', $userId)->update(['wallet_id' => $walletId]);
+        $this->model->where('id', $userId)->update(['wallet_id' => $walletId]);
     }
 
     public function findUserByWalletId(string $id): ?User
     {
-        return User::where('wallet_id', $id)->first();
+        return $this->model->where('wallet_id', $id)->first();
     }
 
     public function findUserById(string $id): ?User
     {
-        return User::find($id);
+        return $this->model->find($id);
     }
 
     public function findUserByCpf(string $cpf): ?User
     {
-        return User::where('cpf', $cpf)->first();
+        return $this->model->where('cpf', $cpf)->first();
     }
 
     public function findUserByEmail(string $cpf): ?User
     {
-        return User::where('email', $cpf)->first();
+        return $this->model->where('email', $cpf)->first();
     }
 
     public function findUserByCnpj(string $cnpj): ?User
     {
-        return User::where('cnpj', $cnpj)->first();
+        return $this->model->where('cnpj', $cnpj)->first();
     }
 }

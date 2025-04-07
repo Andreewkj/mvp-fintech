@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\VO;
 
+use InvalidArgumentException;
+
 class Cpf
 {
     public function __construct(
@@ -17,7 +19,7 @@ class Cpf
         $cpf = preg_replace('/[^0-9]/', '', $cpf);
 
         if (strlen($cpf) != 11) {
-            throw new \InvalidArgumentException('Invalid CPF length');
+            throw new InvalidArgumentException('Invalid CPF length');
         }
 
         $this->validateFirstDigit($cpf);
@@ -40,7 +42,7 @@ class Cpf
         }
 
         if ($remainder != $cpf[9]) {
-            throw new \InvalidArgumentException('Invalid CPF format');
+            throw new InvalidArgumentException('Invalid CPF format');
         }
     }
 
@@ -59,7 +61,7 @@ class Cpf
         }
 
         if ($remainder != $cpf[10]) {
-            throw new \InvalidArgumentException('Invalid CPF format');
+            throw new InvalidArgumentException('Invalid CPF format');
         }
     }
 
