@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Repositories;
 
-use App\Domain\Interfaces\UserRepositoryInterface;
+use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
 use App\Models\User;
 
 class UserRepository implements UserRepositoryInterface

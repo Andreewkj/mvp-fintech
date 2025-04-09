@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Domain\Adapters;
 
-use App\Domain\Interfaces\BankAdapterInterface;
+use App\Domain\Interfaces\Adapters\BankAdapterInterface;
 use App\Models\Transfer;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\Response;
-use Exception;
 
 class PicPayAdapter implements BankAdapterInterface
 {

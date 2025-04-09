@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Domain\Adapters\UltraNotifyAdapter;
-use App\Domain\Interfaces\NotifyAdapterInterface;
+use App\Domain\Interfaces\Adapters\NotifyAdapterInterface;
 use App\Domain\Services\UserService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Repositories;
 
-use App\Domain\Interfaces\TransferRepositoryInterface;
+use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
 use App\Enums\TransferStatusEnum;
 use App\Models\Transfer;
 

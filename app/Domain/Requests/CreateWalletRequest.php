@@ -8,28 +8,22 @@ use InvalidArgumentException;
 
 readonly class CreateWalletRequest implements RequestValidateInterface
 {
-    public function __construct(
-        private array $data
-    ) {
-        $this->validate();
-    }
-
-    public function validate(): array
+    public function validate(array $data): array
     {
-        if (empty($this->data['user_id'])) {
+        if (empty($data['user_id'])) {
             throw new InvalidArgumentException('User was not found, make sure you are logged in, or contact your support team');
         }
 
-        if (empty($this->data['type'])) {
+        if (empty($data['type'])) {
             throw new InvalidArgumentException('Wallet type was not found');
         }
 
-        match ($this->data['type']) {
+        match ($data['type']) {
             'common' => WalletTypeEnum::COMMON,
             'shop_keeper' => WalletTypeEnum::SHOP_KEEPER,
             default => throw new InvalidArgumentException('Wallet type was not a valid type')
         };
 
-        return $this->data;
+        return $data;
     }
 }

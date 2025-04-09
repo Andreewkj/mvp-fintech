@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Domain\Repositories\UserRepository;
 use App\Domain\Requests\CreateLoginRequest;
 use App\Domain\Services\UserService;
 use App\Domain\Requests\CreateUserRequest;
@@ -15,12 +16,16 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
+    public function __construct(
+        protected UserRepository $userRepository,
+        protected CreateUserRequest $createUserRequest,
+        protected UserService $userService,
+        protected CreateLoginRequest $createLoginRequest
+    ) {}
     public function login(Request $request): JsonResponse
     {
         try {
-            $credentials = (new CreateLoginRequest(
-                $request->only('email', 'password')
-            ))->validate();
+            $credentials = $this->createLoginRequest->validate($request->only('email', 'password'));
 
             if (Auth::attempt($credentials)) {
                 $token = $request->user()->createToken('apiToken')->plainTextToken;

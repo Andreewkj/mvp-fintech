@@ -17,7 +17,9 @@ class WalletController extends Controller
 {
     protected WalletService $walletService;
 
-    public function __construct()
+    public function __construct(
+        protected CreateWalletRequest $createWalletRequest
+    )
     {
         $this->walletService = new WalletService(
             new WalletRepository(),
@@ -32,7 +34,7 @@ class WalletController extends Controller
         $data['user_id'] = auth()->user()->id;
 
         try {
-            $data = (new CreateWalletRequest($data))->validate();
+            $data = $this->createWalletRequest->validate($data);
             $this->walletService->createWallet($data);
 
             return response()->json([

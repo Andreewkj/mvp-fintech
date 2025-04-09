@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Domain\Adapters;
 
-use App\Domain\Interfaces\NotifyAdapterInterface;
+use App\Domain\Interfaces\Adapters\NotifyAdapterInterface;
 use App\Models\User;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Exception;
 
 class UltraNotifyAdapter implements NotifyAdapterInterface
 {

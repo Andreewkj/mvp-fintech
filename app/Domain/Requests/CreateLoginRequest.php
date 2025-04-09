@@ -9,25 +9,20 @@ use InvalidArgumentException;
 
 class CreateLoginRequest implements RequestValidateInterface
 {
-    public function __construct(
-        private array $data
-    ) {
-        $this->validate();
-    }
-    public function validate(): array
+    public function validate(array $data): array
     {
-        if (empty($this->data['email'])) {
+        if (empty($data['email'])) {
             throw new InvalidArgumentException('Email is required');
         }
 
-        if (empty($this->data['password'])) {
+        if (empty($data['password'])) {
             throw new InvalidArgumentException('Password is required');
         }
 
-        $this->data['password'] = (new Password($this->data['password']))->getValue();
+        $data['password'] = (new Password($data['password']))->getValue();
 
-        $this->data['email'] = (new Email($this->data['email']))->getValue();
+        $data['email'] = (new Email($data['email']))->getValue();
 
-        return $this->data;
+        return $data;
     }
 }

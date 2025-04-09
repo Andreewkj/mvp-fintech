@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Domain\Interfaces\BankAdapterInterface;
+use App\Domain\Interfaces\Adapters\BankAdapterInterface;
 use App\Domain\Repositories\WalletRepository;
 use App\Domain\Services\TransferService;
 use App\Domain\Services\UserService;

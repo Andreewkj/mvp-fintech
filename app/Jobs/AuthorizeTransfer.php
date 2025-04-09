@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Domain\Adapters\PicPayAdapter;
-use App\Domain\Interfaces\BankAdapterInterface;
+use App\Domain\Interfaces\Adapters\BankAdapterInterface;
 use App\Domain\Repositories\WalletRepository;
 use App\Domain\Services\TransferService;
 use App\Domain\Services\WalletService;

@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Domain\Interfaces;
+namespace App\Domain\Interfaces\Repositories;
 
 use App\Models\Wallet;
-use Illuminate\Support\Facades\DB;
 
 interface WalletRepositoryInterface
 {

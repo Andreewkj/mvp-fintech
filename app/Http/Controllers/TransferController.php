@@ -21,7 +21,9 @@ class TransferController extends Controller
     private TransferService $transferService;
     private WalletService $walletService;
 
-    public function __construct()
+    public function __construct(
+        protected CreateTransferRequest $createTransferRequest
+    )
     {
         $this->walletService = new WalletService(
             new WalletRepository(),
@@ -35,7 +37,7 @@ class TransferController extends Controller
     public function makeTransfer(Request $request): JsonResponse
     {
         try {
-            $data = (new CreateTransferRequest($request->all()))->validate();
+            $data = $this->createTransferRequest->validate($request->all());
             $this->transferService->transfer($data);
 
             return response()->json([
