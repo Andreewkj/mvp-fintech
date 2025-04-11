@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Domain\Repositories\WalletRepository;
 use App\Domain\Requests\CreateWalletRequest;
-use App\Domain\Services\UserService;
+use App\Domain\Services\TransferService;
 use App\Domain\Services\WalletService;
 use App\Exceptions\WalletException;
 use Illuminate\Http\JsonResponse;
@@ -15,18 +14,13 @@ use Illuminate\Support\Facades\Log;
 
 class WalletController extends Controller
 {
-    protected WalletService $walletService;
 
     public function __construct(
-        protected CreateWalletRequest $createWalletRequest
+        protected CreateWalletRequest $createWalletRequest,
+        protected WalletService $walletService,
+        protected TransferService $transferService,
     )
-    {
-        $this->walletService = new WalletService(
-            new WalletRepository(),
-            new UserService(),
-            null,
-        );
-    }
+    {}
 
     public function createWallet(Request $request): JsonResponse
     {

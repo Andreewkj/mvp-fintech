@@ -13,16 +13,13 @@ use InvalidArgumentException;
 
 class CreateUserRequest implements RequestValidateInterface
 {
-    private UserService $userService;
-
     public function __construct(
-        private array $data
+        private array $data,
+        protected UserService $userService
     ) {
-        $this->userService = new UserService();
-        $this->validate();
     }
 
-    public function validate(): array
+    public function validate(array $data): array
     {
         if (empty($this->data['email'])) {
             throw new InvalidArgumentException('Email is required');

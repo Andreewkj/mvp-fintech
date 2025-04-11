@@ -50,8 +50,8 @@ class UserController extends Controller
     public function store(Request $request): User | JsonResponse
     {
         try {
-            $data = (new CreateUserRequest($request->all()))->validate();
-            return (new UserService())->createUser($data);
+            $data = $this->createUserRequest->validate($request->all());
+            return $this->userService->createUser($data);
         } catch (\InvalidArgumentException $e) {
             return response()->json([
                 'message' => $e->getMessage()

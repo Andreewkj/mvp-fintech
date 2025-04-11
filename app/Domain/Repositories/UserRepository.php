@@ -9,12 +9,8 @@ use App\Models\User;
 
 class UserRepository implements UserRepositoryInterface
 {
-    protected User $model;
-
-    public function __construct()
-    {
-        $this->model = new User();
-    }
+    public function __construct(protected User $model)
+    {}
 
     public function create(array $data): User
     {
@@ -41,9 +37,9 @@ class UserRepository implements UserRepositoryInterface
         return $this->model->where('cpf', $cpf)->first();
     }
 
-    public function findUserByEmail(string $cpf): ?User
+    public function findUserByEmail(string $email): ?User
     {
-        return $this->model->where('email', $cpf)->first();
+        return $this->model->where('email', $email)->first();
     }
 
     public function findUserByCnpj(string $cnpj): ?User

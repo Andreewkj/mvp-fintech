@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Services;
 
+use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
 use App\Domain\VO\Account;
-use App\Domain\Repositories\WalletRepository;
 use App\Exceptions\WalletException;
 use App\Jobs\AuthorizeTransfer;
 use App\Models\Transfer;
@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\DB;
 class WalletService
 {
     public function __construct(
-        private WalletRepository      $walletRepository,
-        private ?UserService          $userService = null,
-        private ?TransferService      $transferService = null
+        protected WalletRepositoryInterface $walletRepository,
+        protected UserService $userService,
+        protected TransferService $transferService
     )
     {}
 

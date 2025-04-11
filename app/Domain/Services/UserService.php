@@ -4,19 +4,14 @@ declare(strict_types=1);
 
 namespace App\Domain\Services;
 
-use App\Domain\VO\Cnpj;
-use App\Domain\VO\Cpf;
 use App\Domain\Repositories\UserRepository;
 use App\Models\User;
 
 class UserService
 {
-    protected UserRepository $userRepository;
-
-    public function __construct()
-    {
-        $this->userRepository = new UserRepository();
-    }
+    public function __construct(
+        protected UserRepository $userRepository
+    ) {}
 
     public function createUser(array $data): User
     {
@@ -43,9 +38,9 @@ class UserService
         return $this->userRepository->findUserByCpf($cpf);
     }
 
-    public function findUserByEmail(string $cpf): ?User
+    public function findUserByEmail(string $email): ?User
     {
-        return $this->userRepository->findUserByEmail($cpf);
+        return $this->userRepository->findUserByEmail($email);
     }
 
     public function findUserByCnpj(string $cnpj) : ?User

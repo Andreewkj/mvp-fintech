@@ -10,12 +10,8 @@ use App\Models\Transfer;
 
 class TransferRepository implements TransferRepositoryInterface
 {
-    protected Transfer $model;
-
-    public function __construct()
-    {
-        $this->model = new Transfer();
-    }
+    public function __construct(protected Transfer $model)
+    {}
 
     public function register(array $array): ?Transfer
     {

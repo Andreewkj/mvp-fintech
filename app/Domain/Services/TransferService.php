@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Services;
 
+use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
 use App\Domain\Repositories\TransferRepository;
 use App\Domain\Repositories\WalletRepository;
 use App\Enums\WalletTypeEnum;
@@ -16,22 +17,13 @@ use Illuminate\Support\Facades\Log;
 
 class TransferService
 {
-    protected TransferRepository $transferRepository;
-
     const MINIMUM_TRANSFER_VALUE = 0;
 
     public function __construct(
-        protected WalletService $walletService
+        protected WalletService $walletService,
+        protected TransferRepositoryInterface $transferRepository
     )
-    {
-        $this->walletService = new WalletService(
-            new WalletRepository(),
-            new UserService(),
-            $this
-        );
-
-        $this->transferRepository = new TransferRepository();
-    }
+    {}
 
     /**
      * @throws TransferException

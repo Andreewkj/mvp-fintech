@@ -9,12 +9,8 @@ use App\Models\Wallet;
 
 class WalletRepository implements WalletRepositoryInterface
 {
-    protected Wallet $model;
-
-    public function __construct()
-    {
-        $this->model = new Wallet();
-    }
+    public function __construct(protected Wallet $model)
+    {}
 
     public function updatePayeeWallet(Wallet $payeeWallet, int $value) : void
     {
