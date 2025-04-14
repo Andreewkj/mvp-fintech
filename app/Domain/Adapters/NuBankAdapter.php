@@ -11,7 +11,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\Response;
 
-class PicPayAdapter implements BankAdapterInterface
+class NuBankAdapter implements BankAdapterInterface
 {
     private Client $client;
     private string $url;

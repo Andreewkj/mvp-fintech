@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Domain\Adapters\PicPayAdapter;
+use App\Domain\Adapters\NuBankAdapter;
 use App\Domain\Adapters\UltraNotifyAdapter;
 use App\Domain\Interfaces\Adapters\BankAdapterInterface;
 use App\Domain\Interfaces\Adapters\NotifyAdapterInterface;
@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RequestValidateInterface::class,CreateTransferRequest::class);
         $this->app->bind(RequestValidateInterface::class,CreateLoginRequest::class);
         $this->app->bind(NotifyAdapterInterface::class, UltraNotifyAdapter::class);
-        $this->app->bind(BankAdapterInterface::class, PicPayAdapter::class);
+        $this->app->bind(BankAdapterInterface::class, NuBankAdapter::class);
     }
 
     /**
