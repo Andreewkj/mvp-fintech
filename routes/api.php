@@ -13,7 +13,7 @@ Route::group(['prefix' => '/user'], function () {
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::group(['prefix' => 'wallet'], function () {
+    Route::group(['prefix' => '/wallet'], function () {
         Route::post('/create', [WalletController::class, 'createWallet']);
     });
 

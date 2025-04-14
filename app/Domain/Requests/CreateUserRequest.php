@@ -14,64 +14,63 @@ use InvalidArgumentException;
 class CreateUserRequest implements RequestValidateInterface
 {
     public function __construct(
-        private array $data,
         protected UserService $userService
     ) {
     }
 
     public function validate(array $data): array
     {
-        if (empty($this->data['email'])) {
+        if (empty($data['email'])) {
             throw new InvalidArgumentException('Email is required');
         }
 
-        $this->data['email'] = (new Email($this->data['email']))->getValue();
+        $data['email'] = (new Email($data['email']))->getValue();
 
-        if ($this->userService->findUserByEmail($this->data['email']) !== null) {
+        if ($this->userService->findUserByEmail($data['email']) !== null) {
             throw new InvalidArgumentException('User already registered');
         }
 
-        if (empty($this->data['full_name'])) {
+        if (empty($data['full_name'])) {
             throw new InvalidArgumentException('Full name is required');
         }
 
-        if (empty($this->data['cpf']) && empty($this->data['cnpj'])) {
+        if (empty($data['cpf']) && empty($data['cnpj'])) {
             throw new InvalidArgumentException('Cpf or Cnpj is required');
         }
 
-        if (empty($this->data['phone'])) {
+        if (empty($data['phone'])) {
             throw new InvalidArgumentException('phone is required');
         }
 
-        $this->data['phone'] = (new Phone($this->data['phone']))->getValue();
+        $data['phone'] = (new Phone($data['phone']))->getValue();
 
 
-        if (empty($this->data['password'])) {
+        if (empty($data['password'])) {
             throw new InvalidArgumentException('Password is required');
         }
 
-        $this->data['password'] = (new Password($this->data['password']))->getValue();
+        $data['password'] = (new Password($data['password']))->getValue();
 
-        if (!empty($this->data['cnpj'])) {
-            $this->data['cnpj'] = (new Cnpj($this->data['cnpj']))->getValue();
+        if (!empty($data['cnpj'])) {
+            $data['cnpj'] = (new Cnpj($data['cnpj']))->getValue();
 
-            if ($this->userService->findUserByCnpj($this->data['cnpj']) !== null) {
+            if ($this->userService->findUserByCnpj($data['cnpj']) !== null) {
                 throw new InvalidArgumentException('User already registered');
             }
 
-            $this->data['cpf'] = null;
+            $data['cpf'] = null;
         }
 
-        if (!empty($this->data['cpf'])) {
-            $this->data['cpf'] = (new Cpf($this->data['cpf']))->getValue();
+        if (!empty($data['cpf'])) {
+            $data['cpf'] = (new Cpf($data['cpf']))->getValue();
 
-            if ($this->userService->findUserByCpf($this->data['cpf']) !== null) {
+            if ($this->userService->findUserByCpf($data['cpf']) !== null) {
                 throw new InvalidArgumentException('User already registered');
             }
 
-            $this->data['cnpj'] = null;
+            $data['cnpj'] = null;
         }
 
-        return $this->data;
+        return $data;
     }
 }

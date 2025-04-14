@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Domain\Services;
 
 use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
-use App\Domain\Repositories\TransferRepository;
-use App\Domain\Repositories\WalletRepository;
 use App\Enums\WalletTypeEnum;
 use App\Exceptions\TransferException;
 use App\Exceptions\WalletException;
@@ -48,28 +46,23 @@ class TransferService
         return $this->walletService->transferBetweenWallets($payeeWallet, $payerWallet, $value);
     }
 
-    private function validateTransfer(Wallet $payeeWallet, Wallet $payerWallet, int $amount): void
+    private function validateTransfer(Wallet $payeeWallet, Wallet $payerWallet, int $value): void
     {
         if ($payerWallet->type === WalletTypeEnum::SHOP_KEEPER->value) {
             throw new TransferException('Shop keeper cannot make transfers');
         }
 
-        if ($amount <= self::MINIMUM_TRANSFER_VALUE) {
+        if ($value <= self::MINIMUM_TRANSFER_VALUE) {
             throw new TransferException('Value must be greater than 0');
         }
 
-        if ($payerWallet->balance < $amount) {
+        if ($payerWallet->balance < $value) {
             throw new TransferException('Insufficient balance');
         }
 
         if ($payeeWallet->id === $payerWallet->id) {
             throw new TransferException('Payee and payer cannot be the same');
         }
-    }
-
-    public function register(array $array): ?Transfer
-    {
-        return $this->transferRepository->register($array);
     }
 
     private function updateTransferToRefund(Transfer $transfer): void
@@ -84,8 +77,8 @@ class TransferService
     {
         try {
             DB::transaction(function () use ($transfer) {
-                $this->walletService->chargebackPayeeAmount($transfer->payee_id, $transfer->amount);
-                $this->walletService->chargebackPayerAmount($transfer->payer_id, $transfer->amount);
+                $this->walletService->chargebackPayeeValue($transfer->payee_id, $transfer->value);
+                $this->walletService->chargebackPayerValue($transfer->payer_id, $transfer->value);
                 $this->updateTransferToRefund($transfer);
             });
 

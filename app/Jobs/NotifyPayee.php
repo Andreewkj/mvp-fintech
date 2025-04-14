@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
-use App\Domain\Adapters\UltraNotifyAdapter;
 use App\Domain\Interfaces\Adapters\NotifyAdapterInterface;
-use App\Domain\Services\UserService;
+use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
+use App\Models\Transfer;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -19,13 +19,11 @@ class NotifyPayee implements ShouldQueue
 
     public int $backoff = 2;
 
-    private NotifyAdapterInterface $notifyAdapter;
-
     /**
      * Create a new job instance.
      */
     public function __construct(
-        private readonly String $userId
+        private readonly Transfer $transfer,
     )
     {}
 
@@ -33,22 +31,24 @@ class NotifyPayee implements ShouldQueue
      * Execute the job.
      * @throws Throwable
      */
-    public function handle(): void
+    public function handle(
+        UserRepositoryInterface $userRepository,
+        NotifyAdapterInterface  $notifyAdapter
+    ): void
     {
         try {
-            $this->notifyAdapter = new UltraNotifyAdapter();
-            $payee = (new UserService())->findUserById($this->userId);
+            $payee = $userRepository->findUserByWalletId($this->transfer->payee_wallet);
 
             if (is_null($payee)) {
-                throw new Exception("Payee ID {$payee->id} not found to notify");
+                throw new Exception("Payee ID not found to notify on transfer id: {$this->transfer->id}");
             }
 
-            $this->notifyAdapter->notifyByEmail($payee);
-            $this->notifyAdapter->notifyBySms($payee);
+            $notifyAdapter->notifyByEmail($payee);
+            $notifyAdapter->notifyBySms($payee);
         } catch (Throwable $e) {
-            $adapterName = get_class($this->notifyAdapter);
+            $adapterName = get_class($notifyAdapter);
             if ($this->attempts() >= $this->tries) {
-                Log::Error("Error sending notification to payee id: {$this->userId} with adapter: {$adapterName}, error: {$e->getMessage()}");
+                Log::Error("Error sending notification to payee id: {$payee->id} with adapter: {$adapterName}, error: {$e->getMessage()}");
                 //maybe store notification on some queue or db to try again later
             }
 

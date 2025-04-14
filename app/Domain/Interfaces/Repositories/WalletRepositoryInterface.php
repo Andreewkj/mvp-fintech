@@ -16,7 +16,7 @@ interface WalletRepositoryInterface
 
     public function userWalletExist(string $userId) : bool;
 
-    public function chargebackPayeeAmount(string $payeeId, int $amount): void;
+    public function chargebackPayeeValue(string $payeeId, int $value): void;
 
-    public function chargebackPayerAmount(string $payerId, int $amount): void;
+    public function chargebackPayerValue(string $payerId, int $value): void;
 }

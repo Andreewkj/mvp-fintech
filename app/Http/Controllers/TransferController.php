@@ -30,11 +30,11 @@ class TransferController extends Controller
             return response()->json([
                 'message' => "transfer completed successfully"
             ], 201);
-        }catch (InvalidArgumentException | WalletException | TransferException $e) {
+        } catch (InvalidArgumentException | WalletException | TransferException $e) {
             return response()->json([
                 'message' => $e->getMessage()
             ], 400);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error("Error creating transfer, error: {$e->getMessage()}");
             return response()->json([
                 'message' => "Apparently something went wrong with your transfer, but don't worry, we will rollback the values for you"

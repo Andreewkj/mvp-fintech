@@ -6,14 +6,16 @@ namespace App\Enums;
 
 enum TransferStatusEnum: String
 {
-    case STATUS_ACTIVE = 'active';
-    case STATUS_REFUND = 'refund';
+    case STATUS_AUTHORIZED = 'authorized';
+    case STATUS_DENIED = 'denied';
+    case STATUS_PENDING = 'pending';
 
     public static function toArray(): array
     {
         return [
-            self::STATUS_ACTIVE->value,
-            self::STATUS_REFUND->value
+            self::STATUS_PENDING->value,
+            self::STATUS_AUTHORIZED->value,
+            self::STATUS_DENIED->value
         ];
     }
 }

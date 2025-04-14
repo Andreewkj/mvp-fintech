@@ -6,6 +6,7 @@ namespace App\Domain\Repositories;
 
 use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
 use App\Models\Wallet;
+use Illuminate\Support\Facades\Cache;
 
 class WalletRepository implements WalletRepositoryInterface
 {
@@ -14,14 +15,28 @@ class WalletRepository implements WalletRepositoryInterface
 
     public function updatePayeeWallet(Wallet $payeeWallet, int $value) : void
     {
-        $payeeWallet->balance += $value;
-        $payeeWallet->save();
+        $lock = Cache::lock('wallet:' . $payeeWallet->id . ':lock', 5);
+        if ($lock->get()) {
+            try {
+                $payeeWallet->balance += $value;
+                $payeeWallet->save();
+            } finally {
+                $lock->release();
+            }
+        }
     }
 
     public function updatePayerWallet(Wallet $payerWallet, int $value) : void
     {
-        $payerWallet->balance -= $value;
-        $payerWallet->save();
+        $lock = Cache::lock('wallet:' . $payerWallet->id . ':lock', 5);
+        if ($lock->get()) {
+            try {
+                $payerWallet->balance -= $value;
+                $payerWallet->save();
+            } finally {
+                $lock->release();
+            }
+        }
     }
 
     public function create(array $data) : Wallet
@@ -39,17 +54,32 @@ class WalletRepository implements WalletRepositoryInterface
         return $this->model->where('user_id', $userId)->exists();
     }
 
-    public function chargebackPayeeAmount(string $payeeId, int $amount): void
+    public function chargebackPayeeValue(string $payeeId, int $value): void
     {
         $wallet = $this->model->where('user_id', $payeeId)->first();
-        $wallet->balance -= $amount;
-        $wallet->save();
+
+        $lock = Cache::lock('wallet:' . $wallet->id . ':lock', 5);
+        if ($lock->get()) {
+            try {
+                $wallet->balance -= $value;
+                $wallet->save();
+            } finally {
+                $lock->release();
+            }
+        }
     }
 
-    public function chargebackPayerAmount(string $payerId, int $amount): void
+    public function chargebackPayerValue(string $payerId, int $value): void
     {
         $wallet = $this->model->where('user_id', $payerId)->first();
-        $wallet->balance += $amount;
-        $wallet->save();
+        $lock = Cache::lock('wallet:' . $wallet->id . ':lock', 5);
+        if ($lock->get()) {
+            try {
+                $wallet->balance += $value;
+                $wallet->save();
+            } finally {
+                $lock->release();
+            }
+        }
     }
 }

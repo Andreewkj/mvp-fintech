@@ -14,11 +14,10 @@ use Illuminate\Support\Facades\Log;
 
 class WalletController extends Controller
 {
-
     public function __construct(
         protected CreateWalletRequest $createWalletRequest,
         protected WalletService $walletService,
-        protected TransferService $transferService,
+        protected TransferService $transferService
     )
     {}
 

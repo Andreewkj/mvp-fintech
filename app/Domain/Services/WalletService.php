@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Services;
 
+use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
+use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
 use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
 use App\Domain\VO\Account;
 use App\Exceptions\WalletException;
@@ -16,8 +18,8 @@ class WalletService
 {
     public function __construct(
         protected WalletRepositoryInterface $walletRepository,
-        protected UserService $userService,
-        protected TransferService $transferService
+        protected UserRepositoryInterface $userRepository,
+        protected TransferRepositoryInterface $transferRepository
     )
     {}
 
@@ -27,16 +29,10 @@ class WalletService
             $transfer = null;
 
             DB::transaction(function () use ($payeeWallet, $payerWallet, $value, &$transfer) {
-                $this->updatePayeeWallet($payeeWallet, $value);
-                $this->updatePayerWallet($payerWallet, $value);
-
-                $payeeUser = $this->userService->findUserByWalletId($payeeWallet->id);
-                $payerUser = $this->userService->findUserByWalletId($payerWallet->id);
-
-                $transfer = $this->transferService->register([
-                    'payee_id' => $payeeUser->id,
-                    'payer_id' => $payerUser->id,
-                    'amount'   => $value
+                $transfer = $this->transferRepository->register([
+                    'payee_wallet_id' => $payeeWallet->id,
+                    'payer_wallet_id' => $payerWallet->id,
+                    'value'   => $value
                 ]);
             });
 
@@ -53,16 +49,6 @@ class WalletService
         }
     }
 
-    private function updatePayeeWallet(Wallet $payeeWallet, int $value): void
-    {
-        $this->walletRepository->updatePayeeWallet($payeeWallet, $value);
-    }
-
-    private function updatePayerWallet(Wallet $payerWallet, int $value): void
-    {
-        $this->walletRepository->updatePayerWallet($payerWallet, $value);
-    }
-
     /**
      * @throws WalletException
      */
@@ -73,7 +59,7 @@ class WalletService
 
         $this->validateIfAccountAlreadyExist($data);
         $wallet = $this->walletRepository->create($data);
-        $this->userService->updateUserWallet($data['user_id'], $wallet->id);
+        $this->userRepository->updateUserWallet($data['user_id'], $wallet->id);
 
         return $wallet;
     }
@@ -90,13 +76,13 @@ class WalletService
         }
     }
 
-    public function chargebackPayeeAmount(string $payeeId, int $amount): void
+    public function chargebackPayeeValue(string $payeeId, int $value): void
     {
-        $this->walletRepository->chargebackPayeeAmount($payeeId, $amount);
+        $this->walletRepository->chargebackPayeeValue($payeeId, $value);
     }
 
-    public function chargebackPayerAmount(string $payerId, int $amount): void
+    public function chargebackPayerValue(string $payerId, int $value): void
     {
-        $this->walletRepository->chargebackPayerAmount($payerId, $amount);
+        $this->walletRepository->chargebackPayerValue($payerId, $value);
     }
 }

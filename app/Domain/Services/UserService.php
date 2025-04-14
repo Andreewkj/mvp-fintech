@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Domain\Services;
 
-use App\Domain\Repositories\UserRepository;
+use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
 use App\Models\User;
 
 class UserService
 {
     public function __construct(
-        protected UserRepository $userRepository
+        protected UserRepositoryInterface $userRepository
     ) {}
 
     public function createUser(array $data): User
