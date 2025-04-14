@@ -19,7 +19,7 @@ class NuBankAdapter implements BankAdapterInterface
     public function __construct()
     {
         $this->client = new Client();
-        $this->url = env('PICPAY_API_URL');
+        $this->url = env('NUBANK_API_URL');
     }
 
     /**
