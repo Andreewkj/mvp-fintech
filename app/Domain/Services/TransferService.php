@@ -64,29 +64,4 @@ class TransferService
             throw new TransferException('Payee and payer cannot be the same');
         }
     }
-
-    private function updateTransferToRefund(Transfer $transfer): void
-    {
-        $this->transferRepository->updateTransferToRefund($transfer);
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    public function refundTransfer(Transfer $transfer): void
-    {
-        try {
-            DB::transaction(function () use ($transfer) {
-                $this->walletService->chargebackPayeeValue($transfer->payee_id, $transfer->value);
-                $this->walletService->chargebackPayerValue($transfer->payer_id, $transfer->value);
-                $this->updateTransferToRefund($transfer);
-            });
-
-            // Might be a refund notification here
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            Log::Critical("Error rolling back transfer id: {$transfer->id}, error: {$e->getMessage()}");
-            throw $e;
-        }
-    }
 }

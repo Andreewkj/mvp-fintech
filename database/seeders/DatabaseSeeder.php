@@ -32,14 +32,17 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('123456'),
         ]);
 
-        Wallet::factory()->create([
+        $wallet1 = Wallet::factory()->create([
             'user_id' => $user1,
             'balance' => 100000,
         ]);
 
-        Wallet::factory()->create([
+        $wallet2 = Wallet::factory()->create([
             'user_id' => $user2,
             'type' => 'shop_keeper',
         ]);
+
+        $user1->update(['wallet_id' => $wallet1->id]);
+        $user2->update(['wallet_id' => $wallet2->id]);
     }
 }

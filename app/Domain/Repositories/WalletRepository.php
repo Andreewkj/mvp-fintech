@@ -13,11 +13,12 @@ class WalletRepository implements WalletRepositoryInterface
     public function __construct(protected Wallet $model)
     {}
 
-    public function updatePayeeWallet(Wallet $payeeWallet, int $value) : void
+    public function updatePayeeWalletById(String $payeeWalletId, int $value) : void
     {
-        $lock = Cache::lock('wallet:' . $payeeWallet->id . ':lock', 5);
+        $lock = Cache::lock('wallet:' . $payeeWalletId . ':lock', 5);
         if ($lock->get()) {
             try {
+                $payeeWallet = $this->model->where('id', $payeeWalletId)->first();
                 $payeeWallet->balance += $value;
                 $payeeWallet->save();
             } finally {
@@ -26,11 +27,12 @@ class WalletRepository implements WalletRepositoryInterface
         }
     }
 
-    public function updatePayerWallet(Wallet $payerWallet, int $value) : void
+    public function updatePayerWalletById(String $payerWalletId, int $value) : void
     {
-        $lock = Cache::lock('wallet:' . $payerWallet->id . ':lock', 5);
+        $lock = Cache::lock('wallet:' . $payerWalletId . ':lock', 5);
         if ($lock->get()) {
             try {
+                $payerWallet = $this->model->where('id', $payerWalletId)->first();
                 $payerWallet->balance -= $value;
                 $payerWallet->save();
             } finally {
@@ -52,6 +54,11 @@ class WalletRepository implements WalletRepositoryInterface
     public function userWalletExist(string $userId) : bool
     {
         return $this->model->where('user_id', $userId)->exists();
+    }
+
+    public function findUserByWalletById(string $walletId) : ?Wallet
+    {
+        return $this->model->where('id', $walletId)->first();
     }
 
     public function chargebackPayeeValue(string $payeeId, int $value): void

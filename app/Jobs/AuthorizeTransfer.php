@@ -51,8 +51,8 @@ class AuthorizeTransfer implements ShouldQueue
 
             $bankAdapter->authorizeTransfer($this->transfer);
 
-            $walletRepository->updatePayeeWallet($this->transfer->payee_wallet, $this->transfer->value);
-            $walletRepository->updatePayerWallet($this->transfer->payerWallet, $this->transfer->value);
+            $walletRepository->updatePayeeWalletById($this->transfer->payee_wallet_id, $this->transfer->value);
+            $walletRepository->updatePayerWalletById($this->transfer->payer_wallet_id, $this->transfer->value);
 
             NotifyPayee::dispatch($this->transfer);
         } catch (Throwable $e) {

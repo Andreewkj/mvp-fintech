@@ -17,7 +17,7 @@ class NotifyPayee implements ShouldQueue
 
     public int $tries = 3;
 
-    public int $backoff = 2;
+    public int $backoff = 5;
 
     /**
      * Create a new job instance.
@@ -37,7 +37,7 @@ class NotifyPayee implements ShouldQueue
     ): void
     {
         try {
-            $payee = $userRepository->findUserByWalletId($this->transfer->payee_wallet);
+            $payee = $userRepository->findUserByWalletId($this->transfer->payee_wallet_id);
 
             if (is_null($payee)) {
                 throw new Exception("Payee ID not found to notify on transfer id: {$this->transfer->id}");
