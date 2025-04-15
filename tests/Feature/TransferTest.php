@@ -1,18 +1,18 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
+use App\Application\Services\TransferService;
+use App\Application\Services\UserService;
+use App\Application\Services\WalletService;
 use App\Domain\Interfaces\Adapters\BankAdapterInterface;
-use App\Domain\Repositories\WalletRepository;
-use App\Domain\Services\TransferService;
-use App\Domain\Services\UserService;
-use App\Domain\Services\WalletService;
 use App\Enums\WalletTypeEnum;
 use App\Exceptions\TransferException;
 use App\Exceptions\WalletException;
-use App\Models\Transfer;
-use App\Models\User;
-use App\Models\Wallet;
+use App\Infra\Repositories\WalletRepository;
+use App\Models\TransferModel;
+use App\Models\UserModel;
+use App\Models\WalletModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Auth;
@@ -33,17 +33,11 @@ class TransferTest extends TestCase
         $this->userService = $this->createMock(UserService::class);
         $this->transferService = $this->createMock(TransferService::class);
         $this->bankAdapter = $this->createMock(BankAdapterInterface::class);
-
-        $this->walletService = new WalletService(
-            $this->walletRepository,
-            $this->userService,
-            $this->transferService,
-        );
     }
 
     public function testTransferFailsWhenPayeeWalletNotFound()
     {
-        $user = User::factory()->create();
+        $user = UserModel::factory()->create();
         Auth::login($user);
 
         $mockWalletService = $this->createMock(WalletService::class);
@@ -52,7 +46,7 @@ class TransferTest extends TestCase
                 if ($userId === 'payee-id') {
                     return null;
                 } elseif ($userId === 'payer-id') {
-                    return new Wallet(['id' => $userId]);
+                    return new WalletModel(['id' => $userId]);
                 }
                 return null;
             });
@@ -79,14 +73,14 @@ class TransferTest extends TestCase
 
         $this->expectException(WalletException::class);
 
-        $payeeWallet = new Wallet();
+        $payeeWallet = new WalletModel();
         $payeeWallet->id = Str::ulid()->toString();
-        $payerWallet = new Wallet();
+        $payerWallet = new WalletModel();
         $payerWallet->id = Str::ulid()->toString();
 
-        $payeeUser = new User();
+        $payeeUser = new UserModel();
         $payeeUser->id = Str::ulid()->toString();
-        $payerUser = new User();
+        $payerUser = new UserModel();
         $payerUser->id = Str::ulid()->toString();
 
         $this->userService->method('findUserByWalletId')
@@ -112,28 +106,28 @@ class TransferTest extends TestCase
 
         $payeeId = Str::ulid()->toString();
         $payeeWalletId = Str::ulid()->toString();
-        $payeeWallet = new Wallet(['id' => $payeeWalletId, 'user_id' => $payeeId, 'balance' => 10000, 'type' => WalletTypeEnum::COMMON->value]);
+        $payeeWallet = new WalletModel(['id' => $payeeWalletId, 'user_id' => $payeeId, 'balance' => 10000, 'type' => WalletTypeEnum::COMMON->value]);
         $payeeWallet->id = $payeeWalletId;
 
         $payerId = Str::ulid()->toString();
         $payerWalletId = Str::ulid()->toString();
-        $payerWallet = new Wallet(['id' => $payerWalletId, 'user_id' => $payerId, 'balance' => 10000, 'type' => WalletTypeEnum::COMMON->value]);
+        $payerWallet = new WalletModel(['id' => $payerWalletId, 'user_id' => $payerId, 'balance' => 10000, 'type' => WalletTypeEnum::COMMON->value]);
         $payerWallet->id = $payerWalletId;
 
         $transferId = Str::ulid()->toString();
-        $transfer = new Transfer(['id' => $transferId, 'payee_id' => $payeeId, 'payer_id' => $payerId, 'amount' => 10000]);
+        $transfer = new TransferModel(['id' => $transferId, 'payee_id' => $payeeId, 'payer_id' => $payerId, 'amount' => 10000]);
         $transfer->id = $transferId;
 
-        $payeeUser = new User(['id' => $payeeId, 'name' => 'payee', 'email' => 'mFk2w@example.com', 'phone' => '1234567890']);
+        $payeeUser = new UserModel(['id' => $payeeId, 'name' => 'payee', 'email' => 'mFk2w@example.com', 'phone' => '1234567890']);
         $payeeUser->id = $payeeId;
 
-        $payerUser = new User(['id' => $payerId, 'name' => 'payer', 'email' => 'mFk2w@example.com', 'phone' => '1234567890']);
+        $payerUser = new UserModel(['id' => $payerId, 'name' => 'payer', 'email' => 'mFk2w@example.com', 'phone' => '1234567890']);
         $payerUser->id = $payerId;
 
         $value = 100;
 
         $transferId = Str::ulid()->toString();
-        $transfer = new Transfer(['id' => $transferId, 'payee_id' => $payeeId, 'payer_id' => $payerId, 'amount' => 10000]);
+        $transfer = new TransferModel(['id' => $transferId, 'payee_id' => $payeeId, 'payer_id' => $payerId, 'amount' => 10000]);
         $transfer->id = $transferId;
 
         $this->transferService->method('register')
@@ -151,6 +145,6 @@ class TransferTest extends TestCase
 
         $result = $this->walletService->transferBetweenWallets($payeeWallet, $payerWallet, $value);
 
-        $this->assertInstanceOf(Transfer::class, $result);
+        $this->assertInstanceOf(TransferModel::class, $result);
     }
 }

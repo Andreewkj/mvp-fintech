@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\UserModel;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Models\Wallet;
+use App\Models\WalletModel;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $user1 = User::factory()->create([
+        $user1 = UserModel::factory()->create([
             'full_name'  => 'Andreew Januario',
             'email' => 'andreew@gmail.com',
             'cpf'   => '31543499015',
@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('123456'),
         ]);
 
-        $user2 = User::factory()->create([
+        $user2 = UserModel::factory()->create([
             'full_name'  => 'Alecssander Januario',
             'email' => 'alecssander@gmail.com',
             'cnpj'  => '55456074000129',
@@ -32,12 +32,12 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('123456'),
         ]);
 
-        $wallet1 = Wallet::factory()->create([
+        $wallet1 = WalletModel::factory()->create([
             'user_id' => $user1,
             'balance' => 100000,
         ]);
 
-        $wallet2 = Wallet::factory()->create([
+        $wallet2 = WalletModel::factory()->create([
             'user_id' => $user2,
             'type' => 'shop_keeper',
         ]);

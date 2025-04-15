@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Adapters;
+namespace App\Infra\Adapters;
 
 use App\Domain\Interfaces\Adapters\NotifyAdapterInterface;
-use App\Models\User;
+use App\Models\UserModel;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -25,7 +25,7 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
      * @throws GuzzleException
      * @throws Exception
      */
-    public function notifyByEmail(User $user): void
+    public function notifyByEmail(UserModel $user): void
     {
         $response = $this->client->post($this->url, [
             $user->email
@@ -40,7 +40,7 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
      * @throws GuzzleException
      * @throws Exception
      */
-    public function notifyBySms(User $user): void
+    public function notifyBySms(UserModel $user): void
     {
         $response = $this->client->post($this->url, [
             $user->phone

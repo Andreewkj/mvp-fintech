@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Services;
+namespace App\Application\Services;
 
+use App\Domain\Entities\Transfer;
 use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
 use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
 use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
 use App\Domain\VO\Account;
 use App\Exceptions\WalletException;
 use App\Jobs\AuthorizeTransfer;
-use App\Models\Transfer;
-use App\Models\Wallet;
+use App\Domain\Entities\Wallet;
 use Illuminate\Support\Facades\DB;
 
 class WalletService
@@ -23,6 +23,9 @@ class WalletService
     )
     {}
 
+    /**
+     * @throws WalletException
+     */
     public function transferBetweenWallets(Wallet $payeeWallet, Wallet $payerWallet, int $value): Transfer
     {
         try {
@@ -30,14 +33,14 @@ class WalletService
 
             DB::transaction(function () use ($payeeWallet, $payerWallet, $value, &$transfer) {
                 $transfer = $this->transferRepository->register([
-                    'payee_wallet_id' => $payeeWallet->id,
-                    'payer_wallet_id' => $payerWallet->id,
+                    'payee_wallet_id' => $payeeWallet->getId(),
+                    'payer_wallet_id' => $payerWallet->getId(),
                     'value'   => $value
                 ]);
             });
 
             if (is_null($transfer)) {
-                throw new WalletException('Transfer could not be created');
+                throw new WalletException('TransferModel could not be created');
             }
 
             AuthorizeTransfer::dispatch($transfer);
@@ -59,7 +62,7 @@ class WalletService
 
         $this->validateIfAccountAlreadyExist($data);
         $wallet = $this->walletRepository->create($data);
-        $this->userRepository->updateUserWallet($data['user_id'], $wallet->id);
+        $this->userRepository->updateUserWallet($data['user_id'], $wallet->getId());
 
         return $wallet;
     }
@@ -69,20 +72,13 @@ class WalletService
         return $this->walletRepository->findWalletByUserId($userId);
     }
 
+    /**
+     * @throws WalletException
+     */
     private function validateIfAccountAlreadyExist(array $data): void
     {
         if ($this->walletRepository->userWalletExist($data['user_id'])) {
-            throw new WalletException('Wallet already exists');
+            throw new WalletException('WalletModel already exists');
         }
-    }
-
-    public function chargebackPayeeValue(string $payeeId, int $value): void
-    {
-        $this->walletRepository->chargebackPayeeValue($payeeId, $value);
-    }
-
-    public function chargebackPayerValue(string $payerId, int $value): void
-    {
-        $this->walletRepository->chargebackPayerValue($payerId, $value);
     }
 }

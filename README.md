@@ -142,7 +142,7 @@ curl --request POST \
   --url http://localhost/api/user/login \
   --header 'Accept: application/json' \
   --header 'Content-Type: application/json' \
-  --header 'User-Agent: insomnia/11.0.1' \
+  --header 'UserModel-Agent: insomnia/11.0.1' \
   --data '{
 	"email": "ak@gmail.com",
 	"password": "123456"
@@ -166,7 +166,7 @@ curl --request POST \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer 5|K06KKyxjWxNS8VuJqLGuLKqjGf7IMfgRv6TpFJ12efa38699' \
   --header 'Content-Type: application/json' \
-  --header 'User-Agent: insomnia/11.0.1' \
+  --header 'UserModel-Agent: insomnia/11.0.1' \
   --data '{
 	"type": "common"
 }'
@@ -188,7 +188,7 @@ curl --request POST \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer 5|K06KKyxjWxNS8VuJqLGuLKqjGf7IMfgRv6TpFJ12efa38699' \
   --header 'Content-Type: application/json' \
-  --header 'User-Agent: insomnia/11.0.1' \
+  --header 'UserModel-Agent: insomnia/11.0.1' \
   --data '{
 	"value": 5000,
 	"payee_id": "01jr6vqyf825nx0hyxpg037hpt"

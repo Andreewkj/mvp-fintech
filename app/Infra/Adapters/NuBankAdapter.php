@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Adapters;
+namespace App\Infra\Adapters;
 
 use App\Domain\Interfaces\Adapters\BankAdapterInterface;
-use App\Models\Transfer;
+use App\Models\TransferModel;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -26,7 +26,7 @@ class NuBankAdapter implements BankAdapterInterface
      * @throws GuzzleException
      * @throws Exception
      */
-    public function authorizeTransfer(Transfer $transfer): void
+    public function authorizeTransfer(TransferModel $transfer): void
     {
         $response = $this->client->get($this->url);
 

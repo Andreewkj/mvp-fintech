@@ -6,9 +6,9 @@ use App\Domain\VO\Account;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Wallet>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\WalletModel>
  */
-class WalletFactory extends Factory
+class WalletModelFactory extends Factory
 {
     /**
      * Define the model's default state.

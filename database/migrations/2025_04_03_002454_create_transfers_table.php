@@ -18,7 +18,8 @@ return new class extends Migration
             $table->enum('status', TransferStatusEnum::toArray())->default(TransferStatusEnum::STATUS_PENDING->value);
             $table->foreignUlid('payer_wallet_id')->references('id')->on('wallets');
             $table->foreignUlid('payee_wallet_id')->references('id')->on('wallets');
-            $table->dateTime('refunded_at')->nullable();
+            $table->dateTime('authorized_at')->nullable();
+            $table->dateTime('denied_at')->nullable();
             $table->timestamps();
         });
     }

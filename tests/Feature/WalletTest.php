@@ -1,13 +1,13 @@
 <?php
 
-namespace Feature;
+namespace Tests\Feature;
 
-use App\Domain\Repositories\WalletRepository;
-use App\Domain\Services\TransferService;
-use App\Domain\Services\UserService;
-use App\Domain\Services\WalletService;
+use App\Application\Services\TransferService;
+use App\Application\Services\UserService;
+use App\Application\Services\WalletService;
 use App\Enums\WalletTypeEnum;
-use App\Models\Wallet;
+use App\Infra\Repositories\WalletRepository;
+use App\Models\WalletModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -36,7 +36,7 @@ class WalletTest extends TestCase
         $userId = Str::ulid()->toString();
         $walletId = Str::ulid()->toString();
 
-        $wallet = new Wallet(['id' => $walletId, 'user_id' => $userId, 'balance' => 0, 'type' => WalletTypeEnum::COMMON->value]);
+        $wallet = new WalletModel(['id' => $walletId, 'user_id' => $userId, 'balance' => 0, 'type' => WalletTypeEnum::COMMON->value]);
         $wallet->id = $walletId;
 
         $this->walletRepository->method('create')->willReturn($wallet);
@@ -49,7 +49,7 @@ class WalletTest extends TestCase
 
         $result = $walletService->createWallet(['user_id' => $userId, 'amount' => 500]);
 
-        $this->assertInstanceOf(Wallet::class, $result);
+        $this->assertInstanceOf(WalletModel::class, $result);
         $this->assertEquals($walletId, $result->id);
         $this->assertEquals($userId, $result->user_id);
     }

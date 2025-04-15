@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Services;
+namespace App\Application\Services;
 
 use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
-use App\Models\User;
+use App\Domain\Entities\User;
 
 class UserService
 {
@@ -28,11 +28,6 @@ class UserService
         return $this->userRepository->findUserByWalletId($walletId);
     }
 
-    public function findUserById(string $userId): ?User
-    {
-        return $this->userRepository->findUserById($userId);
-    }
-
     public function findUserByCpf(string $cpf): ?User
     {
         return $this->userRepository->findUserByCpf($cpf);
@@ -43,7 +38,7 @@ class UserService
         return $this->userRepository->findUserByEmail($email);
     }
 
-    public function findUserByCnpj(string $cnpj) : ?User
+    public function findUserByCnpj(string $cnpj): ?User
     {
         return $this->userRepository->findUserByCnpj($cnpj);
     }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Application\Services\TransferService;
+use App\Application\Services\WalletService;
 use App\Domain\Requests\CreateWalletRequest;
-use App\Domain\Services\TransferService;
-use App\Domain\Services\WalletService;
 use App\Exceptions\WalletException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,7 +31,7 @@ class WalletController extends Controller
             $this->walletService->createWallet($data);
 
             return response()->json([
-                'message' => "Wallet was created successfully"
+                'message' => "WalletModel was created successfully"
             ], 201);
         } catch (\InvalidArgumentException | WalletException $e) {
             return response()->json([

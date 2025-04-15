@@ -2,7 +2,7 @@
 
 namespace App\Domain\Interfaces\Repositories;
 
-use App\Models\User;
+use App\Domain\Entities\User;
 
 interface UserRepositoryInterface
 {
@@ -11,8 +11,6 @@ interface UserRepositoryInterface
     public function updateUserWallet(string $userId, string $walletId): void;
 
     public function findUserByWalletId(string $walletId): ?User;
-
-    public function findUserById(string $userId): ?User;
 
     public function findUserByCpf(string $cpf): ?User;
 

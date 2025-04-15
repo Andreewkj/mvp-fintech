@@ -8,7 +8,7 @@ use App\Domain\Interfaces\Adapters\BankAdapterInterface;
 use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
 use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
 use App\Enums\TransferStatusEnum;
-use App\Models\Transfer;
+use App\Models\TransferModel;
 use Exception;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,7 +30,7 @@ class AuthorizeTransfer implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        private readonly Transfer $transfer
+        private readonly TransferModel $transfer
     )
     {}
 

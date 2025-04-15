@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Domain\Repositories\UserRepository;
+use App\Application\Services\UserService;
 use App\Domain\Requests\CreateLoginRequest;
-use App\Domain\Services\UserService;
 use App\Domain\Requests\CreateUserRequest;
-use App\Models\User;
+use App\Domain\Entities\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +16,6 @@ use Illuminate\Support\Facades\Log;
 class UserController extends Controller
 {
     public function __construct(
-        protected UserRepository $userRepository,
         protected CreateUserRequest $createUserRequest,
         protected UserService $userService,
         protected CreateLoginRequest $createLoginRequest

@@ -2,7 +2,7 @@
 
 namespace App\Domain\Interfaces\Repositories;
 
-use App\Models\Wallet;
+use App\Domain\Entities\Wallet;
 
 interface WalletRepositoryInterface
 {
@@ -17,8 +17,4 @@ interface WalletRepositoryInterface
     public function userWalletExist(string $userId) : bool;
 
     public function findUserByWalletById(string $walletId) : ?Wallet;
-
-    public function chargebackPayeeValue(string $payeeId, int $value): void;
-
-    public function chargebackPayerValue(string $payerId, int $value): void;
 }

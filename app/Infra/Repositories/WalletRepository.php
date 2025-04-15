@@ -2,16 +2,30 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Repositories;
+namespace App\Infra\Repositories;
 
 use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
-use App\Models\Wallet;
+use App\Infra\Mappers\WalletMapper;
+use App\Models\WalletModel;
 use Illuminate\Support\Facades\Cache;
+use App\Domain\Entities\Wallet;
 
 class WalletRepository implements WalletRepositoryInterface
 {
-    public function __construct(protected Wallet $model)
+    public function __construct(protected WalletModel $model)
     {}
+
+    public function save(Wallet $entity): void
+    {
+        $model = $this->model->find($entity->getId());
+
+        if (!$model) {
+            throw new \Exception('Wallet not found');
+        }
+
+        $model = WalletMapper::toModel($entity, $model);
+        $model->save();
+    }
 
     public function updatePayeeWalletById(String $payeeWalletId, int $value) : void
     {
@@ -43,12 +57,15 @@ class WalletRepository implements WalletRepositoryInterface
 
     public function create(array $data) : Wallet
     {
-        return $this->model->create($data);
+        $model = $this->model->create($data);
+        return WalletMapper::toEntity($model);
     }
 
     public function findWalletByUserId(string $userId) : ?Wallet
     {
-        return $this->model->where('user_id', $userId)->first();
+        $model = $this->model->where('user_id', $userId)->first();
+        return $model ? WalletMapper::toEntity($model) : null;
+
     }
 
     public function userWalletExist(string $userId) : bool
@@ -58,35 +75,7 @@ class WalletRepository implements WalletRepositoryInterface
 
     public function findUserByWalletById(string $walletId) : ?Wallet
     {
-        return $this->model->where('id', $walletId)->first();
-    }
-
-    public function chargebackPayeeValue(string $payeeId, int $value): void
-    {
-        $wallet = $this->model->where('user_id', $payeeId)->first();
-
-        $lock = Cache::lock('wallet:' . $wallet->id . ':lock', 5);
-        if ($lock->get()) {
-            try {
-                $wallet->balance -= $value;
-                $wallet->save();
-            } finally {
-                $lock->release();
-            }
-        }
-    }
-
-    public function chargebackPayerValue(string $payerId, int $value): void
-    {
-        $wallet = $this->model->where('user_id', $payerId)->first();
-        $lock = Cache::lock('wallet:' . $wallet->id . ':lock', 5);
-        if ($lock->get()) {
-            try {
-                $wallet->balance += $value;
-                $wallet->save();
-            } finally {
-                $lock->release();
-            }
-        }
+        $model = $this->model->where('id', $walletId)->first();
+        return $model ? WalletMapper::toEntity($model) : null;
     }
 }

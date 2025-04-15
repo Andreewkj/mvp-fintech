@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Domain\Interfaces\Adapters\NotifyAdapterInterface;
 use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
-use App\Models\Transfer;
+use App\Models\TransferModel;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -23,7 +23,7 @@ class NotifyPayee implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        private readonly Transfer $transfer,
+        private readonly TransferModel $transfer,
     )
     {}
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Application\Services\TransferService;
 use App\Domain\Requests\CreateTransferRequest;
-use App\Domain\Services\TransferService;
 use App\Exceptions\TransferException;
 use App\Exceptions\WalletException;
 use Illuminate\Http\JsonResponse;

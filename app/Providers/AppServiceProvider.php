@@ -2,23 +2,22 @@
 
 namespace App\Providers;
 
-use App\Domain\Adapters\NuBankAdapter;
-use App\Domain\Adapters\UltraNotifyAdapter;
 use App\Domain\Interfaces\Adapters\BankAdapterInterface;
 use App\Domain\Interfaces\Adapters\NotifyAdapterInterface;
 use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
 use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
 use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
 use App\Domain\Interfaces\RequestValidateInterface;
-use App\Domain\Repositories\TransferRepository;
-use App\Domain\Repositories\UserRepository;
-use App\Domain\Repositories\WalletRepository;
 use App\Domain\Requests\CreateLoginRequest;
 use App\Domain\Requests\CreateTransferRequest;
 use App\Domain\Requests\CreateUserRequest;
 use App\Domain\Requests\CreateWalletRequest;
+use App\Infra\Adapters\NuBankAdapter;
+use App\Infra\Adapters\UltraNotifyAdapter;
+use App\Infra\Repositories\TransferRepository;
+use App\Infra\Repositories\UserRepository;
+use App\Infra\Repositories\WalletRepository;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {

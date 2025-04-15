@@ -2,7 +2,7 @@
 
 namespace App\Domain\Interfaces\Repositories;
 
-use App\Models\Transfer;
+use App\Domain\Entities\Transfer;
 
 interface TransferRepositoryInterface
 {
