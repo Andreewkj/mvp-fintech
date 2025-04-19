@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Domain\Interfaces\Adapters;
 
-use App\Models\UserModel;
+use App\Domain\Entities\User;
 
 interface NotifyAdapterInterface
 {
-    public function notifyByEmail(UserModel $user);
-    public function notifyBySms(UserModel $user);
+    public function notifyByEmail(User $user);
+    public function notifyBySms(User $user);
 }

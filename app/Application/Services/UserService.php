@@ -18,16 +18,6 @@ class UserService
         return $this->userRepository->create($data);
     }
 
-    public function updateUserWallet(string $userId, string $walletId): void
-    {
-        $this->userRepository->updateUserWallet($userId, $walletId);
-    }
-
-    public function findUserByWalletId(string $walletId): ?User
-    {
-        return $this->userRepository->findUserByWalletId($walletId);
-    }
-
     public function findUserByCpf(string $cpf): ?User
     {
         return $this->userRepository->findUserByCpf($cpf);

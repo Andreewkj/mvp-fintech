@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infra\Repositories;
 
 use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
+use App\Exceptions\WalletException;
 use App\Infra\Mappers\WalletMapper;
 use App\Models\WalletModel;
 use Illuminate\Support\Facades\Cache;
@@ -27,37 +28,37 @@ class WalletRepository implements WalletRepositoryInterface
         $model->save();
     }
 
-    public function updatePayeeWalletById(String $payeeWalletId, int $value) : void
+    /**
+     * @throws WalletException
+     */
+    public function updateBalance(Wallet $wallet): void
     {
-        $lock = Cache::lock('wallet:' . $payeeWalletId . ':lock', 5);
+        $lock = Cache::lock("wallet:{$wallet->getId()}:lock", 5);
+
         if ($lock->get()) {
             try {
-                $payeeWallet = $this->model->where('id', $payeeWalletId)->first();
-                $payeeWallet->balance += $value;
-                $payeeWallet->save();
+                $walletModel = $this->model->findOrFail($wallet->getId());
+                $walletModel->balance = $wallet->getBalance();
+                $walletModel->save();
             } finally {
                 $lock->release();
             }
+        } else {
+            throw new WalletException('Could not acquire lock');
         }
     }
 
-    public function updatePayerWalletById(String $payerWalletId, int $value) : void
+    public function findById(string $getPayeeWalletId) : ?Wallet
     {
-        $lock = Cache::lock('wallet:' . $payerWalletId . ':lock', 5);
-        if ($lock->get()) {
-            try {
-                $payerWallet = $this->model->where('id', $payerWalletId)->first();
-                $payerWallet->balance -= $value;
-                $payerWallet->save();
-            } finally {
-                $lock->release();
-            }
-        }
+        $model = $this->model->where('id', $getPayeeWalletId)->first();
+        return $model ? WalletMapper::toEntity($model) : null;
     }
 
     public function create(array $data) : Wallet
     {
         $model = $this->model->create($data);
+        $model->refresh();
+
         return WalletMapper::toEntity($model);
     }
 

@@ -17,6 +17,7 @@ class UserRepository implements UserRepositoryInterface
     public function create(array $data): User
     {
         $model = $this->userModel->create($data);
+        $model->refresh();
         return UserMapper::toEntity($model);
     }
 
@@ -27,25 +28,25 @@ class UserRepository implements UserRepositoryInterface
 
     public function findUserByWalletId(string $walletId): ?User
     {
-        $model = $this->userModel->with('wallet')->where('wallet_id', $walletId)->first();
+        $model = $this->userModel->where('wallet_id', $walletId)->first();
         return $model ? UserMapper::toEntity($model) : null;
     }
 
     public function findUserByEmail(string $email): ?User
     {
-        $model = $this->userModel->with('wallet')->where('email', $email)->first();
+        $model = $this->userModel->where('email', $email)->first();
         return $model ? UserMapper::toEntity($model) : null;
     }
 
     public function findUserByCpf(string $cpf): ?User
     {
-        $model = $this->userModel->with('wallet')->where('cpf', $cpf)->first();
+        $model = $this->userModel->where('cpf', $cpf)->first();
         return $model ? UserMapper::toEntity($model) : null;
     }
 
     public function findUserByCnpj(string $cnpj): ?User
     {
-        $model = $this->userModel->with('wallet')->where('cnpj', $cnpj)->first();
+        $model = $this->userModel->where('cnpj', $cnpj)->first();
         return $model ? UserMapper::toEntity($model) : null;
     }
 }

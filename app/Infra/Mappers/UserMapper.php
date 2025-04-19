@@ -7,6 +7,7 @@ namespace App\Infra\Mappers;
 use App\Domain\Entities\User;
 use App\Domain\VO\Cpf;
 use App\Domain\VO\Cnpj;
+use App\Domain\VO\Email;
 use App\Domain\VO\Phone;
 use App\Models\UserModel;
 
@@ -19,7 +20,7 @@ class UserMapper
             name: $model->full_name,
             cpf: $model->cpf ? new Cpf($model->cpf) : null,
             cnpj: $model->cnpj ? new Cnpj($model->cnpj) : null,
-            email: $model->email,
+            email: new Email($model->email),
             phone: new Phone($model->phone),
             wallet: $model->wallet ? WalletMapper::toEntity($model->wallet) : null
         );

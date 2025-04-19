@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Application\Services\UserService;
-use App\Domain\Requests\CreateLoginRequest;
-use App\Domain\Requests\CreateUserRequest;
 use App\Domain\Entities\User;
+use App\Http\Requests\CreateLoginRequest;
+use App\Http\Requests\CreateUserRequest;
+use App\Presenters\UserPresenter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,7 +50,9 @@ class UserController extends Controller
     {
         try {
             $data = $this->createUserRequest->validate($request->all());
-            return $this->userService->createUser($data);
+            $user = $this->userService->createUser($data);
+
+            return response()->json(UserPresenter::fromEntity($user));
         } catch (\InvalidArgumentException $e) {
             return response()->json([
                 'message' => $e->getMessage()

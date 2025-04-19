@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Requests;
+namespace App\Http\Requests;
 
 use App\Domain\Interfaces\RequestValidateInterface;
 use InvalidArgumentException;

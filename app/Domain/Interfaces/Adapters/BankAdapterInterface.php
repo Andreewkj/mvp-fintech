@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domain\Interfaces\Adapters;
 
-use App\Models\TransferModel;
+use App\Domain\Entities\Transfer;
 
 interface BankAdapterInterface
 {
-    public function authorizeTransfer(TransferModel $transfer): void;
+    public function authorizeTransfer(Transfer $transfer): void;
 }

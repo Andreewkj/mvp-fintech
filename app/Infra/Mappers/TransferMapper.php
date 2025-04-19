@@ -3,6 +3,7 @@
 namespace App\Infra\Mappers;
 
 use App\Domain\Entities\Transfer;
+use App\Domain\VO\TransferValue;
 use App\Models\TransferModel;
 
 class TransferMapper
@@ -14,7 +15,7 @@ class TransferMapper
             payer_wallet_id: $model->payer_wallet_id,
             payee_wallet_id: $model->payee_wallet_id,
             status: $model->status,
-            value: $model->value,
+            value: new TransferValue($model->value),
             authorized_at: $model->authorized_at,
             denied_at: $model->denied_at,
         );

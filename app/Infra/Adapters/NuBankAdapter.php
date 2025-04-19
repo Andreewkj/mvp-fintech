@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infra\Adapters;
 
+use App\Domain\Entities\Transfer;
 use App\Domain\Interfaces\Adapters\BankAdapterInterface;
-use App\Models\TransferModel;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -26,12 +26,12 @@ class NuBankAdapter implements BankAdapterInterface
      * @throws GuzzleException
      * @throws Exception
      */
-    public function authorizeTransfer(TransferModel $transfer): void
+    public function authorizeTransfer(Transfer $transfer): void
     {
         $response = $this->client->get($this->url);
 
         if ($response->getStatusCode() !== Response::HTTP_OK) {
-            throw new Exception('Error authorizing transfer id: ' . $transfer->id);
+            throw new Exception('Error authorizing transfer id: ' . $transfer->getId());
         }
     }
 }

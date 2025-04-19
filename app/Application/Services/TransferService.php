@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace App\Application\Services;
 
-use App\Domain\Entities\User;
 use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
-use App\Domain\VO\Cnpj;
-use App\Domain\VO\Cpf;
-use App\Domain\VO\Email;
-use App\Domain\VO\Phone;
 use App\Exceptions\TransferException;
-use App\Exceptions\WalletException;
 use App\Domain\Entities\Transfer;
+use App\Jobs\AuthorizeTransfer;
+use Illuminate\Support\Facades\DB;
 
 class TransferService
 {
@@ -24,38 +20,34 @@ class TransferService
 
     /**
      * @throws TransferException
-     * @throws WalletException
      */
-    public function transfer(array $data): Transfer
+    public function transfer(array $data, String $userId): Transfer
     {
         $payeeWallet = $this->walletService->findWalletByUserId($data['payee_id']);
-        $payerUser = $this->buildPayerWithWallet();
+        $payerWallet = $this->walletService->findWalletByUserId($userId);
+
         $value = $data['value'];
 
-        $payerUser->validateTransfer($value);
+        $payerWallet->validateTransfer($value);
 
-        if ($payeeWallet->getId() === $payerUser->getWallet()->getId()) {
+        if ($payeeWallet->getId() === $payerWallet->getId()) {
             throw new TransferException('Payee and payer cannot be the same');
         }
 
-        return $this->walletService->transferBetweenWallets($payeeWallet, $payerUser->getWallet(), $value);
-    }
+        return DB::transaction(function () use ($payeeWallet, $payerWallet, $value) {
+            $transfer = $this->transferRepository->register([
+                'payee_wallet_id' => $payeeWallet->getId(),
+                'payer_wallet_id' => $payerWallet->getId(),
+                'value' => $value
+            ]);
 
-    private function buildPayerWithWallet(): User
-    {
-        $payerWallet = $this->walletService->findWalletByUserId(auth()->user()->id);
+            if (!$transfer) {
+                throw new TransferException('Transfer could not be created');
+            }
 
-        $user = new User(
-            id: auth()->user()->id,
-            name: auth()->user()->name,
-            cpf: auth()->user()->cpf ? new Cpf(auth()->user()->cpf) : null,
-            cnpj: auth()->user()->cnpj ? new Cnpj(auth()->user()->cnpj) : null,
-            email: new Email(auth()->user()->email),
-            phone: new Phone(auth()->user()->phone),
-        );
+            AuthorizeTransfer::dispatch($transfer);
 
-        $user->assignWallet($payerWallet);
-
-        return $user;
+            return $transfer;
+        });
     }
 }

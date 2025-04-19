@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Domain\Entities\Transfer;
 use App\Domain\Interfaces\Adapters\BankAdapterInterface;
 use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
 use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
 use App\Enums\TransferStatusEnum;
-use App\Models\TransferModel;
 use Exception;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,7 +17,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class AuthorizeTransfer implements ShouldQueue
+class AuthorizeTransfer
 {
     use Queueable;
     use InteractsWithSockets, SerializesModels;
@@ -30,7 +30,7 @@ class AuthorizeTransfer implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        private readonly TransferModel $transfer
+        private readonly Transfer $transfer
     )
     {}
 
@@ -45,22 +45,29 @@ class AuthorizeTransfer implements ShouldQueue
     ): void
     {
         try {
-            if ($this->transfer->status === TransferStatusEnum::STATUS_DENIED->value) {
-                throw new Exception('This transfer was denied');
+            if ($this->transfer->getStatus() !== TransferStatusEnum::STATUS_PENDING->value) {
+                throw new Exception('This transfer is not on pending status');
             }
 
             $bankAdapter->authorizeTransfer($this->transfer);
 
-            $walletRepository->updatePayeeWalletById($this->transfer->payee_wallet_id, $this->transfer->value);
-            $walletRepository->updatePayerWalletById($this->transfer->payer_wallet_id, $this->transfer->value);
+            $payeeWallet = $walletRepository->findById($this->transfer->getPayeeWalletId());
+            $payerWallet = $walletRepository->findById($this->transfer->getPayerWalletId());
+
+            $payeeWallet->credit($this->transfer->getValue());
+            $payerWallet->debit($this->transfer->getValue());
+
+            $walletRepository->updateBalance($payeeWallet);
+            $walletRepository->updateBalance($payerWallet);
+            $transferRepository->updateToAuthorizedStatus($this->transfer);
 
             NotifyPayee::dispatch($this->transfer);
         } catch (Throwable $e) {
             $adapterName = get_class($bankAdapter);
+
             if ($this->attempts() >= $this->tries) {
-                Log::Critical("Error authorizing transfer id: {$this->transfer->id} with adapter: {$adapterName}, error: {$e->getMessage()}");
-                $this->transfer->status = TransferStatusEnum::STATUS_DENIED->value;
-                $transferRepository->update($this->transfer);
+                Log::Critical("Error authorizing transfer id: {$this->transfer->getId()} with adapter: {$adapterName}, error: {$e->getMessage()}");
+                $transferRepository->updateToDeniedStatus($this->transfer);
             }
 
             throw $e;

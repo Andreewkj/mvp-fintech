@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Requests;
+namespace App\Http\Requests;
 
 use App\Domain\Interfaces\RequestValidateInterface;
 use App\Enums\WalletTypeEnum;
@@ -15,13 +15,13 @@ readonly class CreateWalletRequest implements RequestValidateInterface
         }
 
         if (empty($data['type'])) {
-            throw new InvalidArgumentException('WalletModel type was not found');
+            throw new InvalidArgumentException('Wallet type was not found');
         }
 
         match ($data['type']) {
             'common' => WalletTypeEnum::COMMON,
             'shop_keeper' => WalletTypeEnum::SHOP_KEEPER,
-            default => throw new InvalidArgumentException('WalletModel type was not a valid type')
+            default => throw new InvalidArgumentException('Wallet type was not a valid type')
         };
 
         return $data;

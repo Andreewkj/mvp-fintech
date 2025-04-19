@@ -2,8 +2,8 @@
 
 namespace App\Domain\Entities;
 
+use App\Domain\VO\TransferValue;
 use DateTime;
-use PhpParser\Node\Scalar\String_;
 
 class Transfer
 {
@@ -12,7 +12,7 @@ class Transfer
         private string $payer_wallet_id,
         private string $payee_wallet_id,
         private string $status,
-        private int $value,
+        private TransferValue $value,
         private ?DateTime $authorized_at,
         private ?DateTime $denied_at,
     ) {}
@@ -38,7 +38,7 @@ class Transfer
 
     public function getValue(): int
     {
-        return $this->value;
+        return $this->value->getValue();
     }
 
     public function getAuthorizedAt(): ?String

@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Domain\Entities\Transfer;
 use App\Domain\Interfaces\Adapters\NotifyAdapterInterface;
 use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
-use App\Models\TransferModel;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -23,7 +23,7 @@ class NotifyPayee implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        private readonly TransferModel $transfer,
+        private readonly Transfer $transfer,
     )
     {}
 
@@ -37,10 +37,10 @@ class NotifyPayee implements ShouldQueue
     ): void
     {
         try {
-            $payee = $userRepository->findUserByWalletId($this->transfer->payee_wallet_id);
+            $payee = $userRepository->findUserByWalletId($this->transfer->getPayeeWalletId());
 
             if (is_null($payee)) {
-                throw new Exception("Payee ID not found to notify on transfer id: {$this->transfer->id}");
+                throw new Exception("Payee ID not found to notify on transfer id: {$this->transfer->getId()}");
             }
 
             $notifyAdapter->notifyByEmail($payee);
@@ -48,7 +48,7 @@ class NotifyPayee implements ShouldQueue
         } catch (Throwable $e) {
             $adapterName = get_class($notifyAdapter);
             if ($this->attempts() >= $this->tries) {
-                Log::Error("Error sending notification to payee id: {$payee->id} with adapter: {$adapterName}, error: {$e->getMessage()}");
+                Log::Error("Error sending notification to payee id: {$payee->getId()} with adapter: {$adapterName}, error: {$e->getMessage()}");
                 //maybe store notification on some queue or db to try again later
             }
 

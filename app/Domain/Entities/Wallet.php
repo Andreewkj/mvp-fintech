@@ -4,6 +4,7 @@ namespace App\Domain\Entities;
 
 use App\Enums\WalletTypeEnum;
 use App\Exceptions\TransferException;
+use App\Exceptions\WalletException;
 use DomainException;
 
 class Wallet
@@ -43,28 +44,6 @@ class Wallet
         return $this->type;
     }
 
-    public function deposit(int $value): void
-    {
-        if ($value <= 0) {
-            throw new DomainException('Deposit value must be greater than zero');
-        }
-
-        $this->balance += $value;
-    }
-
-    public function withdraw(int $value): void
-    {
-        if ($value <= 0) {
-            throw new DomainException('Withdraw value must be greater than zero');
-        }
-
-        if ($this->balance < $value) {
-            throw new DomainException('Insufficient balance');
-        }
-
-        $this->balance -= $value;
-    }
-
     public function isShopKeeper(): bool
     {
         return $this->type == WalletTypeEnum::SHOP_KEEPER;
@@ -75,6 +54,19 @@ class Wallet
         return $this->balance >= $value;
     }
 
+    public function debit(int $value): void
+    {
+        if ($this->balance < $value) {
+            throw new DomainException('Insufficient balance');
+        }
+
+        $this->balance -= $value;
+    }
+
+    public function credit(int $value): void
+    {
+        $this->balance += $value;
+    }
 
     /**
      * @throws TransferException

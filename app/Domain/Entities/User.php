@@ -8,7 +8,6 @@ use App\Domain\VO\Cpf;
 use App\Domain\VO\Cnpj;
 use App\Domain\VO\Email;
 use App\Domain\VO\Phone;
-use App\Enums\WalletTypeEnum;
 use App\Exceptions\TransferException;
 use DomainException;
 
@@ -66,17 +65,5 @@ class User
     public function getCnpj(): ?Cnpj
     {
         return $this->cnpj;
-    }
-
-    /**
-     * @throws TransferException
-     */
-    public function validateTransfer(int $value): void
-    {
-        if ($this->wallet === null) {
-            throw new TransferException('User has no wallet assigned');
-        }
-
-        $this->wallet->validateTransfer($value);
     }
 }

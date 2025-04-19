@@ -26,35 +26,6 @@ class WalletService
     /**
      * @throws WalletException
      */
-    public function transferBetweenWallets(Wallet $payeeWallet, Wallet $payerWallet, int $value): Transfer
-    {
-        try {
-            $transfer = null;
-
-            DB::transaction(function () use ($payeeWallet, $payerWallet, $value, &$transfer) {
-                $transfer = $this->transferRepository->register([
-                    'payee_wallet_id' => $payeeWallet->getId(),
-                    'payer_wallet_id' => $payerWallet->getId(),
-                    'value'   => $value
-                ]);
-            });
-
-            if (is_null($transfer)) {
-                throw new WalletException('TransferModel could not be created');
-            }
-
-            AuthorizeTransfer::dispatch($transfer);
-
-            return $transfer;
-        } catch (WalletException $e) {
-            DB::rollBack();
-            throw $e;
-        }
-    }
-
-    /**
-     * @throws WalletException
-     */
     public function createWallet(array $data) : Wallet
     {
         $data['account'] = (new Account())->getValue();
@@ -78,7 +49,7 @@ class WalletService
     private function validateIfAccountAlreadyExist(array $data): void
     {
         if ($this->walletRepository->userWalletExist($data['user_id'])) {
-            throw new WalletException('WalletModel already exists');
+            throw new WalletException('Wallet already exists');
         }
     }
 }

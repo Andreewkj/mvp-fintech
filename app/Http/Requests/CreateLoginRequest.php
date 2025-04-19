@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\Requests;
+namespace App\Http\Requests;
 
+use App\Domain\Interfaces\RequestValidateInterface;
 use App\Domain\VO\Email;
 use App\Domain\VO\Password;
-use App\Domain\Interfaces\RequestValidateInterface;
 use InvalidArgumentException;
 
 class CreateLoginRequest implements RequestValidateInterface
