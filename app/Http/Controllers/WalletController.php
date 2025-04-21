@@ -36,7 +36,7 @@ class WalletController extends Controller
         } catch (\InvalidArgumentException | WalletException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], 400);
+            ], 422);
         } catch (\Exception $e) {
             Log::error("Error creating wallet for user: {$data['user_id']}, error: {$e->getMessage()}");
 

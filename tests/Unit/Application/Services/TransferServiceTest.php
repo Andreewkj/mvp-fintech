@@ -48,7 +48,7 @@ class TransferServiceTest extends TestCase
         parent::tearDown();
     }
 
-    public function testTransferSuccess(): void
+    public function test_transfer_success(): void
     {
         $payerWallet = Mockery::mock(Wallet::class);
         $payeeWallet = Mockery::mock(Wallet::class);
@@ -100,7 +100,7 @@ class TransferServiceTest extends TestCase
         $this->assertEquals('wallet_payer', $result->getPayeeWalletId());
     }
 
-    public function testThrowsExceptionWhenPayerAndPayeeAreSame(): void
+    public function test_throws_exception_when_payer_and_payee_are_same(): void
     {
         $this->expectException(TransferException::class);
         $this->expectExceptionMessage('Payee and payer cannot be the same');
@@ -120,7 +120,7 @@ class TransferServiceTest extends TestCase
         ], 'payer_id');
     }
 
-    public function testThrowsExceptionWhenTransferCannotBeCreated(): void
+    public function test_throws_exception_when_transfer_could_not_be_created(): void
     {
         $this->expectException(TransferException::class);
         $this->expectExceptionMessage('Transfer could not be created');

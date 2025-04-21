@@ -5,12 +5,9 @@ namespace Tests\Feature;
 use App\Domain\Entities\Wallet;
 use App\Enums\WalletTypeEnum;
 use App\Exceptions\WalletException;
-use App\Http\Requests\CreateWalletRequest;
 use App\Application\Services\WalletService;
 use App\Models\UserModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Mockery;
 use Tests\TestCase;
 
@@ -20,11 +17,9 @@ class CreateWalletTest extends TestCase
 
     public function test_it_creates_wallet_successfully()
     {
-        // Cria um usuário logado
         $user = UserModel::factory()->create();
         $this->actingAs($user);
 
-        // Mock do service
         $walletServiceMock = Mockery::mock(WalletService::class);
         $walletServiceMock->shouldReceive('createWallet')
             ->once()
@@ -32,7 +27,6 @@ class CreateWalletTest extends TestCase
 
         $this->app->instance(WalletService::class, $walletServiceMock);
 
-        // Dados do request
         $payload = [
             'type' => WalletTypeEnum::SHOP_KEEPER->value,
         ];
@@ -60,7 +54,7 @@ class CreateWalletTest extends TestCase
             'type' => WalletTypeEnum::SHOP_KEEPER->value,
         ]);
 
-        $response->assertStatus(400)
+        $response->assertStatus(422)
             ->assertJson([
                 'message' => 'Wallet already exists',
             ]);

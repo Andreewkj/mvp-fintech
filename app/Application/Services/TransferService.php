@@ -9,6 +9,7 @@ use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
 use App\Domain\Contracts\TransactionManagerInterface;
 use App\Exceptions\TransferException;
 use App\Domain\Entities\Transfer;
+use App\Jobs\AuthorizeTransfer;
 
 class TransferService
 {
@@ -47,7 +48,7 @@ class TransferService
                 throw new TransferException('Transfer could not be created');
             }
 
-            $this->dispatcher->dispatch($transfer);
+            $this->dispatcher->dispatch(new AuthorizeTransfer($transfer));
 
             return $transfer;
         });

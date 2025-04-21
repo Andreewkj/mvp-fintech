@@ -9,10 +9,12 @@ use App\Domain\Entities\User;
 use App\Http\Requests\CreateLoginRequest;
 use App\Http\Requests\CreateUserRequest;
 use App\Presenters\UserPresenter;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 
 class UserController extends Controller
 {
@@ -34,11 +36,11 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'Invalid credentials'
             ], 401);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], 400);
-        } catch (\Exception $e) {
+            ], 422);
+        } catch (Exception $e) {
             Log::error("Error logging in user, error: {$e->getMessage()}");
             return response()->json([
                 'message' => "Error logging in your user"
@@ -53,11 +55,11 @@ class UserController extends Controller
             $user = $this->userService->createUser($data);
 
             return response()->json(UserPresenter::fromEntity($user));
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], 400);
-        } catch (\Exception $e) {
+            ], 422);
+        } catch (Exception $e) {
             Log::error("Error creating user, error: {$e->getMessage()}");
             return response()->json([
                 'message' => "Error creating your user"

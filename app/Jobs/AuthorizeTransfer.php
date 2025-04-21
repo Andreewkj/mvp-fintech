@@ -17,7 +17,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class AuthorizeTransfer
+class AuthorizeTransfer implements ShouldQueue
 {
     use Queueable;
     use InteractsWithSockets, SerializesModels;

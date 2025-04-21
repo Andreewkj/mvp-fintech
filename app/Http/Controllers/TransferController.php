@@ -32,7 +32,7 @@ class TransferController extends Controller
         } catch (InvalidArgumentException | TransferException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], 400);
+            ], 422);
         } catch (\Exception $e) {
             Log::error("Error creating transfer, error: {$e->getMessage()}");
             return response()->json([
