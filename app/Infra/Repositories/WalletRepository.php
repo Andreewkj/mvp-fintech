@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infra\Repositories;
 
-use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
+use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Exceptions\WalletException;
 use App\Infra\Mappers\WalletMapper;
 use App\Models\WalletModel;

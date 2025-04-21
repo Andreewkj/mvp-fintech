@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Domain\Interfaces\RequestValidateInterface;
+use App\Domain\Contracts\RequestValidateInterface;
 use App\Domain\VO\Email;
 use App\Domain\VO\Password;
 use InvalidArgumentException;

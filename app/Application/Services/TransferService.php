@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Application\Services;
 
-use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
+use App\Domain\Contracts\DispatcherInterface;
+use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
+use App\Domain\Contracts\TransactionManagerInterface;
 use App\Exceptions\TransferException;
 use App\Domain\Entities\Transfer;
-use App\Jobs\AuthorizeTransfer;
-use Illuminate\Support\Facades\DB;
 
 class TransferService
 {
     public function __construct(
         protected WalletService $walletService,
-        protected TransferRepositoryInterface $transferRepository
+        protected TransferRepositoryInterface $transferRepository,
+        protected TransactionManagerInterface $transactionManager,
+        protected DispatcherInterface $dispatcher
     )
     {}
 
@@ -34,7 +36,7 @@ class TransferService
             throw new TransferException('Payee and payer cannot be the same');
         }
 
-        return DB::transaction(function () use ($payeeWallet, $payerWallet, $value) {
+        return $this->transactionManager->run(function () use ($payeeWallet, $payerWallet, $value) {
             $transfer = $this->transferRepository->register([
                 'payee_wallet_id' => $payeeWallet->getId(),
                 'payer_wallet_id' => $payerWallet->getId(),
@@ -45,7 +47,7 @@ class TransferService
                 throw new TransferException('Transfer could not be created');
             }
 
-            AuthorizeTransfer::dispatch($transfer);
+            $this->dispatcher->dispatch($transfer);
 
             return $transfer;
         });

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Domain\Entities\Transfer;
-use App\Domain\Interfaces\Adapters\BankAdapterInterface;
-use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
-use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
+use App\Domain\Contracts\Adapters\BankAdapterInterface;
+use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
+use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Enums\TransferStatusEnum;
 use Exception;
 use Illuminate\Broadcasting\InteractsWithSockets;

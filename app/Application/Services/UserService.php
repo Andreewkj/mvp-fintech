@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Services;
 
-use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
+use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 use App\Domain\Entities\User;
 
 class UserService

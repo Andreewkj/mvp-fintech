@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Infra\Adapters;
 
 use App\Domain\Entities\Transfer;
-use App\Domain\Interfaces\Adapters\BankAdapterInterface;
+use App\Domain\Contracts\Adapters\BankAdapterInterface;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;

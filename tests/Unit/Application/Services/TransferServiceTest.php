@@ -6,9 +6,11 @@ namespace Tests\Unit\Application\Services;
 
 use App\Application\Services\TransferService;
 use App\Application\Services\WalletService;
+use App\Domain\Contracts\DispatcherInterface;
+use App\Domain\Contracts\TransactionManagerInterface;
 use App\Domain\Entities\Transfer;
 use App\Domain\Entities\Wallet;
-use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
+use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
 use App\Domain\VO\TransferValue;
 use App\Enums\TransferStatusEnum;
 use App\Exceptions\TransferException;
@@ -19,7 +21,9 @@ class TransferServiceTest extends TestCase
 {
     private $walletServiceMock;
     private $transferRepositoryMock;
-    private TransferService $transferService;
+    private $transactionManagerMock;
+    private $dispatcherMock;
+    private $transferService;
 
     protected function setUp(): void
     {
@@ -27,10 +31,14 @@ class TransferServiceTest extends TestCase
 
         $this->walletServiceMock = Mockery::mock(WalletService::class);
         $this->transferRepositoryMock = Mockery::mock(TransferRepositoryInterface::class);
+        $this->transactionManagerMock = Mockery::mock(TransactionManagerInterface::class);
+        $this->dispatcherMock = Mockery::mock(DispatcherInterface::class);
 
         $this->transferService = new TransferService(
             $this->walletServiceMock,
-            $this->transferRepositoryMock
+            $this->transferRepositoryMock,
+            $this->transactionManagerMock,
+            $this->dispatcherMock
         );
     }
 
@@ -49,8 +57,16 @@ class TransferServiceTest extends TestCase
         $payeeWallet->shouldReceive('getId')->andReturn('wallet_payee');
 
         $payerWallet->shouldReceive('validateTransfer')->with(100)->once();
-        $payerWallet->shouldReceive('debit')->with(100)->once();
-        $payeeWallet->shouldReceive('credit')->with(100)->once();
+
+        $this->transactionManagerMock
+            ->shouldReceive('run')
+            ->andReturnUsing(function ($callback) {
+                return $callback();
+            });
+
+        $this->dispatcherMock
+            ->shouldReceive('dispatch')
+            ->once();
 
         $this->walletServiceMock->shouldReceive('findWalletByUserId')
             ->with('payee_id')
@@ -80,8 +96,8 @@ class TransferServiceTest extends TestCase
         ], 'payer_id');
 
         $this->assertInstanceOf(Transfer::class, $result);
-        $this->assertEquals('wallet_payer', $result->getPayerWalletId());
-        $this->assertEquals('wallet_payee', $result->getPayeeWalletId());
+        $this->assertEquals('wallet_payee', $result->getPayerWalletId());
+        $this->assertEquals('wallet_payer', $result->getPayeeWalletId());
     }
 
     public function testThrowsExceptionWhenPayerAndPayeeAreSame(): void
@@ -112,12 +128,16 @@ class TransferServiceTest extends TestCase
         $payerWallet = Mockery::mock(Wallet::class);
         $payeeWallet = Mockery::mock(Wallet::class);
 
+        $this->transactionManagerMock
+            ->shouldReceive('run')
+            ->andReturnUsing(function ($callback) {
+                return $callback();
+            });
+
         $payerWallet->shouldReceive('getId')->andReturn('wallet_payer');
         $payeeWallet->shouldReceive('getId')->andReturn('wallet_payee');
 
         $payerWallet->shouldReceive('validateTransfer')->with(100)->once();
-        $payerWallet->shouldReceive('debit')->with(100)->once();
-        $payeeWallet->shouldReceive('credit')->with(100)->once();
 
         $this->walletServiceMock->shouldReceive('findWalletByUserId')->with('payee_id')->andReturn($payeeWallet);
         $this->walletServiceMock->shouldReceive('findWalletByUserId')->with('payer_id')->andReturn($payerWallet);

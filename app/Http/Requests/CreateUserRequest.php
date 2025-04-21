@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Application\Services\UserService;
-use App\Domain\Interfaces\RequestValidateInterface;
+use App\Domain\Contracts\RequestValidateInterface;
 use App\Domain\VO\Cnpj;
 use App\Domain\VO\Cpf;
 use App\Domain\VO\Email;

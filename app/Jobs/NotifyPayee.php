@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Domain\Entities\Transfer;
-use App\Domain\Interfaces\Adapters\NotifyAdapterInterface;
-use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
+use App\Domain\Contracts\Adapters\NotifyAdapterInterface;
+use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Application\Services;
 
 use App\Domain\Entities\Transfer;
-use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
-use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
-use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
+use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
+use App\Domain\Contracts\Repositories\UserRepositoryInterface;
+use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Domain\VO\Account;
 use App\Exceptions\WalletException;
 use App\Jobs\AuthorizeTransfer;

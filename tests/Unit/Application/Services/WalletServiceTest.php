@@ -4,9 +4,9 @@ namespace Tests\Unit\Application\Services;
 
 use App\Application\Services\WalletService;
 use App\Domain\Entities\Wallet;
-use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
-use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
-use App\Domain\Interfaces\Repositories\WalletRepositoryInterface;
+use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
+use App\Domain\Contracts\Repositories\UserRepositoryInterface;
+use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Exceptions\WalletException;
 use PHPUnit\Framework\TestCase;
 

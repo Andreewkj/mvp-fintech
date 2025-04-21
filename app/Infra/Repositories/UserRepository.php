@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infra\Repositories;
 
-use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
+use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 use App\Infra\Mappers\UserMapper;
 use App\Models\UserModel;
 use App\Domain\Entities\User;

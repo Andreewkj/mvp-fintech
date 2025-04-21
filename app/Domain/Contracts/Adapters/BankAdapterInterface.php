@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Interfaces\Adapters;
+namespace App\Domain\Contracts\Adapters;
 
 use App\Domain\Entities\Transfer;
 

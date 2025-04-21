@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Infra\Adapters;
 
 use App\Domain\Entities\User;
-use App\Domain\Interfaces\Adapters\NotifyAdapterInterface;
+use App\Domain\Contracts\Adapters\NotifyAdapterInterface;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Infra\Repositories;
 
 use App\Domain\Entities\Transfer;
-use App\Domain\Interfaces\Repositories\TransferRepositoryInterface;
+use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
 use App\Enums\TransferStatusEnum;
 use App\Infra\Mappers\TransferMapper;
 use App\Models\TransferModel;

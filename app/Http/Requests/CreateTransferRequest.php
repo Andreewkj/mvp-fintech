@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Domain\Interfaces\RequestValidateInterface;
+use App\Domain\Contracts\RequestValidateInterface;
 use InvalidArgumentException;
 
 readonly class CreateTransferRequest implements RequestValidateInterface
