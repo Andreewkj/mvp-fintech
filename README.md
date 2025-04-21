@@ -10,8 +10,8 @@ Em caso de erro na transfêrencia, deve ser feito um estorno para conta do usuá
 
 ## A Minha interpretação do requisitos
 
-Ao ler a descrição deu a entender que a intenção é mostrar uma solução do desenvolvedor sem depender totalmente do fremework.
-Dito isso optei pelo uso do DDD, utilizando muito do Objects calistenics, linguagem ubiqua, utilizei os Value Objects para ajudar com a obsessão por tipos primitivos e tratamento de requests fora do framework.
+O objetivo do projeto é criar algo o mais agnostico ao framework possível.
+Optei pelo uso do DDD, utilizando muito do Objects calistenics, linguagem ubiqua, utilizei os Value Objects para ajudar com a obsessão por tipos primitivos e tratamento de requests fora do framework.
 Meu objetivo é desacoplar o máximo possível e entregar uma solução agnostiva ao framework.
 Uma das parte que acabei utilizando do Framework foi o ORM, mas continuo estudando pra conseguir não depender dele no futuro.
 Para a chamada dos provedores de atualização e notificação, entendi que poderia ser feito umas tentativas a mais antes de de fato cancelar então o job tem 3 tentativas antes da falha.
