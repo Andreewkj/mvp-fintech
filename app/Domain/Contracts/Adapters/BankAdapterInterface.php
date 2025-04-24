@@ -8,5 +8,5 @@ use App\Domain\Entities\Transfer;
 
 interface BankAdapterInterface
 {
-    public function authorizeTransfer(Transfer $transfer): void;
+    public function authorizeTransfer(Transfer $transfer): bool;
 }

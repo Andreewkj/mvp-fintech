@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Tests\Unit\Application\Services;
 
 use App\Application\Services\TransferService;
-use App\Application\Services\WalletService;
+use App\Domain\Contracts\Adapters\BankAdapterInterface;
 use App\Domain\Contracts\DispatcherInterface;
+use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Domain\Contracts\TransactionManagerInterface;
 use App\Domain\Entities\Transfer;
 use App\Domain\Entities\Wallet;
@@ -19,25 +20,28 @@ use Mockery;
 
 class TransferServiceTest extends TestCase
 {
-    private $walletServiceMock;
+    private $walletRepositoryMock;
     private $transferRepositoryMock;
     private $transactionManagerMock;
     private $dispatcherMock;
     private $transferService;
+    private $banckAdapterMock;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->walletServiceMock = Mockery::mock(WalletService::class);
+        $this->walletRepositoryMock = Mockery::mock(WalletRepositoryInterface::class);
         $this->transferRepositoryMock = Mockery::mock(TransferRepositoryInterface::class);
         $this->transactionManagerMock = Mockery::mock(TransactionManagerInterface::class);
         $this->dispatcherMock = Mockery::mock(DispatcherInterface::class);
+        $this->banckAdapterMock = Mockery::mock(BankAdapterInterface::class);
 
         $this->transferService = new TransferService(
-            $this->walletServiceMock,
+            $this->walletRepositoryMock,
             $this->transferRepositoryMock,
             $this->transactionManagerMock,
+            $this->banckAdapterMock,
             $this->dispatcherMock
         );
     }
@@ -56,6 +60,9 @@ class TransferServiceTest extends TestCase
         $payerWallet->shouldReceive('getId')->andReturn('wallet_payer');
         $payeeWallet->shouldReceive('getId')->andReturn('wallet_payee');
 
+        $payeeWallet->shouldReceive('credit')->with(100)->once();
+        $payerWallet->shouldReceive('debit')->with(100)->once();
+
         $payerWallet->shouldReceive('validateTransfer')->with(100)->once();
 
         $this->transactionManagerMock
@@ -68,11 +75,11 @@ class TransferServiceTest extends TestCase
             ->shouldReceive('dispatch')
             ->once();
 
-        $this->walletServiceMock->shouldReceive('findWalletByUserId')
+        $this->walletRepositoryMock->shouldReceive('findWalletByUserId')
             ->with('payee_id')
             ->andReturn($payeeWallet);
 
-        $this->walletServiceMock->shouldReceive('findWalletByUserId')
+        $this->walletRepositoryMock->shouldReceive('findWalletByUserId')
             ->with('payer_id')
             ->andReturn($payerWallet);
 
@@ -89,6 +96,22 @@ class TransferServiceTest extends TestCase
         $this->transferRepositoryMock->shouldReceive('register')
             ->once()
             ->andReturn($mockTransfer);
+
+        $this->banckAdapterMock->shouldReceive('authorizeTransfer')
+            ->once()
+            ->andReturn(true);
+
+        $this->walletRepositoryMock->shouldReceive('updateBalance')
+            ->with($payeeWallet)
+            ->once();
+
+        $this->walletRepositoryMock->shouldReceive('updateBalance')
+            ->with($payerWallet)
+            ->once();
+
+        $this->transferRepositoryMock->shouldReceive('updateToAuthorizedStatus')
+            ->with($mockTransfer)
+            ->once();
 
         $result = $this->transferService->transfer([
             'payee_id' => 'payee_id',
@@ -109,9 +132,9 @@ class TransferServiceTest extends TestCase
         $wallet->shouldReceive('getId')->andReturn('same_wallet');
         $wallet->shouldReceive('validateTransfer')->with(100)->once();
 
-        $this->walletServiceMock->shouldReceive('findWalletByUserId')
+        $this->walletRepositoryMock->shouldReceive('findWalletByUserId')
             ->with('payee_id')->andReturn($wallet);
-        $this->walletServiceMock->shouldReceive('findWalletByUserId')
+        $this->walletRepositoryMock->shouldReceive('findWalletByUserId')
             ->with('payer_id')->andReturn($wallet);
 
         $this->transferService->transfer([
@@ -139,8 +162,8 @@ class TransferServiceTest extends TestCase
 
         $payerWallet->shouldReceive('validateTransfer')->with(100)->once();
 
-        $this->walletServiceMock->shouldReceive('findWalletByUserId')->with('payee_id')->andReturn($payeeWallet);
-        $this->walletServiceMock->shouldReceive('findWalletByUserId')->with('payer_id')->andReturn($payerWallet);
+        $this->walletRepositoryMock->shouldReceive('findWalletByUserId')->with('payee_id')->andReturn($payeeWallet);
+        $this->walletRepositoryMock->shouldReceive('findWalletByUserId')->with('payer_id')->andReturn($payerWallet);
 
         $this->transferRepositoryMock->shouldReceive('register')->andReturn(null); // Simula falha
 

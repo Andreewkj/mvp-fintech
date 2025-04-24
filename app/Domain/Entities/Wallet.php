@@ -4,7 +4,6 @@ namespace App\Domain\Entities;
 
 use App\Enums\WalletTypeEnum;
 use App\Exceptions\TransferException;
-use App\Exceptions\WalletException;
 use DomainException;
 
 class Wallet

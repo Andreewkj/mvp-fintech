@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\NotifyPayee;
 use App\Models\UserModel;
 use App\Models\WalletModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
-use App\Jobs\AuthorizeTransfer;
 use Tests\TestCase;
 
 class MakeTransferTest extends TestCase
@@ -48,7 +48,7 @@ class MakeTransferTest extends TestCase
             'value' => 100,
         ]);
 
-        Queue::assertPushed(AuthorizeTransfer::class);
+        Queue::assertPushed(NotifyPayee::class);
     }
 
     public function test_cannot_transfer_to_self(): void
@@ -77,7 +77,7 @@ class MakeTransferTest extends TestCase
             'payee_id' => 'invalid_id',
         ]);
 
-        $response->assertStatus(422); // erro de validação
+        $response->assertStatus(422);
     }
 
     public function test_unauthorized_user(): void

@@ -6,10 +6,12 @@ namespace App\Infra\Adapters;
 
 use App\Domain\Entities\Transfer;
 use App\Domain\Contracts\Adapters\BankAdapterInterface;
+use App\Exceptions\TransferAuthorizationException;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class NuBankAdapter implements BankAdapterInterface
 {
@@ -23,15 +25,19 @@ class NuBankAdapter implements BankAdapterInterface
     }
 
     /**
-     * @throws GuzzleException
      * @throws Exception
+     * @throws Throwable
      */
-    public function authorizeTransfer(Transfer $transfer): void
+    public function authorizeTransfer(Transfer $transfer): bool
     {
-        $response = $this->client->get($this->url);
-
-        if ($response->getStatusCode() !== Response::HTTP_OK) {
-            throw new Exception('Error authorizing transfer id: ' . $transfer->getId());
+        try {
+            retry(3, function () use ($transfer) {
+                $this->client->get($this->url);
+            }, 2000);
+            return true;
+        } catch (GuzzleException $e) {
+            Log::critical('Error authorizing transfer id: ' . $transfer->getId() . ', error: ' . $e->getMessage());
+            throw new TransferAuthorizationException('Authorization failed for transfer id: ' . $transfer->getId());
         }
     }
 }

@@ -16,18 +16,6 @@ class WalletRepository implements WalletRepositoryInterface
     public function __construct(protected WalletModel $model)
     {}
 
-    public function save(Wallet $entity): void
-    {
-        $model = $this->model->find($entity->getId());
-
-        if (!$model) {
-            throw new \Exception('Wallet not found');
-        }
-
-        $model = WalletMapper::toModel($entity, $model);
-        $model->save();
-    }
-
     /**
      * @throws WalletException
      */
