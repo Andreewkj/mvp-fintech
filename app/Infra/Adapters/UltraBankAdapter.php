@@ -13,7 +13,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class NuBankAdapter implements BankAdapterInterface
+class UltraBankAdapter implements BankAdapterInterface
 {
     private Client $client;
     private string $url;

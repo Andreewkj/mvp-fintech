@@ -14,7 +14,7 @@ use App\Http\Requests\CreateLoginRequest;
 use App\Http\Requests\CreateTransferRequest;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\CreateWalletRequest;
-use App\Infra\Adapters\NuBankAdapter;
+use App\Infra\Adapters\UltraBankAdapter;
 use App\Infra\Adapters\UltraNotifyAdapter;
 use App\Infra\LaravelDispatcher;
 use App\Infra\LaravelTransactionManager;
@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RequestValidateInterface::class,CreateTransferRequest::class);
         $this->app->bind(RequestValidateInterface::class,CreateLoginRequest::class);
         $this->app->bind(NotifyAdapterInterface::class, UltraNotifyAdapter::class);
-        $this->app->bind(BankAdapterInterface::class, NuBankAdapter::class);
+        $this->app->bind(BankAdapterInterface::class, UltraBankAdapter::class);
         $this->app->bind(DispatcherInterface::class, LaravelDispatcher::class);
         $this->app->bind(TransactionManagerInterface::class, LaravelTransactionManager::class);
     }
