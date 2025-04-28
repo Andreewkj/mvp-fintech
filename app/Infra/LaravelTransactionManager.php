@@ -13,4 +13,19 @@ class LaravelTransactionManager implements TransactionManagerInterface
     {
         return DB::transaction($callback);
     }
+
+    public function beginTransaction(): void
+    {
+        DB::beginTransaction();
+    }
+
+    public function commit(): void
+    {
+        DB::commit();
+    }
+
+    public function rollback(): void
+    {
+        DB::rollBack();
+    }
 }

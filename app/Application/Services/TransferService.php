@@ -5,33 +5,34 @@ declare(strict_types=1);
 namespace App\Application\Services;
 
 use App\Domain\Contracts\Adapters\BankAdapterInterface;
-use App\Domain\Contracts\DispatcherInterface;
+use App\Domain\Contracts\EventDispatcherInterface;
 use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
-use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Domain\Contracts\TransactionManagerInterface;
-use App\Domain\Entities\Wallet;
-use App\Exceptions\TransferException;
 use App\Domain\Entities\Transfer;
+use App\Domain\Entities\Wallet;
+use App\Domain\Exceptions\TransferException;
+use App\Events\TransferWasCompleted;
 use App\Jobs\NotifyPayee;
+use Exception;
 
 class TransferService
 {
     public function __construct(
-        protected WalletRepositoryInterface $walletRepository,
+        protected WalletService $walletService,
         protected TransferRepositoryInterface $transferRepository,
         protected TransactionManagerInterface $transactionManager,
         protected BankAdapterInterface $bankAdapter,
-        protected DispatcherInterface $dispatcher
+        protected EventDispatcherInterface $eventDispatcher
     )
     {}
 
     /**
-     * @throws TransferException
+     * @throws TransferException | Exception
      */
     public function transfer(array $data, String $userId): Transfer
     {
-        $payeeWallet = $this->walletRepository->findWalletByUserId($data['payee_id']);
-        $payerWallet = $this->walletRepository->findWalletByUserId($userId);
+        $payeeWallet = $this->walletService->findWalletByUserId($data['payee_id']);
+        $payerWallet = $this->walletService->findWalletByUserId($userId);
 
         $value = $data['value'];
 
@@ -60,7 +61,7 @@ class TransferService
 
             $this->handleAuthorizedTransfer($transfer, $payeeWallet, $payerWallet);
 
-            $this->dispatcher->dispatch(new NotifyPayee($transfer));
+            $this->eventDispatcher->dispatch(new TransferWasCompleted($transfer));
 
             return $transfer;
         });
@@ -68,11 +69,9 @@ class TransferService
 
     private function handleAuthorizedTransfer(Transfer $transfer, Wallet $payeeWallet, Wallet $payerWallet): void
     {
-        $payeeWallet->credit($transfer->getValue());
-        $payerWallet->debit($transfer->getValue());
+        $this->walletService->creditWallet($payeeWallet, $transfer->getValue());
+        $this->walletService->debitWallet($payerWallet, $transfer->getValue());
 
-        $this->walletRepository->updateBalance($payeeWallet);
-        $this->walletRepository->updateBalance($payerWallet);
         $this->transferRepository->updateToAuthorizedStatus($transfer);
     }
 }

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Application\Services\TransferService;
-use App\Exceptions\TransferException;
+use App\Domain\Enums\HttpStatusCodeEnum;
+use App\Domain\Exceptions\TransferException;
 use App\Http\Requests\CreateTransferRequest;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -29,16 +30,16 @@ class TransferController extends Controller
 
             return response()->json([
                 'message' => "transfer completed successfully"
-            ], 201);
+            ], HttpStatusCodeEnum::CREATED->value);
         } catch (InvalidArgumentException | TransferException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], 422);
+            ], HttpStatusCodeEnum::UNPROCESSABLE_ENTITY->value);
         } catch (Exception $e) {
             Log::error("Error creating transfer, error: {$e->getMessage()}");
             return response()->json([
                 'message' => "Apparently something went wrong with your transfer, but don't worry, we will rollback the values for you"
-            ], 500);
+            ], HttpStatusCodeEnum::INTERNAL_SERVER_ERROR->value);
         }
     }
 }

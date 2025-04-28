@@ -2,8 +2,8 @@
 
 namespace App\Domain\Entities;
 
-use App\Enums\WalletTypeEnum;
-use App\Exceptions\TransferException;
+use App\Domain\Enums\WalletTypeEnum;
+use App\Domain\Exceptions\TransferException;
 use DomainException;
 
 class Wallet

@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Domain\Contracts\RequestValidateInterface;
-use App\Enums\WalletTypeEnum;
+use App\Domain\Enums\WalletTypeEnum;
 use InvalidArgumentException;
 
 readonly class CreateWalletRequest implements RequestValidateInterface

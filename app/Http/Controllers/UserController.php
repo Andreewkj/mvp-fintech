@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Application\Services\UserService;
 use App\Domain\Entities\User;
+use App\Domain\Enums\HttpStatusCodeEnum;
 use App\Http\Requests\CreateLoginRequest;
 use App\Http\Requests\CreateUserRequest;
 use App\Presenters\UserPresenter;
@@ -35,16 +36,16 @@ class UserController extends Controller
 
             return response()->json([
                 'message' => 'Invalid credentials'
-            ], 401);
+            ], HttpStatusCodeEnum::UNAUTHORIZED->value);
         } catch (InvalidArgumentException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], 422);
+            ], HttpStatusCodeEnum::UNPROCESSABLE_ENTITY->value);
         } catch (Exception $e) {
             Log::error("Error logging in user, error: {$e->getMessage()}");
             return response()->json([
                 'message' => "Error logging in your user"
-            ], 500);
+            ], HttpStatusCodeEnum::INTERNAL_SERVER_ERROR->value);
         }
     }
 
@@ -58,12 +59,12 @@ class UserController extends Controller
         } catch (InvalidArgumentException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], 422);
+            ], HttpStatusCodeEnum::UNPROCESSABLE_ENTITY->value);
         } catch (Exception $e) {
             Log::error("Error creating user, error: {$e->getMessage()}");
             return response()->json([
                 'message' => "Error creating your user"
-            ], 500);
+            ], HttpStatusCodeEnum::INTERNAL_SERVER_ERROR->value);
         }
     }
 }

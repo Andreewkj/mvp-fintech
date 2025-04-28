@@ -4,24 +4,27 @@ namespace App\Providers;
 
 use App\Domain\Contracts\Adapters\BankAdapterInterface;
 use App\Domain\Contracts\Adapters\NotifyAdapterInterface;
-use App\Domain\Contracts\DispatcherInterface;
+use App\Domain\Contracts\EventDispatcherInterface;
 use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
 use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Domain\Contracts\RequestValidateInterface;
 use App\Domain\Contracts\TransactionManagerInterface;
+use App\Events\TransferWasCompleted;
 use App\Http\Requests\CreateLoginRequest;
 use App\Http\Requests\CreateTransferRequest;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\CreateWalletRequest;
 use App\Infra\Adapters\UltraBankAdapter;
 use App\Infra\Adapters\UltraNotifyAdapter;
-use App\Infra\LaravelDispatcher;
+use App\Infra\LaravelEventDispatcher;
 use App\Infra\LaravelTransactionManager;
 use App\Infra\Repositories\TransferRepository;
 use App\Infra\Repositories\UserRepository;
 use App\Infra\Repositories\WalletRepository;
+use App\Listeners\NotifyPayee;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RequestValidateInterface::class,CreateLoginRequest::class);
         $this->app->bind(NotifyAdapterInterface::class, UltraNotifyAdapter::class);
         $this->app->bind(BankAdapterInterface::class, UltraBankAdapter::class);
-        $this->app->bind(DispatcherInterface::class, LaravelDispatcher::class);
+        $this->app->bind(EventDispatcherInterface::class, LaravelEventDispatcher::class);
         $this->app->bind(TransactionManagerInterface::class, LaravelTransactionManager::class);
     }
 
@@ -49,6 +52,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Event::listen(
+            TransferWasCompleted::class,
+            NotifyPayee::class,
+        );
     }
 }

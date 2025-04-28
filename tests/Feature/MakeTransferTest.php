@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Jobs\NotifyPayee;
+use App\Events\TransferWasCompleted;
 use App\Models\UserModel;
 use App\Models\WalletModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class MakeTransferTest extends TestCase
@@ -15,7 +15,7 @@ class MakeTransferTest extends TestCase
 
     public function test_successful_transfer(): void
     {
-        Queue::fake();
+        Event::fake();
 
         $payer = UserModel::factory()->create();
         $payee = UserModel::factory()->create();
@@ -48,7 +48,7 @@ class MakeTransferTest extends TestCase
             'value' => 100,
         ]);
 
-        Queue::assertPushed(NotifyPayee::class);
+        Event::assertDispatched(TransferWasCompleted::class);
     }
 
     public function test_cannot_transfer_to_self(): void

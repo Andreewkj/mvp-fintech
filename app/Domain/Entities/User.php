@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Domain\Entities;
 
-use App\Domain\VO\Cpf;
 use App\Domain\VO\Cnpj;
+use App\Domain\VO\Cpf;
 use App\Domain\VO\Email;
 use App\Domain\VO\Phone;
-use App\Exceptions\TransferException;
 use DomainException;
 
 class User

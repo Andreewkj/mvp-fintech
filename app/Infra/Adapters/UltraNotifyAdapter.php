@@ -9,6 +9,7 @@ use App\Domain\Contracts\Adapters\NotifyAdapterInterface;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
 
 class UltraNotifyAdapter implements NotifyAdapterInterface
 {
@@ -22,31 +23,31 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
     }
 
     /**
-     * @throws GuzzleException
      * @throws Exception
      */
     public function notifyByEmail(User $user): void
     {
-        $response = $this->client->post($this->url, [
-            $user->getEmail()->getValue()
-        ]);
-
-        if ($response->getStatusCode() !== 204) {
+        try {
+            $response = $this->client->post($this->url, [
+                $user->getEmail()->getValue()
+            ]);
+        } catch (GuzzleException $e) {
+            Log::error("Failed to send email to user id: {$user->getId()}, email: {$user->getPhone()->getValue()}, error: {$e->getMessage()}");
             throw new Exception('Error sending email to user: ' . $user->getEmail()->getValue());
         }
     }
 
     /**
-     * @throws GuzzleException
      * @throws Exception
      */
     public function notifyBySms(User $user): void
     {
-        $response = $this->client->post($this->url, [
-            $user->getPhone()->getValue()
-        ]);
-
-        if ($response->getStatusCode() !== 204) {
+        try {
+            $response = $this->client->post($this->url, [
+                $user->getPhone()->getValue()
+            ]);
+        } catch (GuzzleException $e) {
+            Log::error("Failed to send SMS to user id: {$user->getId()}, phone: {$user->getPhone()->getValue()}, error: {$e->getMessage()}");
             throw new Exception('Error sending message to user phone: ' . $user->getPhone()->getValue());
         }
     }

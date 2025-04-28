@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace Tests\Unit\Application\Services;
 
 use App\Application\Services\TransferService;
+use App\Application\Services\WalletService;
 use App\Domain\Contracts\Adapters\BankAdapterInterface;
-use App\Domain\Contracts\DispatcherInterface;
+use App\Domain\Contracts\EventDispatcherInterface;
+use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
+use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Domain\Contracts\TransactionManagerInterface;
 use App\Domain\Entities\Transfer;
 use App\Domain\Entities\Wallet;
-use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
+use App\Domain\Enums\TransferStatusEnum;
+use App\Domain\Exceptions\TransferException;
 use App\Domain\VO\TransferValue;
-use App\Enums\TransferStatusEnum;
-use App\Exceptions\TransferException;
-use PHPUnit\Framework\TestCase;
 use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class TransferServiceTest extends TestCase
 {
@@ -26,6 +28,8 @@ class TransferServiceTest extends TestCase
     private $dispatcherMock;
     private $transferService;
     private $banckAdapterMock;
+    private $userRepositoryMock;
+    private $walletService;
 
     protected function setUp(): void
     {
@@ -34,11 +38,18 @@ class TransferServiceTest extends TestCase
         $this->walletRepositoryMock = Mockery::mock(WalletRepositoryInterface::class);
         $this->transferRepositoryMock = Mockery::mock(TransferRepositoryInterface::class);
         $this->transactionManagerMock = Mockery::mock(TransactionManagerInterface::class);
-        $this->dispatcherMock = Mockery::mock(DispatcherInterface::class);
+        $this->userRepositoryMock = Mockery::mock(UserRepositoryInterface::class);
+        $this->dispatcherMock = Mockery::mock(EventDispatcherInterface::class);
         $this->banckAdapterMock = Mockery::mock(BankAdapterInterface::class);
 
-        $this->transferService = new TransferService(
+        $this->walletService = new WalletService(
             $this->walletRepositoryMock,
+            $this->userRepositoryMock,
+            $this->transferRepositoryMock
+        );
+
+        $this->transferService = new TransferService(
+            $this->walletService,
             $this->transferRepositoryMock,
             $this->transactionManagerMock,
             $this->banckAdapterMock,

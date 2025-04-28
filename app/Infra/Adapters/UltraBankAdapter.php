@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Infra\Adapters;
 
-use App\Domain\Entities\Transfer;
 use App\Domain\Contracts\Adapters\BankAdapterInterface;
-use App\Exceptions\TransferAuthorizationException;
+use App\Domain\Entities\Transfer;
+use App\Domain\Exceptions\TransferAuthorizationException;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;

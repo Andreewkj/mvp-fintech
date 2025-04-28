@@ -5,35 +5,70 @@ declare(strict_types=1);
 namespace App\Infra\Repositories;
 
 use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
-use App\Exceptions\WalletException;
+use App\Domain\Contracts\TransactionManagerInterface;
+use App\Domain\Entities\Wallet;
+use App\Domain\Exceptions\WalletException;
 use App\Infra\Mappers\WalletMapper;
 use App\Models\WalletModel;
-use Illuminate\Support\Facades\Cache;
-use App\Domain\Entities\Wallet;
+use Exception;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 class WalletRepository implements WalletRepositoryInterface
 {
-    public function __construct(protected WalletModel $model)
+    public function __construct(
+        protected WalletModel $model,
+        protected TransactionManagerInterface $transactionManager
+    )
     {}
 
     /**
      * @throws WalletException
+     * @throws Exception
      */
     public function updateBalance(Wallet $wallet): void
     {
-        $lock = Cache::lock("wallet:{$wallet->getId()}:lock", 5);
+        $maxAttempts = 5;
+        $attempt = 0;
 
-        if ($lock->get()) {
+        while ($attempt < $maxAttempts) {
+            $attempt++;
+
+            $this->transactionManager->beginTransaction();
+
             try {
-                $walletModel = $this->model->findOrFail($wallet->getId());
+                $walletModel = $this->model->where('id', $wallet->getId())
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$walletModel) {
+                    throw new WalletException('Wallet not found');
+                }
+
                 $walletModel->balance = $wallet->getBalance();
                 $walletModel->save();
-            } finally {
-                $lock->release();
+
+                $this->transactionManager->commit();
+                return;
+
+            } catch (QueryException $e) {
+                if ($this->isDeadlock($e)) {
+                    $this->transactionManager->rollback();
+                    continue;
+                }
+
+                $this->transactionManager->rollback();
+                throw $e;
             }
-        } else {
-            throw new WalletException('Could not acquire lock');
         }
+
+        Log::critical("Update balance for wallet: {$wallet->getId()}, balance: {$wallet->getBalance()} failed after {$maxAttempts} attempts");
+        throw new Exception('Transaction failed after multiple attempts due to deadlock');
+    }
+
+    private function isDeadlock(QueryException $e): bool
+    {
+        return $e->getCode() === '1213';
     }
 
     public function findById(string $getPayeeWalletId) : ?Wallet

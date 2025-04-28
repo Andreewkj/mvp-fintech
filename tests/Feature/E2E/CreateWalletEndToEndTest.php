@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\E2E;
 
-use App\Enums\WalletTypeEnum;
+use App\Domain\Enums\WalletTypeEnum;
 use App\Models\UserModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

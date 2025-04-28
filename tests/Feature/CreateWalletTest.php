@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Domain\Entities\Wallet;
-use App\Enums\WalletTypeEnum;
-use App\Exceptions\WalletException;
 use App\Application\Services\WalletService;
+use App\Domain\Entities\Wallet;
+use App\Domain\Enums\WalletTypeEnum;
+use App\Domain\Exceptions\WalletException;
 use App\Models\UserModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;

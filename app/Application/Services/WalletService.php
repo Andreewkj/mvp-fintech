@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Application\Services;
 
-use App\Domain\Entities\Transfer;
 use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
 use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
-use App\Domain\VO\Account;
-use App\Exceptions\WalletException;
-use App\Jobs\AuthorizeTransfer;
 use App\Domain\Entities\Wallet;
-use Illuminate\Support\Facades\DB;
+use App\Domain\Exceptions\WalletException;
+use App\Domain\VO\Account;
 
 class WalletService
 {
@@ -51,5 +48,17 @@ class WalletService
         if ($this->walletRepository->userWalletExist($data['user_id'])) {
             throw new WalletException('Wallet already exists');
         }
+    }
+
+    public function creditWallet(Wallet $wallet, int $value): void
+    {
+        $wallet->credit($value);
+        $this->walletRepository->updateBalance($wallet);
+    }
+
+    public function debitWallet(Wallet $wallet, int $value): void
+    {
+        $wallet->debit($value);
+        $this->walletRepository->updateBalance($wallet);
     }
 }
