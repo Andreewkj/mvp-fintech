@@ -2,19 +2,16 @@
 
 ## Sobre o projeto
 
-O principal UseCase do projeto é a transferência entre dois usuários, no caso serão um usuário comun e um logista, antes de finalizar a transfêrencia, deve ser consultado um serviço externo e verificar se podemos aprovar a transferência.
-
+O principal UseCase do projeto é a transferência entre dois usuários, no caso serão um usuário comum e um logista, antes de finalizar a transferência, deve ser consultado um serviço externo e verificar se podemos aprovar a transferência.
 Caso a transferência seja aprovada, é feito um envio de notificação por email e por sms.
+Em caso de erro na transferência, deve ser feito um estorno para conta do usuário pagador e a dedução do valor na conta do recebedor.
 
-Em caso de erro na transfêrencia, deve ser feito um estorno para conta do usuário pagador e a dedução do valor na conta do recebedor.
+## Sobre o Projeto
 
-## A Minha interpretação do requisitos
-
-O objetivo do projeto é criar algo o mais agnostico ao framework possível.
-Optei pelo uso do DDD, utilizando muito do Objects calistenics, linguagem ubiqua, utilizei os Value Objects para ajudar com a obsessão por tipos primitivos e tratamento de requests fora do framework.
-Meu objetivo é desacoplar o máximo possível e entregar uma solução agnostiva ao framework.
-Uma das parte que acabei utilizando do Framework foi o ORM, mas continuo estudando pra conseguir não depender dele no futuro.
-Para a chamada dos provedores de atualização e notificação, entendi que poderia ser feito umas tentativas a mais antes de de fato cancelar então o job tem 3 tentativas antes da falha.
+O objetivo do projeto é criar algo mais agnóstico ao framework possível.
+Optei pelo uso do DDD, utilizando muito do Objects calisthenics, linguagem ubiqua, utilizei os Value Objects para ajudar com a obsessão por tipos primitivos e tratamento de requests fora do framework.
+Uma parte que acabei utilizando do Framework foi o ORM, mas continuo estudando pra conseguir não depender dele no futuro.
+Para a chamada dos provedores de atualização e notificação, foi feito três tentativas antes de dar como falha.
 
 ## Regras de negocio da implementação
 
@@ -24,8 +21,8 @@ Para a chamada dos provedores de atualização e notificação, entendi que pode
  - O que difere um lojista de um utilizador comum é a sua carteira, já que hoje é possivel fazer operações como lojista apenas com o CPF.
  - Não há rota de saldo mas basta ir até a tabela coluna balance da tabela wallets para adicionar.
  - A principal regra da transferência é que o Logista só pode receber valores, e o usuário comum recebe e envia.
- - Para fazer a transference o usuário precisa apenas passar o id do usuário que irá receber, pois é necessário que o pagador esteja logado, pois com o usuário logado, já possuimos as suas informações
- - Caso a transferência não tenha sucesso o mesmo job que faz a chamada do serviço de autorização, vai devolver os valores para o pagador e para o recebedor e atualizar a transação como type='refund'
+ - Para fazer a transferência o usuário precisa apenas passar o id do usuário que irá receber, pois é necessário que o pagador esteja logado, pois com o usuário logado, já possuímos as suas informações
+ - Caso a transferência não tenha sucesso não deve ser debitado o valor da conta do pagador e também não deve ser enviado a notificação para o recebedor.
 
 ## Configuração do Projeto
 
