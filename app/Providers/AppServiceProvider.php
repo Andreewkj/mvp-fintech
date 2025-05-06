@@ -19,12 +19,13 @@ use App\Infra\Adapters\UltraBankAdapter;
 use App\Infra\Adapters\UltraNotifyAdapter;
 use App\Infra\LaravelEventDispatcher;
 use App\Infra\LaravelTransactionManager;
+use App\Infra\Messaging\MessageBusPublisher;
 use App\Infra\Repositories\TransferRepository;
 use App\Infra\Repositories\UserRepository;
 use App\Infra\Repositories\WalletRepository;
 use App\Listeners\NotifyPayee;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -45,6 +46,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(BankAdapterInterface::class, UltraBankAdapter::class);
         $this->app->bind(EventDispatcherInterface::class, LaravelEventDispatcher::class);
         $this->app->bind(TransactionManagerInterface::class, LaravelTransactionManager::class);
+
+        $this->app->singleton(MessageBusPublisher::class, function ($app) {
+            return new MessageBusPublisher();
+        });
+
     }
 
     /**
