@@ -36,13 +36,7 @@ class NotifyPayee implements ShouldQueue
         }
 
         try {
-            $messageContent = json_encode([
-                'user_id' => $payee->getId(),
-                'message' => 'Your transfer is complete.'
-            ]);
-
-            dump('foi');
-            $this->messageBusPublisher->publishMessage($messageContent);
+            $this->messageBusPublisher->publishMessage($payee);
         } catch (Throwable $e) {
             Log::error("Failed to notify payee ID {$payee->getId()}: {$e->getMessage()}");
         }

@@ -18,17 +18,13 @@ class NotifyUserService
         $this->userRepository = $userRepository;
     }
 
-    public function execute(array $data): void
+    public function notifyByEmail(array $data): void
     {
-        $payee = $this->userRepository->findUserById($data['user_id']);
+        $this->notifyAdapter->notifyByEmail($data);
+    }
 
-        if (!$payee) {
-            // talvez logar ou jogar para DLQ
-            return;
-        }
-
-        //tratar o erro do provedor
-        $this->notifyAdapter->notifyByEmail($payee);
-        $this->notifyAdapter->notifyBySms($payee);
+    public function notifyBySms(array $data): void
+    {
+        $this->notifyAdapter->notifyBySms($data);
     }
 }
