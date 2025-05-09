@@ -36,7 +36,6 @@ class TransferController extends Controller
                 'message' => $e->getMessage()
             ], HttpStatusCodeEnum::UNPROCESSABLE_ENTITY->value);
         } catch (Exception $e) {
-            throw $e;
             Log::error("Error creating transfer, error: {$e->getMessage()}");
             return response()->json([
                 'message' => "Apparently something went wrong with your transfer, but don't worry, we will rollback the values for you"

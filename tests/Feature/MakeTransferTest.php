@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Contracts\Adapters\BankAdapterInterface;
 use App\Events\TransferWasCompleted;
 use App\Models\UserModel;
 use App\Models\WalletModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Mockery;
 use Tests\TestCase;
 
 class MakeTransferTest extends TestCase
@@ -16,6 +18,13 @@ class MakeTransferTest extends TestCase
     public function test_successful_transfer(): void
     {
         Event::fake();
+
+        $bankMock = Mockery::mock(BankAdapterInterface::class);
+        $bankMock->shouldReceive('authorizeTransfer')
+            ->once()
+            ->andReturn(true);
+
+        $this->app->instance(BankAdapterInterface::class, $bankMock);
 
         $payer = UserModel::factory()->create();
         $payee = UserModel::factory()->create();
