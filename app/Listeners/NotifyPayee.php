@@ -2,11 +2,9 @@
 
 namespace App\Listeners;
 
-use App\Domain\Contracts\Adapters\NotifyAdapterInterface;
 use App\Domain\Contracts\Repositories\UserRepositoryInterface;
-use App\Domain\Entities\User;
 use App\Events\TransferWasCompleted;
-use Exception;
+use App\Infra\Messaging\MessageBusPublisher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -19,13 +17,16 @@ class NotifyPayee implements ShouldQueue
     public int $tries = 3;
     public int $backoff = 2;
 
+    public function __construct(
+        protected MessageBusPublisher $messageBusPublisher
+    ) {}
+
     /**
      * @throws Throwable
      */
     public function handle(TransferWasCompleted $event): void
     {
         $userRepository = app(UserRepositoryInterface::class);
-        $notifyAdapter = app(NotifyAdapterInterface::class);
 
         $payee = $userRepository->findUserByWalletId($event->transfer->getPayeeWalletId());
 
@@ -35,8 +36,7 @@ class NotifyPayee implements ShouldQueue
         }
 
         try {
-            $notifyAdapter->notifyByEmail($payee);
-            $notifyAdapter->notifyBySms($payee);
+            $this->messageBusPublisher->publishMessage($payee);
         } catch (Throwable $e) {
             Log::error("Failed to notify payee ID {$payee->getId()}: {$e->getMessage()}");
         }

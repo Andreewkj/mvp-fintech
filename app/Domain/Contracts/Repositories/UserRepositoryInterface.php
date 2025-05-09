@@ -17,4 +17,6 @@ interface UserRepositoryInterface
     public function findUserByEmail(string $email): ?User;
 
     public function findUserByCnpj(string $cnpj): ?User;
+
+    public function findUserById(string $userId): ?User;
 }

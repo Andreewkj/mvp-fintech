@@ -19,12 +19,15 @@ use App\Infra\Adapters\UltraBankAdapter;
 use App\Infra\Adapters\UltraNotifyAdapter;
 use App\Infra\LaravelEventDispatcher;
 use App\Infra\LaravelTransactionManager;
+use App\Infra\Messaging\MessageBusPublisher;
+use App\Infra\Messaging\RabbitMQChannelFactory;
+use App\Infra\Messaging\RabbitMQConnectionFactory;
 use App\Infra\Repositories\TransferRepository;
 use App\Infra\Repositories\UserRepository;
 use App\Infra\Repositories\WalletRepository;
 use App\Listeners\NotifyPayee;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,14 +40,22 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TransferRepositoryInterface::class, TransferRepository::class);
         $this->app->bind(WalletRepositoryInterface::class, WalletRepository::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+
+        // TODO: Refatorar para uma factory
         $this->app->bind(RequestValidateInterface::class,CreateUserRequest::class);
         $this->app->bind(RequestValidateInterface::class,CreateWalletRequest::class);
         $this->app->bind(RequestValidateInterface::class,CreateTransferRequest::class);
         $this->app->bind(RequestValidateInterface::class,CreateLoginRequest::class);
+
         $this->app->bind(NotifyAdapterInterface::class, UltraNotifyAdapter::class);
         $this->app->bind(BankAdapterInterface::class, UltraBankAdapter::class);
         $this->app->bind(EventDispatcherInterface::class, LaravelEventDispatcher::class);
         $this->app->bind(TransactionManagerInterface::class, LaravelTransactionManager::class);
+
+        $this->app->singleton(RabbitMQChannelFactory::class);
+        $this->app->singleton(RabbitMQConnectionFactory::class);
+        $this->app->singleton(MessageBusPublisher::class);
+
     }
 
     /**

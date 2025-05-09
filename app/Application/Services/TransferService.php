@@ -12,7 +12,6 @@ use App\Domain\Entities\Transfer;
 use App\Domain\Entities\Wallet;
 use App\Domain\Exceptions\TransferException;
 use App\Events\TransferWasCompleted;
-use App\Jobs\NotifyPayee;
 use Exception;
 
 class TransferService

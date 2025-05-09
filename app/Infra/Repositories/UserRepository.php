@@ -49,4 +49,10 @@ class UserRepository implements UserRepositoryInterface
         $model = $this->userModel->where('cnpj', $cnpj)->first();
         return $model ? UserMapper::toEntity($model) : null;
     }
+
+    public function findUserById(string $userId): ?User
+    {
+        $model = $this->userModel->where('id', $userId)->first();
+        return $model ? UserMapper::toEntity($model) : null;
+    }
 }
