@@ -23,10 +23,19 @@ Para a chamada dos provedores de atualização e notificação, foi feito três 
  - A principal regra da transferência é que o Logista só pode receber valores, e o usuário comum recebe e envia.
  - Para fazer a transferência o usuário precisa apenas passar o id do usuário que irá receber, pois é necessário que o pagador esteja logado, pois com o usuário logado, já possuímos as suas informações
  - Caso a transferência não tenha sucesso não deve ser debitado o valor da conta do pagador e também não deve ser enviado a notificação para o recebedor.
+ - A tranferência é feita de forma sincrona mas as notificações são enviadas através do evento disparado ao obter sucesso, onde são enviadas para o producer no rabbitmq e ao serem consumidas, a validação do provedor é executa e caso seja recusada, e mensagem da notificação vai para uma DLQ.
 
 ## Configuração do Projeto
 
 Dentro da pasta do projeto temos duas opções, configurar o sail, ou utilizar o docker compose.
+
+## Fluxo de transferência
+
+1. criação dos usuários
+2. criação dasd wallets dos usuários
+3. tranferência entre wallets através do Id do usuário
+4. ativação das filas para ativar a notificação
+5. ativação do consumer ```bash consumer:notify ``` para o envio das notificações
 
 ## Configuração Sail
 
@@ -191,6 +200,10 @@ curl --request POST \
 	"payee_id": "01jr6vqyf825nx0hyxpg037hpt"
 }'
 ```
+
+## RabbitMQ
+
+``` http://localhost:15672/ ```
 
 ## Testes
 
