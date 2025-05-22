@@ -35,7 +35,7 @@ class TransferService
 
         $value = $data['value'];
 
-        $payerWallet->validateTransfer($value);
+        $payerWallet->validateTransfer($value, $payeeWallet);
 
         if ($payeeWallet->getId() === $payerWallet->getId()) {
             throw new TransferException('Payee and payer cannot be the same');

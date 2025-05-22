@@ -27,6 +27,7 @@ class NotifyConsumer
         try {
             $this->notifyUserService->notifyByEmail($body);
             $msg->ack();
+            echo "E-mail enviado com sucesso\n";
         } catch (\Throwable $e) {
             if ($tries >= 3) {
                 echo "Enviando para DLQ...\n";
@@ -53,6 +54,7 @@ class NotifyConsumer
         try {
             $this->notifyUserService->notifyBySms($body);
             $msg->ack();
+            echo "SMS enviado com sucesso\n";
         } catch (\Throwable $e) {
             if ($tries >= 3) {
                 echo "Enviando para DLQ...\n";
@@ -89,7 +91,7 @@ class NotifyConsumer
         $channel = $this->channelFactory->make(
             queue: $queue,
             queueOptions: [],
-            exchange: '',
+            exchange: 'dlq.exchange',
             exchangeOptions: [],
             routingKey: $queue
         );

@@ -70,8 +70,12 @@ class Wallet
     /**
      * @throws TransferException
      */
-    public function validateTransfer(int $value): void
+    public function validateTransfer(int $value, ?Wallet $payeeWallet): void
     {
+        if (!$payeeWallet) {
+            throw new TransferException('Payee wallet not found');
+        }
+
         if ($this->isShopKeeper()) {
             throw new TransferException('Shop keeper cannot make transfers');
         }

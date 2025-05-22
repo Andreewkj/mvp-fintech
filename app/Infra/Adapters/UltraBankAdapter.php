@@ -6,12 +6,11 @@ namespace App\Infra\Adapters;
 
 use App\Domain\Contracts\Adapters\BankAdapterInterface;
 use App\Domain\Entities\Transfer;
-use App\Domain\Exceptions\TransferAuthorizationException;
-use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use Exception;
 
 class UltraBankAdapter implements BankAdapterInterface
 {
@@ -24,10 +23,6 @@ class UltraBankAdapter implements BankAdapterInterface
         $this->url = env('NUBANK_API_URL');
     }
 
-    /**
-     * @throws Exception
-     * @throws Throwable
-     */
     public function authorizeTransfer(Transfer $transfer): bool
     {
         try {
@@ -35,9 +30,9 @@ class UltraBankAdapter implements BankAdapterInterface
                 $this->client->get($this->url);
             }, 2000);
             return true;
-        } catch (GuzzleException $e) {
+        } catch (GuzzleException | Throwable $e) {
             Log::critical('Error authorizing transfer id: ' . $transfer->getId() . ', error: ' . $e->getMessage());
-            throw new TransferAuthorizationException('Authorization failed for transfer id: ' . $transfer->getId());
+            return false;
         }
     }
 }

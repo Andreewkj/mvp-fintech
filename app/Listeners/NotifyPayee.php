@@ -15,7 +15,6 @@ class NotifyPayee implements ShouldQueue
     use InteractsWithQueue;
 
     public int $tries = 3;
-    public int $backoff = 2;
 
     public function __construct(
         protected MessageBusPublisher $messageBusPublisher
