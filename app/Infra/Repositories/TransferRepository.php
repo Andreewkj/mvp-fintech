@@ -10,9 +10,9 @@ use App\Domain\Enums\TransferStatusEnum;
 use App\Infra\Mappers\TransferMapper;
 use App\Models\TransferModel;
 
-class TransferRepository implements TransferRepositoryInterface
+readonly class TransferRepository implements TransferRepositoryInterface
 {
-    public function __construct(protected TransferModel $model)
+    public function __construct(private TransferModel $model)
     {}
 
     public function register(array $array): ?Transfer
@@ -23,17 +23,25 @@ class TransferRepository implements TransferRepositoryInterface
         return TransferMapper::toEntity($model);
     }
 
+    /**
+     * @param Transfer $transfer
+     * @return void
+     */
     public function updateToDeniedStatus(Transfer $transfer): void
     {
-        $this->model->where('id', $transfer->getId())->update([
+        $this->model->query()->where('id', $transfer->getId())->update([
             'status' => TransferStatusEnum::STATUS_DENIED->value,
             'denied_at' => now()->format('Y-m-d H:i:s'),
         ]);
     }
 
+    /**
+     * @param Transfer $transfer
+     * @return void
+     */
     public function updateToAuthorizedStatus(Transfer $transfer): void
     {
-        $this->model->where('id', $transfer->getId())->update([
+        $this->model->query()->where('id', $transfer->getId())->update([
             'status' => TransferStatusEnum::STATUS_AUTHORIZED->value,
             'authorized_at' => now()->format('Y-m-d H:i:s'),
         ]);

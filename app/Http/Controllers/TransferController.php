@@ -17,8 +17,8 @@ use InvalidArgumentException;
 class TransferController extends Controller
 {
     public function __construct(
-        protected CreateTransferRequest $createTransferRequest,
-        protected TransferService $transferService
+        private readonly CreateTransferRequest $createTransferRequest,
+        private readonly TransferService $transferService
     )
     {}
 

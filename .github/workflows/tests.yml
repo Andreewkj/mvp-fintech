@@ -17,8 +17,8 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: laravel
-          MYSQL_USER: sail
+          MYSQL_DATABASE: test_fintech
+          MYSQL_USER: master
           MYSQL_PASSWORD: password
         ports:
           - 3306:3306
@@ -35,7 +35,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: mbstring, pdo_mysql
           tools: composer, phpunit
 
@@ -45,8 +45,8 @@ jobs:
           echo "DB_CONNECTION=mysql" >> .env
           echo "DB_HOST=127.0.0.1" >> .env
           echo "DB_PORT=3306" >> .env
-          echo "DB_DATABASE=laravel" >> .env
-          echo "DB_USERNAME=sail" >> .env
+          echo "DB_DATABASE=test_fintech" >> .env
+          echo "DB_USERNAME=master" >> .env
           echo "DB_PASSWORD=password" >> .env
           echo "REDIS_HOST=127.0.0.1" >> .env
 

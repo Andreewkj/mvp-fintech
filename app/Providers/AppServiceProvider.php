@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Domain\Contracts\Adapters\BankAdapterInterface;
 use App\Domain\Contracts\Adapters\NotifyAdapterInterface;
+use App\Domain\Contracts\CreateUserRequestValidateInterface;
 use App\Domain\Contracts\EventDispatcherInterface;
 use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
 use App\Domain\Contracts\Repositories\UserRepositoryInterface;
@@ -42,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
 
         // TODO: Refatorar para uma factory
-        $this->app->bind(RequestValidateInterface::class,CreateUserRequest::class);
+        $this->app->bind(CreateUserRequestValidateInterface::class,CreateUserRequest::class);
         $this->app->bind(RequestValidateInterface::class,CreateWalletRequest::class);
         $this->app->bind(RequestValidateInterface::class,CreateTransferRequest::class);
         $this->app->bind(RequestValidateInterface::class,CreateLoginRequest::class);

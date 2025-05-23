@@ -14,11 +14,11 @@ use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 
-class WalletRepository implements WalletRepositoryInterface
+readonly class WalletRepository implements WalletRepositoryInterface
 {
     public function __construct(
-        protected WalletModel $model,
-        protected TransactionManagerInterface $transactionManager
+        private WalletModel                 $model,
+        private TransactionManagerInterface $transactionManager
     )
     {}
 
@@ -37,7 +37,7 @@ class WalletRepository implements WalletRepositoryInterface
             $this->transactionManager->beginTransaction();
 
             try {
-                $walletModel = $this->model->where('id', $wallet->getId())
+                $walletModel = $this->model->query()->where('id', $wallet->getId())
                     ->lockForUpdate()
                     ->first();
 
@@ -73,7 +73,7 @@ class WalletRepository implements WalletRepositoryInterface
 
     public function findById(string $getPayeeWalletId) : ?Wallet
     {
-        $model = $this->model->where('id', $getPayeeWalletId)->first();
+        $model = $this->model->query()->where('id', $getPayeeWalletId)->first();
         return $model ? WalletMapper::toEntity($model) : null;
     }
 
@@ -87,19 +87,19 @@ class WalletRepository implements WalletRepositoryInterface
 
     public function findWalletByUserId(string $userId) : ?Wallet
     {
-        $model = $this->model->where('user_id', $userId)->first();
+        $model = $this->model->query()->where('user_id', $userId)->first();
         return $model ? WalletMapper::toEntity($model) : null;
 
     }
 
     public function userWalletExist(string $userId) : bool
     {
-        return $this->model->where('user_id', $userId)->exists();
+        return $this->model->query()->where('user_id', $userId)->exists();
     }
 
     public function findUserByWalletById(string $walletId) : ?Wallet
     {
-        $model = $this->model->where('id', $walletId)->first();
+        $model = $this->model->query()->where('id', $walletId)->first();
         return $model ? WalletMapper::toEntity($model) : null;
     }
 }

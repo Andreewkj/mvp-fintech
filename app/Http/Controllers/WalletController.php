@@ -16,9 +16,8 @@ use Illuminate\Support\Facades\Log;
 class WalletController extends Controller
 {
     public function __construct(
-        protected CreateWalletRequest $createWalletRequest,
-        protected WalletService $walletService,
-        protected TransferService $transferService
+        private readonly CreateWalletRequest $createWalletRequest,
+        private readonly WalletService $walletService
     )
     {}
 

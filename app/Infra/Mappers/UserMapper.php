@@ -10,9 +10,14 @@ use App\Domain\VO\Cnpj;
 use App\Domain\VO\Email;
 use App\Domain\VO\Phone;
 use App\Models\UserModel;
+use Illuminate\Support\Facades\Hash;
 
 class UserMapper
 {
+    /**
+     * @param UserModel $model
+     * @return User
+     */
     public static function toEntity(UserModel $model): User
     {
         return new User(
@@ -26,15 +31,24 @@ class UserMapper
         );
     }
 
-    public static function toModel(User $entity, ?UserModel $model = null): UserModel
+    /**
+     * @param User $entity
+     * @param string|null $password
+     * @return UserModel
+     */
+    public static function toModel(User $entity, ?string $password): UserModel
     {
-        $model = $model ?: new UserModel();
+        $model = new UserModel();
         $model->id = $entity->getId();
         $model->full_name = $entity->getName();
         $model->cpf = $entity->getCpf()?->getValue();
         $model->cnpj = $entity->getCnpj()?->getValue();
         $model->email = $entity->getEmail()->getValue();
         $model->phone = $entity->getPhone()->getValue();
+
+        if ($password) {
+            $model->password = Hash::make($password);
+        }
 
         return $model;
     }

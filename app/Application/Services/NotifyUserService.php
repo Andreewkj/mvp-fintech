@@ -18,11 +18,17 @@ class NotifyUserService
         $this->userRepository = $userRepository;
     }
 
+    /**
+     * @param array $data
+     */
     public function notifyByEmail(array $data): void
     {
         $this->notifyAdapter->notifyByEmail($data);
     }
 
+    /**
+     * @param array $data
+     */
     public function notifyBySms(array $data): void
     {
         $this->notifyAdapter->notifyBySms($data);

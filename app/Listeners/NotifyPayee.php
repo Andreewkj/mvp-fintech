@@ -17,7 +17,7 @@ class NotifyPayee implements ShouldQueue
     public int $tries = 3;
 
     public function __construct(
-        protected MessageBusPublisher $messageBusPublisher
+        private readonly MessageBusPublisher $messageBusPublisher
     ) {}
 
     /**

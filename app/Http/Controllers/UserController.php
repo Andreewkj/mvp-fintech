@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Application\DTO\UserResponseDTO;
 use App\Application\Services\UserService;
 use App\Domain\Entities\User;
 use App\Domain\Enums\HttpStatusCodeEnum;
 use App\Http\Requests\CreateLoginRequest;
 use App\Http\Requests\CreateUserRequest;
-use App\Presenters\UserPresenter;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,9 +20,9 @@ use InvalidArgumentException;
 class UserController extends Controller
 {
     public function __construct(
-        protected CreateUserRequest $createUserRequest,
-        protected UserService $userService,
-        protected CreateLoginRequest $createLoginRequest
+        private readonly CreateUserRequest $createUserRequest,
+        private readonly UserService $userService,
+        private readonly CreateLoginRequest $createLoginRequest
     ) {}
     public function login(Request $request): JsonResponse
     {
@@ -52,10 +52,13 @@ class UserController extends Controller
     public function store(Request $request): User | JsonResponse
     {
         try {
-            $data = $this->createUserRequest->validate($request->all());
-            $user = $this->userService->createUser($data);
+            $dto = $this->createUserRequest->validate($request->all());
+            $user = $this->userService->createUser($dto);
 
-            return response()->json(UserPresenter::fromEntity($user));
+            return response()->json(
+                UserResponseDTO::fromEntity($user)->toArray(),
+                HttpStatusCodeEnum::CREATED->value
+            );
         } catch (InvalidArgumentException $e) {
             return response()->json([
                 'message' => $e->getMessage()
@@ -63,7 +66,7 @@ class UserController extends Controller
         } catch (Exception $e) {
             Log::error("Error creating user, error: {$e->getMessage()}");
             return response()->json([
-                'message' => "Error creating your user"
+                'message' => "Error creating user"
             ], HttpStatusCodeEnum::INTERNAL_SERVER_ERROR->value);
         }
     }

@@ -12,7 +12,6 @@ use App\Domain\Entities\Transfer;
 use App\Domain\Entities\Wallet;
 use App\Domain\Exceptions\TransferException;
 use App\Events\TransferWasCompleted;
-use Exception;
 
 class TransferService
 {
@@ -26,8 +25,12 @@ class TransferService
     {}
 
     /**
-     * @throws TransferException | Exception
+     * @param array $data
+     * @param String $userId
+     * @return Transfer
+     * @throws TransferException
      */
+
     public function transfer(array $data, String $userId): Transfer
     {
         $payeeWallet = $this->walletService->findWalletByUserId($data['payee_id']);
@@ -41,6 +44,7 @@ class TransferService
             throw new TransferException('Payee and payer cannot be the same');
         }
 
+        // TODO: apesar de ter a lógica, a transferência que falhou não esta sendo salva.
         return $this->transactionManager->run(function () use ($payeeWallet, $payerWallet, $value) {
             // Create transfer with pending status to have the history of transfers even if the transfer fails
             $transfer = $this->transferRepository->register([
@@ -66,6 +70,11 @@ class TransferService
         });
     }
 
+    /**
+     * @param Transfer $transfer
+     * @param Wallet $payeeWallet
+     * @param Wallet $payerWallet
+     */
     private function handleAuthorizedTransfer(Transfer $transfer, Wallet $payeeWallet, Wallet $payerWallet): void
     {
         $this->walletService->creditWallet($payeeWallet, $transfer->getValue());

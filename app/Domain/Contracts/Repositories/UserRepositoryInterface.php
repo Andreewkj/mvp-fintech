@@ -6,7 +6,7 @@ use App\Domain\Entities\User;
 
 interface UserRepositoryInterface
 {
-    public function create(array $data): User;
+    public function create(User $userEntity, string $password): User;
 
     public function updateUserWallet(string $userId, string $walletId): void;
 

@@ -14,6 +14,10 @@ class Cnpj
         $this->validate($cnpj);
     }
 
+    /**
+     * @param string $cnpj
+     * @return void
+     */
     private function validate(string $cnpj): void
     {
         $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
@@ -27,6 +31,10 @@ class Cnpj
         $this->cnpj = $cnpj;
     }
 
+    /**
+     * @param string $cnpj
+     * @return void
+     */
     private function validateCheckDigits(string $cnpj): void
     {
         $length = strlen($cnpj) - 2;
@@ -65,6 +73,9 @@ class Cnpj
         }
     }
 
+    /**
+     * @return string
+     */
     public function getValue(): string
     {
         return $this->cnpj;
