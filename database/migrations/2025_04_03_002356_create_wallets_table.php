@@ -16,7 +16,6 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->enum('type', WalletTypeEnum::toArray())->default(WalletTypeEnum::COMMON->value);
             $table->integer('balance')->default(0);
-            $table->char('account', 15)->unique();
             $table->foreignUlid('user_id')->references('id')->on('users');
             $table->timestamps();
         });

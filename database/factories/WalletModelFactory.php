@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Domain\VO\Account;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +20,6 @@ class WalletModelFactory extends Factory
             'user_id' => 1,
             'balance' => 0,
             'type'    => 'common',
-            'account' => (new Account())->getValue()
         ];
     }
 }

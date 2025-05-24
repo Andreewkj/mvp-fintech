@@ -2,14 +2,15 @@
 
 namespace App\Http\Requests;
 
-use App\Domain\Contracts\RequestValidateInterface;
+use App\Application\DTO\User\LoginUserDTO;
+use App\Domain\Contracts\LoginUserRequestValidateInterface;
 use App\Domain\VO\Email;
 use App\Domain\VO\Password;
 use InvalidArgumentException;
 
-class CreateLoginRequest implements RequestValidateInterface
+class LoginUserRequest implements LoginUserRequestValidateInterface
 {
-    public function validate(array $data): array
+    public function validate(array $data): LoginUserDTO
     {
         if (empty($data['email'])) {
             throw new InvalidArgumentException('Email is required');
@@ -23,6 +24,9 @@ class CreateLoginRequest implements RequestValidateInterface
 
         $data['email'] = (new Email($data['email']))->getValue();
 
-        return $data;
+        return new LoginUserDTO(
+            $data['email'],
+            $data['password']
+        );
     }
 }

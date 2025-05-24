@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Services;
 
-use App\Application\DTO\CreateUserDto;
+use App\Application\DTO\User\CreateUserDTO;
 use App\Application\Factories\UserFactory;
 use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 use App\Domain\Entities\User;
@@ -19,10 +19,10 @@ class UserService
     ) {}
 
     /**
-     * @param CreateUserDto $createUserDto
+     * @param CreateUserDTO $createUserDto
      * @return User
      */
-    public function createUser(CreateUserDto $createUserDto): User
+    public function createUser(CreateUserDTO $createUserDto): User
     {
         $userEntity = UserFactory::fromDto($createUserDto);
 

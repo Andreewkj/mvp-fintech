@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use App\Application\DTO\CreateUserDto;
+use App\Application\DTO\User\CreateUserDTO;
 use App\Application\Services\UserService;
 use App\Domain\Contracts\CreateUserRequestValidateInterface;
 use App\Domain\VO\Cnpj;
@@ -23,9 +23,9 @@ class CreateUserRequest implements CreateUserRequestValidateInterface
 
     /**
      * @param array $data
-     * @return CreateUserDto
+     * @return CreateUserDTO
      */
-    public function validate(array $data): CreateUserDto
+    public function validate(array $data): CreateUserDTO
     {
         if (empty($data['email'])) {
             throw new InvalidArgumentException('Email is required');
@@ -74,7 +74,7 @@ class CreateUserRequest implements CreateUserRequestValidateInterface
             }
         }
 
-        return new CreateUserDto(
+        return new CreateUserDTO(
             email: $email,
             fullName: $data['full_name'],
             cpf: $cpf,

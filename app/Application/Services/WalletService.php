@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Application\Services;
 
+use App\Application\DTO\Wallet\CreateWalletDTO;
+use App\Application\Factories\WalletFactory;
 use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
 use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Domain\Entities\Wallet;
 use App\Domain\Exceptions\WalletException;
-use App\Domain\VO\Account;
 
 class WalletService
 {
@@ -21,41 +22,59 @@ class WalletService
     {}
 
     /**
+     * @param CreateWalletDTO $createWalletDto
+     * @return Wallet
      * @throws WalletException
      */
-    public function createWallet(array $data) : Wallet
+    public function createWallet(CreateWalletDTO $createWalletDto) : Wallet
     {
-        $data['account'] = (new Account())->getValue();
-        //Here probably should be post to bank and get account
+        $this->validateIfAccountAlreadyExist($createWalletDto);
 
-        $this->validateIfAccountAlreadyExist($data);
-        $wallet = $this->walletRepository->create($data);
-        $this->userRepository->updateUserWallet($data['user_id'], $wallet->getId());
+        $walletEntity = WalletFactory::fromDto($createWalletDto);
+        $wallet = $this->walletRepository->create($walletEntity);
+
+        $this->userRepository->updateUserWallet($createWalletDto->userId, $wallet->getId());
 
         return $wallet;
     }
 
+    /**
+     * @param string $userId
+     * @return Wallet|null
+     */
     public function findWalletByUserId(string $userId) : ?Wallet
     {
         return $this->walletRepository->findWalletByUserId($userId);
     }
 
     /**
+     * @param CreateWalletDTO $createWalletDto
+     * @return void
      * @throws WalletException
      */
-    private function validateIfAccountAlreadyExist(array $data): void
+    private function validateIfAccountAlreadyExist(CreateWalletDTO $createWalletDto): void
     {
-        if ($this->walletRepository->userWalletExist($data['user_id'])) {
+        if ($this->walletRepository->userWalletExist($createWalletDto->userId)) {
             throw new WalletException('Wallet already exists');
         }
     }
 
+    /**
+     * @param Wallet $wallet
+     * @param int $value
+     * @return void
+     */
     public function creditWallet(Wallet $wallet, int $value): void
     {
         $wallet->credit($value);
         $this->walletRepository->updateBalance($wallet);
     }
 
+    /**
+     * @param Wallet $wallet
+     * @param int $value
+     * @return void
+     */
     public function debitWallet(Wallet $wallet, int $value): void
     {
         $wallet->debit($value);

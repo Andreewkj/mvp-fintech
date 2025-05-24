@@ -12,7 +12,6 @@ class WalletMapper
         return new Wallet(
             id: $model->id,
             user_id: $model->user_id,
-            account: $model->account,
             balance: $model->balance,
             type: $model->type,
         );
@@ -23,7 +22,6 @@ class WalletMapper
         $model = $model ?: new WalletModel();
         $model->id = $entity->getId();
         $model->user_id = $entity->getUserId();
-        $model->account = $entity->getAccount();
         $model->balance = $entity->getBalance();
         $model->type = $entity->getType();
 

@@ -8,11 +8,11 @@ use App\Application\Services\TransferService;
 use App\Domain\Enums\HttpStatusCodeEnum;
 use App\Domain\Exceptions\TransferException;
 use App\Http\Requests\CreateTransferRequest;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
+use Exception;
 
 class TransferController extends Controller
 {
@@ -25,8 +25,11 @@ class TransferController extends Controller
     public function makeTransfer(Request $request): JsonResponse
     {
         try {
-            $data = $this->createTransferRequest->validate($request->all());
-            $this->transferService->transfer($data, auth()->user()->id);
+            $requestData = $request->all();
+            $requestData['payer_id'] = auth()->user()->id;
+
+            $makeTransferDto = $this->createTransferRequest->validate($requestData);
+            $this->transferService->transfer($makeTransferDto);
 
             return response()->json([
                 'message' => "transfer completed successfully"

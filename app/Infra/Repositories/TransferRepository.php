@@ -15,12 +15,16 @@ readonly class TransferRepository implements TransferRepositoryInterface
     public function __construct(private TransferModel $model)
     {}
 
-    public function register(array $array): ?Transfer
+    /**
+     * @param Transfer $transfer
+     * @return Transfer|null
+     */
+    public function create(Transfer $transfer): ?Transfer
     {
-        $model = $this->model->create($array);
-        $model->refresh();
+        $transferModel = TransferMapper::toModel($transfer);
+        $transferModel->save();
 
-        return TransferMapper::toEntity($model);
+        return TransferMapper::toEntity($transferModel);
     }
 
     /**

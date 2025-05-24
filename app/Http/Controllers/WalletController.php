@@ -27,8 +27,8 @@ class WalletController extends Controller
         $data['user_id'] = auth()->user()->id;
 
         try {
-            $data = $this->createWalletRequest->validate($data);
-            $this->walletService->createWallet($data);
+            $createWalletDto = $this->createWalletRequest->validate($data);
+            $this->walletService->createWallet($createWalletDto);
 
             return response()->json([
                 'message' => "Your wallet was created successfully"

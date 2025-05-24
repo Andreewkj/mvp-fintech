@@ -13,7 +13,6 @@ class Wallet
     public function __construct(
         private string $id,
         private string $user_id,
-        private string $account,
         private int $balance,
         private string $type,
     ) {}
@@ -26,11 +25,6 @@ class Wallet
     public function getUserId(): string
     {
         return $this->user_id;
-    }
-
-    public function getAccount(): string
-    {
-        return $this->account;
     }
 
     public function getBalance(): int

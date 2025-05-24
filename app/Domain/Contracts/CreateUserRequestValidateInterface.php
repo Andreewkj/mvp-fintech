@@ -2,9 +2,9 @@
 
 namespace App\Domain\Contracts;
 
-use App\Application\DTO\CreateUserDto;
+use App\Application\DTO\User\CreateUserDTO;
 
 interface CreateUserRequestValidateInterface
 {
-    public function validate(array $data): CreateUserDto;
+    public function validate(array $data): CreateUserDTO;
 }

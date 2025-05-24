@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests;
 
-use App\Domain\Contracts\RequestValidateInterface;
+use App\Application\DTO\Wallet\CreateWalletDTO;
+use App\Domain\Contracts\CreateWalletRequestValidateInterface;
 use App\Domain\Enums\WalletTypeEnum;
 use InvalidArgumentException;
 
-readonly class CreateWalletRequest implements RequestValidateInterface
+readonly class CreateWalletRequest implements CreateWalletRequestValidateInterface
 {
-    public function validate(array $data): array
+    public function validate(array $data): CreateWalletDTO
     {
         if (empty($data['user_id'])) {
             throw new InvalidArgumentException('UserModel was not found, make sure you are logged in, or contact your support team');
@@ -24,6 +25,12 @@ readonly class CreateWalletRequest implements RequestValidateInterface
             default => throw new InvalidArgumentException('Wallet type was not a valid type')
         };
 
-        return $data;
+        $data['balance'] = 0;
+
+        return new CreateWalletDTO(
+            $data['user_id'],
+            $data['type'],
+            $data['balance']
+        );
     }
 }

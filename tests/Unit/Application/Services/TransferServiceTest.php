@@ -104,7 +104,7 @@ class TransferServiceTest extends TestCase
             null
         );
 
-        $this->transferRepositoryMock->shouldReceive('register')
+        $this->transferRepositoryMock->shouldReceive('create')
             ->once()
             ->andReturn($mockTransfer);
 
@@ -176,7 +176,7 @@ class TransferServiceTest extends TestCase
         $this->walletRepositoryMock->shouldReceive('findWalletByUserId')->with('payee_id')->andReturn($payeeWallet);
         $this->walletRepositoryMock->shouldReceive('findWalletByUserId')->with('payer_id')->andReturn($payerWallet);
 
-        $this->transferRepositoryMock->shouldReceive('register')->andReturn(null); // Simula falha
+        $this->transferRepositoryMock->shouldReceive('create')->andReturn(null); // Simula falha
 
         $this->transferService->transfer([
             'payee_id' => 'payee_id',

@@ -6,7 +6,7 @@ use App\Domain\Entities\Wallet;
 
 interface WalletRepositoryInterface
 {
-    public function create(array $data) : Wallet;
+    public function create(Wallet $wallet) : Wallet;
 
     public function findWalletByUserId(string $userId) : ?Wallet;
 

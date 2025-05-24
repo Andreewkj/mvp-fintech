@@ -10,9 +10,9 @@ use App\Domain\Entities\Wallet;
 use App\Domain\Exceptions\WalletException;
 use App\Infra\Mappers\WalletMapper;
 use App\Models\WalletModel;
-use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 readonly class WalletRepository implements WalletRepositoryInterface
 {
@@ -23,6 +23,20 @@ readonly class WalletRepository implements WalletRepositoryInterface
     {}
 
     /**
+     * @param Wallet $wallet
+     * @return Wallet
+     */
+    public function create(Wallet $wallet) : Wallet
+    {
+        $model = WalletMapper::toModel($wallet);
+        $model->save();
+
+        return WalletMapper::toEntity($model);
+    }
+
+    /**
+     * @param Wallet $wallet
+     * @return void
      * @throws WalletException
      * @throws Exception
      */
@@ -66,25 +80,29 @@ readonly class WalletRepository implements WalletRepositoryInterface
         throw new Exception('Transaction failed after multiple attempts due to deadlock');
     }
 
+    /**
+     * @param QueryException $e
+     * @return bool
+     */
     private function isDeadlock(QueryException $e): bool
     {
         return $e->getCode() === '1213';
     }
 
+    /**
+     * @param string $getPayeeWalletId
+     * @return Wallet|null
+     */
     public function findById(string $getPayeeWalletId) : ?Wallet
     {
         $model = $this->model->query()->where('id', $getPayeeWalletId)->first();
         return $model ? WalletMapper::toEntity($model) : null;
     }
 
-    public function create(array $data) : Wallet
-    {
-        $model = $this->model->create($data);
-        $model->refresh();
-
-        return WalletMapper::toEntity($model);
-    }
-
+    /**
+     * @param string $userId
+     * @return Wallet|null
+     */
     public function findWalletByUserId(string $userId) : ?Wallet
     {
         $model = $this->model->query()->where('user_id', $userId)->first();
@@ -92,11 +110,19 @@ readonly class WalletRepository implements WalletRepositoryInterface
 
     }
 
+    /**
+     * @param string $userId
+     * @return bool
+     */
     public function userWalletExist(string $userId) : bool
     {
         return $this->model->query()->where('user_id', $userId)->exists();
     }
 
+    /**
+     * @param string $walletId
+     * @return Wallet|null
+     */
     public function findUserByWalletById(string $walletId) : ?Wallet
     {
         $model = $this->model->query()->where('id', $walletId)->first();

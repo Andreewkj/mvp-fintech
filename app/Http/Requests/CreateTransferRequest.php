@@ -2,12 +2,17 @@
 
 namespace App\Http\Requests;
 
-use App\Domain\Contracts\RequestValidateInterface;
+use App\Application\DTO\Transfer\MakeTransferDTO;
+use App\Domain\Contracts\CreateTransferRequestValidateInterface;
 use InvalidArgumentException;
 
-readonly class CreateTransferRequest implements RequestValidateInterface
+readonly class CreateTransferRequest implements CreateTransferRequestValidateInterface
 {
-    public function validate(array $data): array
+    /**
+     * @param array $data
+     * @return MakeTransferDTO
+     */
+    public function validate(array $data): MakeTransferDTO
     {
         if (empty($data['payee_id'])) {
             throw new InvalidArgumentException('Payee id is required');
@@ -25,6 +30,10 @@ readonly class CreateTransferRequest implements RequestValidateInterface
             throw new InvalidArgumentException('Payee id must be a string');
         }
 
-        return $data;
+        return new MakeTransferDTO(
+            $data['payer_id'],
+            $data['payee_id'],
+            $data['value']
+        );
     }
 }

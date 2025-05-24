@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Application\DTO;
+namespace App\Application\DTO\User;
 
 use App\Domain\Entities\User;
 
-readonly class UserResponseDTO
+readonly class ResponseUserDTO
 {
     public function __construct(
-        public string  $id,
+        public string  $userId,
         public string  $fullName,
         public string  $email,
         public string  $phone,
@@ -18,7 +18,7 @@ readonly class UserResponseDTO
     public static function fromEntity(User $user): self
     {
         return new self(
-            id: $user->getId(),
+            userId: $user->getId(),
             fullName: $user->getName(),
             email: $user->getEmail()->getValue(),
             phone: $user->getPhone()->getValue(),
@@ -30,7 +30,7 @@ readonly class UserResponseDTO
     public function toArray(): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->userId,
             'full_name' => $this->fullName,
             'email' => $this->email,
             'phone' => $this->phone,
