@@ -14,6 +14,17 @@ readonly class CreateTransferRequest implements CreateTransferRequestValidateInt
      */
     public function validate(array $data): MakeTransferDTO
     {
+        $this->validateRequiredFields($data);
+
+        return new MakeTransferDTO(
+            $data['payer_id'],
+            $data['payee_id'],
+            $data['value']
+        );
+    }
+
+    private function validateRequiredFields(array $data): void
+    {
         if (empty($data['payee_id'])) {
             throw new InvalidArgumentException('Payee id is required');
         }
@@ -29,11 +40,5 @@ readonly class CreateTransferRequest implements CreateTransferRequestValidateInt
         if (gettype($data['payee_id']) !== 'string') {
             throw new InvalidArgumentException('Payee id must be a string');
         }
-
-        return new MakeTransferDTO(
-            $data['payer_id'],
-            $data['payee_id'],
-            $data['value']
-        );
     }
 }

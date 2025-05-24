@@ -11,20 +11,20 @@ class Wallet
     const MINIMUM_TRANSFER_VALUE = 0;
 
     public function __construct(
-        private string $id,
-        private string $user_id,
+        private string $walletId,
+        private string $userId,
         private int $balance,
         private string $type,
     ) {}
 
-    public function getId(): string
+    public function getWalletId(): string
     {
-        return $this->id;
+        return $this->walletId;
     }
 
     public function getUserId(): string
     {
-        return $this->user_id;
+        return $this->userId;
     }
 
     public function getBalance(): int

@@ -9,11 +9,11 @@ use Illuminate\Support\Str;
 
 class WalletFactory
 {
-    public static function fromDto(CreateWalletDTO $createWalletDto) : Wallet
+    public function fromDto(CreateWalletDTO $createWalletDto) : Wallet
     {
         return new Wallet(
-            id: (new EntityId())->getValue(),
-            user_id: $createWalletDto->userId,
+            walletId: (new EntityId())->getValue(),
+            userId: $createWalletDto->userId,
             balance: $createWalletDto->balance,
             type: $createWalletDto->type
         );

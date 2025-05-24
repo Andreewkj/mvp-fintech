@@ -30,20 +30,20 @@ class NotifyPayee implements ShouldQueue
         $payee = $userRepository->findUserByWalletId($event->transfer->getPayeeWalletId());
 
         if (is_null($payee)) {
-            Log::warning("Payee ID not found on transfer id: {$event->transfer->getId()}");
+            Log::warning("Payee ID not found on transfer id: {$event->transfer->getTransferId()}");
             return;
         }
 
         try {
             $this->messageBusPublisher->publishMessage($payee);
-        } catch (Throwable $e) {
-            Log::error("Failed to notify payee ID {$payee->getId()}: {$e->getMessage()}");
+        } catch (Throwable $exception) {
+            Log::error("Failed to notify payee ID {$payee->getUserId()}: {$exception->getMessage()}");
         }
     }
 
-    public function failed(TransferWasCompleted $event, Throwable $e): void
+    public function failed(TransferWasCompleted $event, Throwable $exception): void
     {
-        Log::Error("Error sending notification to payee wallet id: {$event->transfer->getPayeeWalletId()}, error: {$e->getMessage()}");
+        Log::Error("Error sending notification to payee wallet id: {$event->transfer->getPayeeWalletId()}, error: {$exception->getMessage()}");
         //maybe store notification on some queue or db to try again later
     }
 }

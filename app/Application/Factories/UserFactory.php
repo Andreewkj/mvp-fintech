@@ -17,10 +17,10 @@ class UserFactory
      * @param CreateUserDTO $dto
      * @return User
      */
-    public static function fromDto(CreateUserDTO $dto): User
+    public function fromDto(CreateUserDTO $dto): User
     {
         return new User(
-            id: (new EntityId())->getValue(),
+            UserId: (new EntityId())->getValue(),
             name: $dto->fullName,
             cpf: $dto->cpf ? new Cpf($dto->cpf) : null,
             cnpj: $dto->cnpj ? new Cnpj($dto->cnpj) : null,

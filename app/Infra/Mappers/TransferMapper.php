@@ -24,7 +24,7 @@ class TransferMapper
     public static function toModel(Transfer $entity, ?TransferModel $model = null): TransferModel
     {
         $model = $model ?: new TransferModel();
-        $model->id = $entity->getId();
+        $model->id = $entity->getTransferId();
         $model->payer_wallet_id = $entity->getPayerWalletId();
         $model->payee_wallet_id = $entity->getPayeeWalletId();
         $model->status = $entity->getStatus();

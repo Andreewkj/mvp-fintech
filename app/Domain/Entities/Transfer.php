@@ -8,18 +8,18 @@ use DateTime;
 class Transfer
 {
     public function __construct(
-        private string $id,
-        private string $payer_wallet_id,
-        private string $payee_wallet_id,
+        private string $transferId,
+        private string $payerWalletId,
+        private string $payeeWalletId,
         private string $status,
         private TransferValue $value,
-        private ?DateTime $authorized_at,
-        private ?DateTime $denied_at,
+        private ?DateTime $authorizedAt,
+        private ?DateTime $deniedAt,
     ) {}
 
-    public function getId(): string
+    public function getTransferId(): string
     {
-        return $this->id;
+        return $this->transferId;
     }
 
     public function getStatus(): string
@@ -28,12 +28,12 @@ class Transfer
     }
     public function getPayerWalletId(): string
     {
-        return $this->payer_wallet_id;
+        return $this->payerWalletId;
     }
 
     public function getPayeeWalletId(): string
     {
-        return $this->payee_wallet_id;
+        return $this->payeeWalletId;
     }
 
     public function getValue(): int
@@ -43,11 +43,11 @@ class Transfer
 
     public function getAuthorizedAt(): ?String
     {
-        return $this->authorized_at?->format('Y-m-d H:i:s');
+        return $this->authorizedAt?->format('Y-m-d H:i:s');
     }
 
     public function getDeniedAt(): ?String
     {
-        return $this->denied_at?->format('Y-m-d H:i:s');
+        return $this->deniedAt?->format('Y-m-d H:i:s');
     }
 }

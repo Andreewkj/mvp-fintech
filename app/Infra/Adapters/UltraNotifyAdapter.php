@@ -27,7 +27,7 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
     public function notifyByEmail(array $data): void
     {
         try {
-            $response = $this->client->post($this->url, [
+            $this->client->post($this->url, [
                 $data['email']
             ]);
         } catch (GuzzleException $e) {
@@ -42,7 +42,7 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
     public function notifyBySms(array $data): void
     {
         try {
-            $response = $this->client->post($this->url, [
+            $this->client->post($this->url, [
                 $data['phone']
             ]);
         } catch (GuzzleException $e) {

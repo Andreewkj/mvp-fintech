@@ -12,10 +12,11 @@ use App\Domain\VO\Cnpj;
 use App\Domain\VO\Cpf;
 use App\Domain\VO\Email;
 
-class UserService
+readonly class UserService
 {
     public function __construct(
-        protected UserRepositoryInterface $userRepository
+        private UserRepositoryInterface $userRepository,
+        private UserFactory             $userFactory
     ) {}
 
     /**
@@ -24,8 +25,7 @@ class UserService
      */
     public function createUser(CreateUserDTO $createUserDto): User
     {
-        $userEntity = UserFactory::fromDto($createUserDto);
-
+        $userEntity = $this->userFactory->fromDto($createUserDto);
         return $this->userRepository->create($userEntity, $createUserDto->password);
     }
 
@@ -56,7 +56,6 @@ class UserService
     public function findUserByCnpj(string $cnpj): ?User
     {
         $cnpj = (new Cnpj($cnpj))->getValue();
-
         return $this->userRepository->findUserByCnpj($cnpj);
     }
 }

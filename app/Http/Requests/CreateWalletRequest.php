@@ -11,13 +11,7 @@ readonly class CreateWalletRequest implements CreateWalletRequestValidateInterfa
 {
     public function validate(array $data): CreateWalletDTO
     {
-        if (empty($data['user_id'])) {
-            throw new InvalidArgumentException('UserModel was not found, make sure you are logged in, or contact your support team');
-        }
-
-        if (empty($data['type'])) {
-            throw new InvalidArgumentException('Wallet type was not found');
-        }
+        $this->validateRequiredFields($data);
 
         match ($data['type']) {
             'common' => WalletTypeEnum::COMMON,
@@ -32,5 +26,16 @@ readonly class CreateWalletRequest implements CreateWalletRequestValidateInterfa
             $data['type'],
             $data['balance']
         );
+    }
+
+    private function validateRequiredFields(array $data): void
+    {
+        if (empty($data['user_id'])) {
+            throw new InvalidArgumentException('UserModel was not found, make sure you are logged in, or contact your support team');
+        }
+
+        if (empty($data['type'])) {
+            throw new InvalidArgumentException('Wallet type was not found');
+        }
     }
 }

@@ -28,13 +28,13 @@ class MessageBusPublisher
     public function publishMessage(User $user): void
     {
         $smsPayload = json_encode([
-            'user_id' => $user->getId(),
+            'user_id' => $user->getUserId(),
             'phone' => $user->getPhone()->getValue(),
             'message' => "Hello {$user->getName()}, Your transfer was completed successfully"
         ]);
 
         $emailPayload = json_encode([
-            'user_id' => $user->getId(),
+            'user_id' => $user->getUserId(),
             'email' => $user->getEmail()->getValue(),
             'message' => "Good news {$user->getName()}, Your transfer was completed successfully"
         ]);

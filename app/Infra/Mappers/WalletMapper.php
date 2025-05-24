@@ -20,7 +20,7 @@ class WalletMapper
     public static function toModel(Wallet $entity, ?WalletModel $model = null): WalletModel
     {
         $model = $model ?: new WalletModel();
-        $model->id = $entity->getId();
+        $model->id = $entity->getWalletId();
         $model->user_id = $entity->getUserId();
         $model->balance = $entity->getBalance();
         $model->type = $entity->getType();

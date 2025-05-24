@@ -68,8 +68,8 @@ class TransferServiceTest extends TestCase
         $payerWallet = Mockery::mock(Wallet::class);
         $payeeWallet = Mockery::mock(Wallet::class);
 
-        $payerWallet->shouldReceive('getId')->andReturn('wallet_payer');
-        $payeeWallet->shouldReceive('getId')->andReturn('wallet_payee');
+        $payerWallet->shouldReceive('getWalletId')->andReturn('wallet_payer');
+        $payeeWallet->shouldReceive('getWalletId')->andReturn('wallet_payee');
 
         $payeeWallet->shouldReceive('credit')->with(100)->once();
         $payerWallet->shouldReceive('debit')->with(100)->once();
@@ -140,7 +140,7 @@ class TransferServiceTest extends TestCase
         $this->expectExceptionMessage('Payee and payer cannot be the same');
 
         $wallet = Mockery::mock(Wallet::class);
-        $wallet->shouldReceive('getId')->andReturn('same_wallet');
+        $wallet->shouldReceive('getWalletId')->andReturn('same_wallet');
         $wallet->shouldReceive('validateTransfer')->with(100, $wallet)->once();
 
         $this->walletRepositoryMock->shouldReceive('findWalletByUserId')
@@ -168,8 +168,8 @@ class TransferServiceTest extends TestCase
                 return $callback();
             });
 
-        $payerWallet->shouldReceive('getId')->andReturn('wallet_payer');
-        $payeeWallet->shouldReceive('getId')->andReturn('wallet_payee');
+        $payerWallet->shouldReceive('getWalletId')->andReturn('wallet_payer');
+        $payeeWallet->shouldReceive('getWalletId')->andReturn('wallet_payee');
 
         $payerWallet->shouldReceive('validateTransfer')->with(100, $payeeWallet)->once();
 

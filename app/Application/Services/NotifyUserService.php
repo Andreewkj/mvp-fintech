@@ -3,19 +3,12 @@
 namespace App\Application\Services;
 
 use App\Domain\Contracts\Adapters\NotifyAdapterInterface;
-use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 
-class NotifyUserService
+readonly class NotifyUserService
 {
-    protected NotifyAdapterInterface $notifyAdapter;
-    protected UserRepositoryInterface $userRepository;
-
     public function __construct(
-        NotifyAdapterInterface $notifyAdapter,
-        UserRepositoryInterface $userRepository
+        private NotifyAdapterInterface  $notifyAdapter
     ) {
-        $this->notifyAdapter = $notifyAdapter;
-        $this->userRepository = $userRepository;
     }
 
     /**

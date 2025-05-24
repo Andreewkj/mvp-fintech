@@ -13,7 +13,7 @@ use DomainException;
 class User
 {
     public function __construct(
-        private string $id,
+        private string $userId,
         private string $name,
         private ?Cpf $cpf,
         private ?Cnpj $cnpj,
@@ -22,18 +22,9 @@ class User
         private ?Wallet $wallet = null,
     ) {}
 
-    public function assignWallet(Wallet $wallet): void
+    public function getUserId(): string
     {
-        if ($this->wallet !== null) {
-            throw new DomainException("UserModel already has a wallet");
-        }
-
-        $this->wallet = $wallet;
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
+        return $this->userId;
     }
 
     public function getName(): string

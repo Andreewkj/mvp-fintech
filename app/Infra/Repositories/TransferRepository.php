@@ -33,7 +33,7 @@ readonly class TransferRepository implements TransferRepositoryInterface
      */
     public function updateToDeniedStatus(Transfer $transfer): void
     {
-        $this->model->query()->where('id', $transfer->getId())->update([
+        $this->model->query()->where('id', $transfer->getTransferId())->update([
             'status' => TransferStatusEnum::STATUS_DENIED->value,
             'denied_at' => now()->format('Y-m-d H:i:s'),
         ]);
@@ -45,7 +45,7 @@ readonly class TransferRepository implements TransferRepositoryInterface
      */
     public function updateToAuthorizedStatus(Transfer $transfer): void
     {
-        $this->model->query()->where('id', $transfer->getId())->update([
+        $this->model->query()->where('id', $transfer->getTransferId())->update([
             'status' => TransferStatusEnum::STATUS_AUTHORIZED->value,
             'authorized_at' => now()->format('Y-m-d H:i:s'),
         ]);

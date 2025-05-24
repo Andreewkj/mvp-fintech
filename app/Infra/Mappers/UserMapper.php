@@ -39,7 +39,7 @@ class UserMapper
     public static function toModel(User $entity, ?string $password): UserModel
     {
         $model = new UserModel();
-        $model->id = $entity->getId();
+        $model->id = $entity->getUserId();
         $model->full_name = $entity->getName();
         $model->cpf = $entity->getCpf()?->getValue();
         $model->cnpj = $entity->getCnpj()?->getValue();

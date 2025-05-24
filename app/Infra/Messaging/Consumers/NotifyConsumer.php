@@ -5,6 +5,7 @@ namespace App\Infra\Messaging\Consumers;
 use App\Application\Services\NotifyUserService;
 use App\Infra\Messaging\RabbitMQChannelFactory;
 use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Wire\AMQPTable;
 
 class NotifyConsumer
 {
@@ -20,7 +21,7 @@ class NotifyConsumer
 
         $body = json_decode($msg->getBody(), true);
         $headers = $msg->get_properties()['application_headers'] ?? null;
-        $tries = $headers instanceof \PhpAmqpLib\Wire\AMQPTable && isset($headers->getNativeData()['x-tries'])
+        $tries = $headers instanceof AMQPTable && isset($headers->getNativeData()['x-tries'])
             ? $headers->getNativeData()['x-tries']
             : 0;
 
@@ -33,11 +34,12 @@ class NotifyConsumer
                 echo "Enviando para DLQ...\n";
                 $this->sendToDlq('dlq_notify_email', $body, $e->getMessage());
                 $msg->ack();
-            } else {
-                echo "Erro ao enviar e-mail. Retentativa " . ($tries + 1) . "\n";
-                $this->republishWithRetry($msg, 'notify_email', $tries + 1);
-                $msg->ack();
+                return;
             }
+
+            echo "Erro ao enviar e-mail. Retentativa " . ($tries + 1) . "\n";
+            $this->republishWithRetry($msg, 'notify_email', $tries + 1);
+            $msg->ack();
         }
     }
 
@@ -47,7 +49,7 @@ class NotifyConsumer
 
         $body = json_decode($msg->getBody(), true);
         $headers = $msg->get_properties()['application_headers'] ?? null;
-        $tries = $headers instanceof \PhpAmqpLib\Wire\AMQPTable && isset($headers->getNativeData()['x-tries'])
+        $tries = $headers instanceof AMQPTable && isset($headers->getNativeData()['x-tries'])
             ? $headers->getNativeData()['x-tries']
             : 0;
 
@@ -60,11 +62,12 @@ class NotifyConsumer
                 echo "Enviando para DLQ...\n";
                 $this->sendToDlq('dlq_notify_sms', $body, $e->getMessage());
                 $msg->ack();
-            } else {
-                echo "Erro ao enviar sms. Retentativa " . ($tries + 1) . "\n";
-                $this->republishWithRetry($msg, 'notify_sms', $tries + 1);
-                $msg->ack();
+                return;
             }
+
+            echo "Erro ao enviar sms. Retentativa " . ($tries + 1) . "\n";
+            $this->republishWithRetry($msg, 'notify_sms', $tries + 1);
+            $msg->ack();
         }
     }
 
@@ -73,7 +76,7 @@ class NotifyConsumer
         $msgBody = $msg->getBody();
         $msgProps = [
             'delivery_mode' => 2,
-            'application_headers' => new \PhpAmqpLib\Wire\AMQPTable([
+            'application_headers' => new AMQPTable([
                 'x-tries' => $tries,
             ]),
         ];

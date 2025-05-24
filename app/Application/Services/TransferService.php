@@ -16,14 +16,15 @@ use App\Domain\Entities\Wallet;
 use App\Domain\Exceptions\TransferException;
 use App\Events\TransferWasCompleted;
 
-class TransferService
+readonly class TransferService
 {
     public function __construct(
-        protected WalletService $walletService,
-        protected TransferRepositoryInterface $transferRepository,
-        protected TransactionManagerInterface $transactionManager,
-        protected BankAdapterInterface $bankAdapter,
-        protected EventDispatcherInterface $eventDispatcher
+        private WalletService               $walletService,
+        private TransferRepositoryInterface $transferRepository,
+        private TransactionManagerInterface $transactionManager,
+        private BankAdapterInterface        $bankAdapter,
+        private EventDispatcherInterface    $eventDispatcher,
+        private TransferFactory             $transferFactory
     )
     {}
 
@@ -39,7 +40,7 @@ class TransferService
 
         $payerWallet->validateTransfer($makeTransferDTO->value, $payeeWallet);
 
-        if ($payeeWallet->getId() === $payerWallet->getId()) {
+        if ($payeeWallet->getWalletId() === $payerWallet->getWalletId()) {
             throw new TransferException('Payee and payer cannot be the same');
         }
 
@@ -53,7 +54,7 @@ class TransferService
                 $makeTransferDTO->value
             );
 
-            $transferEntity = TransferFactory::fromDto($createTransferDTO);
+            $transferEntity = $this->transferFactory->fromDto($createTransferDTO);
 
             $transfer = $this->transferRepository->create($transferEntity);
 

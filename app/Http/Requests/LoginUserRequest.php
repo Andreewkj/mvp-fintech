@@ -12,13 +12,7 @@ class LoginUserRequest implements LoginUserRequestValidateInterface
 {
     public function validate(array $data): LoginUserDTO
     {
-        if (empty($data['email'])) {
-            throw new InvalidArgumentException('Email is required');
-        }
-
-        if (empty($data['password'])) {
-            throw new InvalidArgumentException('Password is required');
-        }
+        $this->validateRequiredFields($data);
 
         $data['password'] = (new Password($data['password']))->getValue();
 
@@ -28,5 +22,16 @@ class LoginUserRequest implements LoginUserRequestValidateInterface
             $data['email'],
             $data['password']
         );
+    }
+
+    private function validateRequiredFields(array $data): void
+    {
+        if (empty($data['email'])) {
+            throw new InvalidArgumentException('Email is required');
+        }
+
+        if (empty($data['password'])) {
+            throw new InvalidArgumentException('Password is required');
+        }
     }
 }

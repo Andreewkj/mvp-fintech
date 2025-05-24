@@ -31,7 +31,7 @@ class UltraBankAdapter implements BankAdapterInterface
             }, 2000);
             return true;
         } catch (GuzzleException | Throwable $e) {
-            Log::critical('Error authorizing transfer id: ' . $transfer->getId() . ', error: ' . $e->getMessage());
+            Log::critical('Error authorizing transfer id: ' . $transfer->getTransferId() . ', error: ' . $e->getMessage());
             return false;
         }
     }

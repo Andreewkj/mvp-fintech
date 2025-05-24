@@ -53,7 +53,7 @@ class WalletServiceTest extends TestCase
         $this->userRepository
             ->expects($this->once())
             ->method('updateUserWallet')
-            ->with($userId, $walletMock->getId());
+            ->with($userId, $walletMock->getWalletId());
 
         $result = $this->walletService->createWallet($walletData);
 

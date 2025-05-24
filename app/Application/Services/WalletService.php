@@ -6,18 +6,17 @@ namespace App\Application\Services;
 
 use App\Application\DTO\Wallet\CreateWalletDTO;
 use App\Application\Factories\WalletFactory;
-use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
 use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Domain\Entities\Wallet;
 use App\Domain\Exceptions\WalletException;
 
-class WalletService
+readonly class WalletService
 {
     public function __construct(
-        protected WalletRepositoryInterface $walletRepository,
-        protected UserRepositoryInterface $userRepository,
-        protected TransferRepositoryInterface $transferRepository
+        private WalletRepositoryInterface $walletRepository,
+        private UserRepositoryInterface   $userRepository,
+        private WalletFactory             $walletFactory
     )
     {}
 
@@ -30,10 +29,10 @@ class WalletService
     {
         $this->validateIfAccountAlreadyExist($createWalletDto);
 
-        $walletEntity = WalletFactory::fromDto($createWalletDto);
+        $walletEntity = $this->walletFactory->fromDto($createWalletDto);
         $wallet = $this->walletRepository->create($walletEntity);
 
-        $this->userRepository->updateUserWallet($createWalletDto->userId, $wallet->getId());
+        $this->userRepository->updateUserWallet($createWalletDto->userId, $wallet->getWalletId());
 
         return $wallet;
     }

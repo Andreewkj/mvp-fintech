@@ -18,7 +18,7 @@ readonly class ResponseUserDTO
     public static function fromEntity(User $user): self
     {
         return new self(
-            userId: $user->getId(),
+            userId: $user->getUserId(),
             fullName: $user->getName(),
             email: $user->getEmail()->getValue(),
             phone: $user->getPhone()->getValue(),

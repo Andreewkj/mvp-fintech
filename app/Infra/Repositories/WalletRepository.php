@@ -51,7 +51,7 @@ readonly class WalletRepository implements WalletRepositoryInterface
             $this->transactionManager->beginTransaction();
 
             try {
-                $walletModel = $this->model->query()->where('id', $wallet->getId())
+                $walletModel = $this->model->query()->where('id', $wallet->getWalletId())
                     ->lockForUpdate()
                     ->first();
 
@@ -65,28 +65,28 @@ readonly class WalletRepository implements WalletRepositoryInterface
                 $this->transactionManager->commit();
                 return;
 
-            } catch (QueryException $e) {
-                if ($this->isDeadlock($e)) {
+            } catch (QueryException $exception) {
+                if ($this->isDeadlock($exception)) {
                     $this->transactionManager->rollback();
                     continue;
                 }
 
                 $this->transactionManager->rollback();
-                throw $e;
+                throw $exception;
             }
         }
 
-        Log::critical("Update balance for wallet: {$wallet->getId()}, balance: {$wallet->getBalance()} failed after {$maxAttempts} attempts");
+        Log::critical("Update balance for wallet: {$wallet->getWalletId()}, balance: {$wallet->getBalance()} failed after {$maxAttempts} attempts");
         throw new Exception('Transaction failed after multiple attempts due to deadlock');
     }
 
     /**
-     * @param QueryException $e
+     * @param QueryException $exception
      * @return bool
      */
-    private function isDeadlock(QueryException $e): bool
+    private function isDeadlock(QueryException $exception): bool
     {
-        return $e->getCode() === '1213';
+        return $exception->getCode() === '1213';
     }
 
     /**
