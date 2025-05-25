@@ -10,8 +10,8 @@ class WalletMapper
     public static function toEntity(WalletModel $model): Wallet
     {
         return new Wallet(
-            id: $model->id,
-            user_id: $model->user_id,
+            walletId: $model->id,
+            userId: $model->user_id,
             balance: $model->balance,
             type: $model->type,
         );

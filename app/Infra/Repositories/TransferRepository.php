@@ -15,10 +15,6 @@ readonly class TransferRepository implements TransferRepositoryInterface
     public function __construct(private TransferModel $model)
     {}
 
-    /**
-     * @param Transfer $transfer
-     * @return Transfer|null
-     */
     public function create(Transfer $transfer): ?Transfer
     {
         $transferModel = TransferMapper::toModel($transfer);
@@ -27,27 +23,23 @@ readonly class TransferRepository implements TransferRepositoryInterface
         return TransferMapper::toEntity($transferModel);
     }
 
-    /**
-     * @param Transfer $transfer
-     * @return void
-     */
     public function updateToDeniedStatus(Transfer $transfer): void
     {
         $this->model->query()->where('id', $transfer->getTransferId())->update([
             'status' => TransferStatusEnum::STATUS_DENIED->value,
             'denied_at' => now()->format('Y-m-d H:i:s'),
         ]);
+
+        $this->model->refresh();
     }
 
-    /**
-     * @param Transfer $transfer
-     * @return void
-     */
     public function updateToAuthorizedStatus(Transfer $transfer): void
     {
         $this->model->query()->where('id', $transfer->getTransferId())->update([
             'status' => TransferStatusEnum::STATUS_AUTHORIZED->value,
             'authorized_at' => now()->format('Y-m-d H:i:s'),
         ]);
+
+        $this->model->refresh();
     }
 }

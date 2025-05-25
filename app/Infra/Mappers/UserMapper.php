@@ -21,21 +21,15 @@ class UserMapper
     public static function toEntity(UserModel $model): User
     {
         return new User(
-            id: $model->id,
+            userId: $model->id,
             name: $model->full_name,
             cpf: $model->cpf ? new Cpf($model->cpf) : null,
             cnpj: $model->cnpj ? new Cnpj($model->cnpj) : null,
             email: new Email($model->email),
             phone: new Phone($model->phone),
-            wallet: $model->wallet ? WalletMapper::toEntity($model->wallet) : null
         );
     }
 
-    /**
-     * @param User $entity
-     * @param string|null $password
-     * @return UserModel
-     */
     public static function toModel(User $entity, ?string $password): UserModel
     {
         $model = new UserModel();

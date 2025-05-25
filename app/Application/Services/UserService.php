@@ -19,40 +19,24 @@ readonly class UserService
         private UserFactory             $userFactory
     ) {}
 
-    /**
-     * @param CreateUserDTO $createUserDto
-     * @return User
-     */
     public function createUser(CreateUserDTO $createUserDto): User
     {
         $userEntity = $this->userFactory->fromDto($createUserDto);
         return $this->userRepository->create($userEntity, $createUserDto->password);
     }
 
-    /**
-     * @param string $cpf
-     * @return User | null
-     */
     public function findUserByCpf(string $cpf): ?User
     {
         $cpf = (new Cpf($cpf))->getValue();
         return $this->userRepository->findUserByCpf($cpf);
     }
 
-    /**
-     * @param string $email
-     * @return User | null
-     */
     public function findUserByEmail(string $email): ?User
     {
         $email = (new Email($email))->getValue();
         return $this->userRepository->findUserByEmail($email);
     }
 
-    /**
-     * @param string $cnpj
-     * @return User | null
-     */
     public function findUserByCnpj(string $cnpj): ?User
     {
         $cnpj = (new Cnpj($cnpj))->getValue();

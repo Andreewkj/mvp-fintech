@@ -21,10 +21,6 @@ class CreateUserRequest implements CreateUserRequestValidateInterface
     ) {
     }
 
-    /**
-     * @param array $data
-     * @return CreateUserDTO
-     */
     public function validate(array $data): CreateUserDTO
     {
         $this->validateRequiredFields($data);

@@ -10,7 +10,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-use Exception;
 
 class UltraBankAdapter implements BankAdapterInterface
 {
@@ -26,9 +25,12 @@ class UltraBankAdapter implements BankAdapterInterface
     public function authorizeTransfer(Transfer $transfer): bool
     {
         try {
-            retry(3, function () use ($transfer) {
+            retry(3, function () {
                 $this->client->get($this->url);
             }, 2000);
+
+            Log::info('Transfer id: ' . $transfer->getTransferId() . ' authorized');
+
             return true;
         } catch (GuzzleException | Throwable $e) {
             Log::critical('Error authorizing transfer id: ' . $transfer->getTransferId() . ', error: ' . $e->getMessage());

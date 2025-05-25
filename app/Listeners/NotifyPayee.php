@@ -43,7 +43,7 @@ class NotifyPayee implements ShouldQueue
 
     public function failed(TransferWasCompleted $event, Throwable $exception): void
     {
-        Log::Error("Error sending notification to payee wallet id: {$event->transfer->getPayeeWalletId()}, error: {$exception->getMessage()}");
+        Log::error("Error sending notification to payee wallet id: {$event->transfer->getPayeeWalletId()}, error: {$exception->getMessage()}");
         //maybe store notification on some queue or db to try again later
     }
 }

@@ -29,11 +29,9 @@ readonly class TransferService
     {}
 
     /**
-     * @param MakeTransferDTO $makeTransferDTO
-     * @return Transfer
      * @throws TransferException
      */
-    public function transfer(MakeTransferDTO $makeTransferDTO): Transfer
+    public function transfer(MakeTransferDTO $makeTransferDTO): void
     {
         $payerWallet = $this->walletService->findWalletByUserId($makeTransferDTO->payerId);
         $payeeWallet = $this->walletService->findWalletByUserId($makeTransferDTO->payeeId);
@@ -44,10 +42,7 @@ readonly class TransferService
             throw new TransferException('Payee and payer cannot be the same');
         }
 
-        // TODO: apesar de ter a lógica, a transferência que falhou não esta sendo salva.
-        return $this->transactionManager->run(function () use ($payeeWallet, $payerWallet, $makeTransferDTO) {
-            // Create transfer with pending status to have the history of transfers even if the transfer fails
-
+        $transferWasCompleted = $this->transactionManager->run(function () use ($payeeWallet, $payerWallet, $makeTransferDTO) {
             $createTransferDTO = new CreateTransferDTO(
                 $payerWallet,
                 $payeeWallet,
@@ -64,22 +59,20 @@ readonly class TransferService
 
             if (!$this->bankAdapter->authorizeTransfer($transfer)) {
                 $this->transferRepository->updateToDeniedStatus($transfer);
-                throw new TransferException('Transfer was not authorized');
+                return false;
             }
 
             $this->handleAuthorizedTransfer($transfer, $payeeWallet, $payerWallet);
-
             $this->eventDispatcher->dispatch(new TransferWasCompleted($transfer));
 
-            return $transfer;
+            return true;
         });
+
+        if (!$transferWasCompleted) {
+            throw new TransferException('Transfer was not authorized by the bank');
+        }
     }
 
-    /**
-     * @param Transfer $transfer
-     * @param Wallet $payeeWallet
-     * @param Wallet $payerWallet
-     */
     private function handleAuthorizedTransfer(Transfer $transfer, Wallet $payeeWallet, Wallet $payerWallet): void
     {
         $this->walletService->creditWallet($payeeWallet, $transfer->getValue());

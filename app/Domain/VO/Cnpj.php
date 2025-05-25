@@ -14,10 +14,6 @@ class Cnpj
         $this->validate($cnpj);
     }
 
-    /**
-     * @param string $cnpj
-     * @return void
-     */
     private function validate(string $cnpj): void
     {
         $cnpj = preg_replace('/[^0-9]/', '', $cnpj);

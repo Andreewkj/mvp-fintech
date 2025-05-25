@@ -8,10 +8,6 @@ use InvalidArgumentException;
 
 readonly class CreateTransferRequest implements CreateTransferRequestValidateInterface
 {
-    /**
-     * @param array $data
-     * @return MakeTransferDTO
-     */
     public function validate(array $data): MakeTransferDTO
     {
         $this->validateRequiredFields($data);

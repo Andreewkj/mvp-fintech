@@ -10,7 +10,6 @@ use App\Domain\VO\TransferValue;
 
 class TransferFactory
 {
-
     public static function fromDto(CreateTransferDTO $createTransferDto) : Transfer
     {
         return new Transfer(

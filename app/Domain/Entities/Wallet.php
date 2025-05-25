@@ -39,7 +39,7 @@ class Wallet
 
     public function isShopKeeper(): bool
     {
-        return $this->type == WalletTypeEnum::SHOP_KEEPER;
+        return $this->type == WalletTypeEnum::SHOP_KEEPER->value;
     }
 
     public function hasSufficientBalance(int $value): bool

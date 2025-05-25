@@ -14,8 +14,8 @@ readonly class CreateWalletRequest implements CreateWalletRequestValidateInterfa
         $this->validateRequiredFields($data);
 
         match ($data['type']) {
-            'common' => WalletTypeEnum::COMMON,
-            'shop_keeper' => WalletTypeEnum::SHOP_KEEPER,
+            'common' => WalletTypeEnum::COMMON->value,
+            'shop_keeper' => WalletTypeEnum::SHOP_KEEPER->value,
             default => throw new InvalidArgumentException('Wallet type was not a valid type')
         };
 

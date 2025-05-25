@@ -19,7 +19,6 @@ class User
         private ?Cnpj $cnpj,
         private Email $email,
         private Phone $phone,
-        private ?Wallet $wallet = null,
     ) {}
 
     public function getUserId(): string
@@ -35,11 +34,6 @@ class User
     public function getEmail(): Email
     {
         return $this->email;
-    }
-
-    public function getWallet(): ?Wallet
-    {
-        return $this->wallet;
     }
 
     public function getPhone(): Phone

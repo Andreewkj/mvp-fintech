@@ -22,10 +22,6 @@ readonly class WalletRepository implements WalletRepositoryInterface
     )
     {}
 
-    /**
-     * @param Wallet $wallet
-     * @return Wallet
-     */
     public function create(Wallet $wallet) : Wallet
     {
         $model = WalletMapper::toModel($wallet);
@@ -35,8 +31,6 @@ readonly class WalletRepository implements WalletRepositoryInterface
     }
 
     /**
-     * @param Wallet $wallet
-     * @return void
      * @throws WalletException
      * @throws Exception
      */
@@ -80,29 +74,17 @@ readonly class WalletRepository implements WalletRepositoryInterface
         throw new Exception('Transaction failed after multiple attempts due to deadlock');
     }
 
-    /**
-     * @param QueryException $exception
-     * @return bool
-     */
     private function isDeadlock(QueryException $exception): bool
     {
         return $exception->getCode() === '1213';
     }
 
-    /**
-     * @param string $getPayeeWalletId
-     * @return Wallet|null
-     */
     public function findById(string $getPayeeWalletId) : ?Wallet
     {
         $model = $this->model->query()->where('id', $getPayeeWalletId)->first();
         return $model ? WalletMapper::toEntity($model) : null;
     }
 
-    /**
-     * @param string $userId
-     * @return Wallet|null
-     */
     public function findWalletByUserId(string $userId) : ?Wallet
     {
         $model = $this->model->query()->where('user_id', $userId)->first();
@@ -110,19 +92,11 @@ readonly class WalletRepository implements WalletRepositoryInterface
 
     }
 
-    /**
-     * @param string $userId
-     * @return bool
-     */
     public function userWalletExist(string $userId) : bool
     {
         return $this->model->query()->where('user_id', $userId)->exists();
     }
 
-    /**
-     * @param string $walletId
-     * @return Wallet|null
-     */
     public function findUserByWalletById(string $walletId) : ?Wallet
     {
         $model = $this->model->query()->where('id', $walletId)->first();

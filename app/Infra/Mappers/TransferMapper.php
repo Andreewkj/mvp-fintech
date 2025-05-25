@@ -11,13 +11,13 @@ class TransferMapper
     public static function toEntity(TransferModel $model): Transfer
     {
         return new Transfer(
-            id: $model->id,
-            payer_wallet_id: $model->payer_wallet_id,
-            payee_wallet_id: $model->payee_wallet_id,
+            transferId: $model->id,
+            payerWalletId: $model->payer_wallet_id,
+            payeeWalletId: $model->payee_wallet_id,
             status: $model->status,
             value: new TransferValue($model->value),
-            authorized_at: $model->authorized_at,
-            denied_at: $model->denied_at,
+            authorizedAt: $model->authorizedAt,
+            deniedAt: $model->deniedAt,
         );
     }
 

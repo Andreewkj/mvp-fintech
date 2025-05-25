@@ -11,9 +11,6 @@ readonly class NotifyUserService
     ) {
     }
 
-    /**
-     * @param array $data
-     */
     public function notifyByEmail(array $data): void
     {
         $this->notifyAdapter->notifyByEmail($data);

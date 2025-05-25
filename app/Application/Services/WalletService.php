@@ -20,11 +20,6 @@ readonly class WalletService
     )
     {}
 
-    /**
-     * @param CreateWalletDTO $createWalletDto
-     * @return Wallet
-     * @throws WalletException
-     */
     public function createWallet(CreateWalletDTO $createWalletDto) : Wallet
     {
         $this->validateIfAccountAlreadyExist($createWalletDto);
@@ -37,20 +32,11 @@ readonly class WalletService
         return $wallet;
     }
 
-    /**
-     * @param string $userId
-     * @return Wallet|null
-     */
     public function findWalletByUserId(string $userId) : ?Wallet
     {
         return $this->walletRepository->findWalletByUserId($userId);
     }
 
-    /**
-     * @param CreateWalletDTO $createWalletDto
-     * @return void
-     * @throws WalletException
-     */
     private function validateIfAccountAlreadyExist(CreateWalletDTO $createWalletDto): void
     {
         if ($this->walletRepository->userWalletExist($createWalletDto->userId)) {
@@ -58,22 +44,12 @@ readonly class WalletService
         }
     }
 
-    /**
-     * @param Wallet $wallet
-     * @param int $value
-     * @return void
-     */
     public function creditWallet(Wallet $wallet, int $value): void
     {
         $wallet->credit($value);
         $this->walletRepository->updateBalance($wallet);
     }
 
-    /**
-     * @param Wallet $wallet
-     * @param int $value
-     * @return void
-     */
     public function debitWallet(Wallet $wallet, int $value): void
     {
         $wallet->debit($value);
