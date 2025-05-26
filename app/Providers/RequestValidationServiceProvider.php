@@ -13,9 +13,6 @@ use Illuminate\Support\ServiceProvider;
 
 class RequestValidationServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     */
     public function register(): void
     {
         $this->app->bind(CreateUserRequestValidateInterface::class,CreateUserRequest::class);
@@ -24,9 +21,6 @@ class RequestValidationServiceProvider extends ServiceProvider
         $this->app->bind(LoginUserRequestValidateInterface::class,LoginUserRequest::class);
     }
 
-    /**
-     * Bootstrap services.
-     */
     public function boot(): void
     {
         //

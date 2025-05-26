@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infra\Adapters;
 
 use App\Domain\Contracts\Adapters\BankAdapterInterface;
+use App\Domain\Contracts\LoggerInterface;
 use App\Domain\Entities\Transfer;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -16,10 +17,12 @@ class UltraBankAdapter implements BankAdapterInterface
     private Client $client;
     private string $url;
 
-    public function __construct()
+    public function __construct(
+        private readonly LoggerInterface $logger
+    )
     {
         $this->client = new Client();
-        $this->url = env('NUBANK_API_URL');
+        $this->url = env('ULTRA_API_URL');
     }
 
     public function authorizeTransfer(Transfer $transfer): bool
@@ -29,11 +32,10 @@ class UltraBankAdapter implements BankAdapterInterface
                 $this->client->get($this->url);
             }, 2000);
 
-            Log::info('Transfer id: ' . $transfer->getTransferId() . ' authorized');
-
+            $this->logger->info('Transfer id: ' . $transfer->getTransferId() . ' authorized');
             return true;
         } catch (GuzzleException | Throwable $e) {
-            Log::critical('Error authorizing transfer id: ' . $transfer->getTransferId() . ', error: ' . $e->getMessage());
+            $this->logger->critical('Error authorizing transfer id: ' . $transfer->getTransferId() . ', error: ' . $e->getMessage());
             return false;
         }
     }

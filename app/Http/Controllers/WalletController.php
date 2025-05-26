@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Application\Services\TransferService;
 use App\Application\Services\WalletService;
+use App\Domain\Contracts\LoggerInterface;
 use App\Domain\Enums\HttpStatusCodeEnum;
 use App\Domain\Exceptions\WalletException;
 use App\Http\Requests\CreateWalletRequest;
@@ -17,7 +18,8 @@ class WalletController extends Controller
 {
     public function __construct(
         private readonly CreateWalletRequest $createWalletRequest,
-        private readonly WalletService $walletService
+        private readonly WalletService $walletService,
+        private readonly LoggerInterface $logger
     )
     {}
 
@@ -38,7 +40,7 @@ class WalletController extends Controller
                 'message' => $e->getMessage()
             ], HttpStatusCodeEnum::UNPROCESSABLE_ENTITY->value);
         } catch (\Exception $e) {
-            Log::error("Error creating wallet for user: {$data['user_id']}, error: {$e->getMessage()}");
+            $this->logger->error("Error creating wallet for user: {$data['user_id']}, error: {$e->getMessage()}");
 
             return response()->json([
                 'message' => "Error creating your wallet"

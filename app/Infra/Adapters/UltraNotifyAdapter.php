@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App\Infra\Adapters;
 
 use App\Domain\Contracts\Adapters\NotifyAdapterInterface;
-use Exception;
+use App\Domain\Contracts\LoggerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Facades\Log;
+use Exception;
 
 class UltraNotifyAdapter implements NotifyAdapterInterface
 {
     private Client $client;
     private string $url;
 
-    public function __construct()
+    public function __construct(
+        private readonly LoggerInterface $logger
+    )
     {
         $this->client = new Client();
         $this->url = env('ULTRA_NOTIFY_API_URL');
@@ -31,7 +33,7 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
                 $data['email']
             ]);
         } catch (GuzzleException $e) {
-            Log::error("Failed to send email to user id: {$data['user_id']}, email: {$data['email']}, error: {$e->getMessage()}");
+            $this->logger->error("Failed to send email to user id: {$data['user_id']}, email: {$data['email']}, error: {$e->getMessage()}");
             throw new Exception('Error sending email to user: ' . $data['email']);
         }
     }
@@ -46,7 +48,7 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
                 $data['phone']
             ]);
         } catch (GuzzleException $e) {
-            Log::error("Failed to send SMS to user id: {$data['user_id']}, phone: {$data['phone']}, error: {$e->getMessage()}");
+            $this->logger->error("Failed to send SMS to user id: {$data['user_id']}, phone: {$data['phone']}, error: {$e->getMessage()}");
             throw new Exception('Error sending message to user phone: ' . $data['phone']);
         }
     }

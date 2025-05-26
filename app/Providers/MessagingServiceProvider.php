@@ -9,9 +9,6 @@ use Illuminate\Support\ServiceProvider;
 
 class MessagingServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     */
     public function register(): void
     {
         $this->app->singleton(RabbitMQChannelFactory::class);
@@ -19,9 +16,6 @@ class MessagingServiceProvider extends ServiceProvider
         $this->app->singleton(MessageBusPublisher::class);
     }
 
-    /**
-     * Bootstrap services.
-     */
     public function boot(): void
     {
         //

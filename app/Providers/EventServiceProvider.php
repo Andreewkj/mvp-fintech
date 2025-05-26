@@ -11,17 +11,11 @@ use Illuminate\Support\ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     */
     public function register(): void
     {
         $this->app->bind(EventDispatcherInterface::class, LaravelEventDispatcher::class);
     }
 
-    /**
-     * Bootstrap services.
-     */
     public function boot(): void
     {
         Event::listen(

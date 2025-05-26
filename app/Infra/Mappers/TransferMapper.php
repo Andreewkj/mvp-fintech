@@ -16,8 +16,8 @@ class TransferMapper
             payeeWalletId: $model->payee_wallet_id,
             status: $model->status,
             value: new TransferValue($model->value),
-            authorizedAt: $model->authorizedAt,
-            deniedAt: $model->deniedAt,
+            authorizedAt: $model->authorized_at,
+            deniedAt: $model->denied_at,
         );
     }
 

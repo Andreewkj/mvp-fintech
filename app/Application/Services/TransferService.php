@@ -24,7 +24,7 @@ class TransferService
         private TransactionManagerInterface $transactionManager,
         private BankAdapterInterface        $bankAdapter,
         private EventDispatcherInterface    $eventDispatcher,
-        private TransferFactory             $transferFactory
+        private TransferFactory             $transferFactory,
     )
     {}
 
@@ -70,6 +70,7 @@ class TransferService
 
         if (!$transferWasCompleted) {
             throw new TransferException('Transfer was not authorized by the bank');
+
         }
     }
 

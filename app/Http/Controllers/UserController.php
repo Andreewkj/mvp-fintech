@@ -6,13 +6,13 @@ namespace App\Http\Controllers;
 
 use App\Application\DTO\User\ResponseUserDTO;
 use App\Application\Services\UserService;
+use App\Domain\Contracts\LoggerInterface;
 use App\Domain\Enums\HttpStatusCodeEnum;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\LoginUserRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use Exception;
 
@@ -21,7 +21,8 @@ class UserController extends Controller
     public function __construct(
         private readonly CreateUserRequest $createUserRequest,
         private readonly UserService $userService,
-        private readonly LoginUserRequest $createLoginRequest
+        private readonly LoginUserRequest $createLoginRequest,
+        private readonly LoggerInterface $logger
     ) {}
     public function login(Request $request): JsonResponse
     {
@@ -41,7 +42,7 @@ class UserController extends Controller
                 'message' => $e->getMessage()
             ], HttpStatusCodeEnum::UNPROCESSABLE_ENTITY->value);
         } catch (Exception $e) {
-            Log::error("Error logging in user, error: {$e->getMessage()}");
+            $this->logger->error("Error logging in user, error: {$e->getMessage()}");
             return response()->json([
                 'message' => "Error logging in your user"
             ], HttpStatusCodeEnum::INTERNAL_SERVER_ERROR->value);
@@ -63,7 +64,7 @@ class UserController extends Controller
                 'message' => $e->getMessage()
             ], HttpStatusCodeEnum::UNPROCESSABLE_ENTITY->value);
         } catch (Exception $e) {
-            Log::error("Error creating user, error: {$e->getMessage()}");
+            $this->logger->error("Error creating user, error: {$e->getMessage()}");
             return response()->json([
                 'message' => "Error creating user"
             ], HttpStatusCodeEnum::INTERNAL_SERVER_ERROR->value);

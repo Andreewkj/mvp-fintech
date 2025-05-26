@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Infra\Messaging\Consumers;
 
 use App\Application\Services\NotifyUserService;
+use App\Domain\Contracts\LoggerInterface;
 use App\Infra\Messaging\RabbitMQChannelFactory;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
@@ -10,8 +13,9 @@ use PhpAmqpLib\Wire\AMQPTable;
 class NotifyConsumer
 {
     public function __construct(
-        protected NotifyUserService $notifyUserService,
-        protected RabbitMQChannelFactory $channelFactory
+        private NotifyUserService $notifyUserService,
+        private RabbitMQChannelFactory $channelFactory,
+        private LoggerInterface $logger
     )
     {}
 
@@ -34,6 +38,8 @@ class NotifyConsumer
                 echo "Enviando para DLQ...\n";
                 $this->sendToDlq('dlq_notify_email', $body, $e->getMessage());
                 $msg->ack();
+
+                $this->logger->info('Email was sent to DLQ after 3 retries',['error' => $e->getMessage()]);
                 return;
             }
 
@@ -62,6 +68,8 @@ class NotifyConsumer
                 echo "Enviando para DLQ...\n";
                 $this->sendToDlq('dlq_notify_sms', $body, $e->getMessage());
                 $msg->ack();
+
+                $this->logger->info('SMS was sent to DLQ after 3 retries',['error' => $e->getMessage()]);
                 return;
             }
 

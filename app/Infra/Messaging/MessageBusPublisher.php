@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Infra\Messaging;
 
 use App\Domain\Entities\User;

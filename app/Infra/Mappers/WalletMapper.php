@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Infra\Mappers;
 
 use App\Domain\Entities\Wallet;
