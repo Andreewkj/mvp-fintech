@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Infra\Adapters;
 
 use App\Domain\Contracts\Adapters\NotifyAdapterInterface;
@@ -20,7 +18,7 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
     )
     {
         $this->client = new Client();
-        $this->url = env('ULTRA_NOTIFY_API_URL');
+        $this->url = (string) env('ULTRA_NOTIFY_API_URL');
     }
 
     /**

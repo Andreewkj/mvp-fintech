@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Infra\Adapters;
 
 use App\Domain\Contracts\Adapters\BankAdapterInterface;
@@ -9,7 +7,6 @@ use App\Domain\Contracts\LoggerInterface;
 use App\Domain\Entities\Transfer;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class UltraBankAdapter implements BankAdapterInterface
