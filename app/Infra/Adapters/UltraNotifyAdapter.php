@@ -18,7 +18,7 @@ class UltraNotifyAdapter implements NotifyAdapterInterface
     )
     {
         $this->client = new Client();
-        $this->url = (string) env('ULTRA_NOTIFY_API_URL');
+        $this->url = env('ULTRA_NOTIFY_API_URL');
     }
 
     /**
