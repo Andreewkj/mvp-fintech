@@ -11,7 +11,7 @@ use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Domain\Entities\Wallet;
 use App\Domain\Exceptions\WalletException;
 
-readonly class WalletService
+class WalletService
 {
     public function __construct(
         private WalletRepositoryInterface $walletRepository,
@@ -20,6 +20,9 @@ readonly class WalletService
     )
     {}
 
+    /**
+     * @throws WalletException
+     */
     public function createWallet(CreateWalletDTO $createWalletDto) : Wallet
     {
         $this->validateIfAccountAlreadyExist($createWalletDto);
@@ -37,6 +40,9 @@ readonly class WalletService
         return $this->walletRepository->findWalletByUserId($userId);
     }
 
+    /**
+     * @throws WalletException
+     */
     private function validateIfAccountAlreadyExist(CreateWalletDTO $createWalletDto): void
     {
         if ($this->walletRepository->userWalletExist($createWalletDto->userId)) {

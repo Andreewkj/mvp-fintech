@@ -16,7 +16,7 @@ use App\Domain\Entities\Wallet;
 use App\Domain\Exceptions\TransferException;
 use App\Events\TransferWasCompleted;
 
-readonly class TransferService
+class TransferService
 {
     public function __construct(
         private WalletService               $walletService,

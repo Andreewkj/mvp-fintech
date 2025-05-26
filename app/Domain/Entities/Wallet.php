@@ -61,11 +61,6 @@ class Wallet
         $this->balance += $value;
     }
 
-    /**
-     * @param int $value
-     * @param Wallet|null $payeeWallet
-     * @throws TransferException
-     */
     public function validateTransfer(int $value, ?Wallet $payeeWallet): void
     {
         if (!$payeeWallet) {

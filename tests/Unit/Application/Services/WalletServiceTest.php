@@ -2,8 +2,9 @@
 
 namespace Tests\Unit\Application\Services;
 
+use App\Application\DTO\Wallet\CreateWalletDTO;
+use App\Application\Factories\WalletFactory;
 use App\Application\Services\WalletService;
-use App\Domain\Contracts\Repositories\TransferRepositoryInterface;
 use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Domain\Entities\Wallet;
@@ -12,9 +13,8 @@ use PHPUnit\Framework\TestCase;
 
 class WalletServiceTest extends TestCase
 {
-    private $walletRepository;
-    private $userRepository;
-    private $transferRepository;
+    private WalletRepositoryInterface $walletRepository;
+    private WalletFactory $walletFactory;
     private WalletService $walletService;
 
     protected function setUp(): void
@@ -22,21 +22,19 @@ class WalletServiceTest extends TestCase
         parent::setUp();
 
         $this->walletRepository = $this->createMock(WalletRepositoryInterface::class);
-        $this->userRepository = $this->createMock(UserRepositoryInterface::class);
-        $this->transferRepository = $this->createMock(TransferRepositoryInterface::class);
+        $this->walletFactory = $this->createMock(WalletFactory::class);
+        $userRepository = $this->createMock(UserRepositoryInterface::class);
 
         $this->walletService = new WalletService(
             $this->walletRepository,
-            $this->userRepository,
-            $this->transferRepository
+            $userRepository,
+            $this->walletFactory
         );
     }
 
-    public function test_create_wallet_successfully()
+    public function test_create_wallet_successfully(): void
     {
         $userId = 'user-id-123';
-        $walletData = ['user_id' => $userId];
-
         $walletMock = $this->createMock(Wallet::class);
 
         $this->walletRepository
@@ -50,23 +48,23 @@ class WalletServiceTest extends TestCase
             ->method('create')
             ->willReturn($walletMock);
 
-        $this->userRepository
-            ->expects($this->once())
-            ->method('updateUserWallet')
-            ->with($userId, $walletMock->getWalletId());
+        $createWalletDtoMock = new CreateWalletDTO(
+            $userId,
+            'common',
+            0
+        );
 
-        $result = $this->walletService->createWallet($walletData);
+        $result = $this->walletService->createWallet($createWalletDtoMock);
 
         $this->assertSame($walletMock, $result);
     }
 
-    public function test_create_wallet_throws_exception_if_wallet_exists()
+    public function test_create_wallet_throws_exception_if_wallet_exists(): void
     {
         $this->expectException(WalletException::class);
         $this->expectExceptionMessage('Wallet already exists');
 
         $userId = 'user-id-123';
-        $walletData = ['user_id' => $userId];
 
         $this->walletRepository
             ->expects($this->once())
@@ -74,6 +72,12 @@ class WalletServiceTest extends TestCase
             ->with($userId)
             ->willReturn(true);
 
-        $this->walletService->createWallet($walletData);
+        $createWalletDtoMock = new CreateWalletDTO(
+            $userId,
+            'common',
+            0
+        );
+
+        $this->walletService->createWallet($createWalletDtoMock);
     }
 }

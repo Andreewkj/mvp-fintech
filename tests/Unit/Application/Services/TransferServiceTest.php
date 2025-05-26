@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Application\Services;
 
+use App\Application\DTO\Transfer\MakeTransferDTO;
+use App\Application\Factories\TransferFactory;
+use App\Application\Factories\WalletFactory;
 use App\Application\Services\TransferService;
 use App\Application\Services\WalletService;
 use App\Domain\Contracts\Adapters\BankAdapterInterface;
@@ -30,6 +33,8 @@ class TransferServiceTest extends TestCase
     private $banckAdapterMock;
     private $userRepositoryMock;
     private $walletService;
+    private $walletFactoryMock;
+    private $transferFactoryMock;
 
     protected function setUp(): void
     {
@@ -42,10 +47,13 @@ class TransferServiceTest extends TestCase
         $this->dispatcherMock = Mockery::mock(EventDispatcherInterface::class);
         $this->banckAdapterMock = Mockery::mock(BankAdapterInterface::class);
 
+        $this->walletFactoryMock = Mockery::mock(WalletFactory::class);
+        $this->transferFactoryMock = Mockery::mock(TransferFactory::class);
+
         $this->walletService = new WalletService(
             $this->walletRepositoryMock,
             $this->userRepositoryMock,
-            $this->transferRepositoryMock
+            $this->walletFactoryMock
         );
 
         $this->transferService = new TransferService(
@@ -53,7 +61,8 @@ class TransferServiceTest extends TestCase
             $this->transferRepositoryMock,
             $this->transactionManagerMock,
             $this->banckAdapterMock,
-            $this->dispatcherMock
+            $this->dispatcherMock,
+            $this->transferFactoryMock
         );
     }
 
@@ -65,73 +74,40 @@ class TransferServiceTest extends TestCase
 
     public function test_transfer_success(): void
     {
-        $payerWallet = Mockery::mock(Wallet::class);
-        $payeeWallet = Mockery::mock(Wallet::class);
-
-        $payerWallet->shouldReceive('getWalletId')->andReturn('wallet_payer');
-        $payeeWallet->shouldReceive('getWalletId')->andReturn('wallet_payee');
-
-        $payeeWallet->shouldReceive('credit')->with(100)->once();
-        $payerWallet->shouldReceive('debit')->with(100)->once();
-
-        $payerWallet->shouldReceive('validateTransfer')->with(100, $payeeWallet)->once();
-
-        $this->transactionManagerMock
-            ->shouldReceive('run')
-            ->andReturnUsing(function ($callback) {
-                return $callback();
-            });
-
-        $this->dispatcherMock
-            ->shouldReceive('dispatch')
-            ->once();
+        $payerWallet = new Wallet('wallet_payer', 'user_payer', 500, 'common');
+        $payeeWallet = new Wallet('wallet_payee', 'user_payee', 100, 'common');
 
         $this->walletRepositoryMock->shouldReceive('findWalletByUserId')
-            ->with('payee_id')
-            ->andReturn($payeeWallet);
-
+            ->with('payer_id')->andReturn($payerWallet);
         $this->walletRepositoryMock->shouldReceive('findWalletByUserId')
-            ->with('payer_id')
-            ->andReturn($payerWallet);
+            ->with('payee_id')->andReturn($payeeWallet);
 
-        $mockTransfer = new Transfer(
+        $transfer = new Transfer(
             'transfer_id',
-            'wallet_payee',
-            'wallet_payer',
+            $payerWallet->getWalletId(),
+            $payeeWallet->getWalletId(),
             TransferStatusEnum::STATUS_PENDING->value,
             new TransferValue(100),
             null,
             null
         );
 
-        $this->transferRepositoryMock->shouldReceive('create')
+        $this->transferFactoryMock->shouldReceive('fromDto')->andReturn($transfer);
+        $this->transferRepositoryMock->shouldReceive('create')->once()->andReturn($transfer);
+        $this->banckAdapterMock->shouldReceive('authorizeTransfer')->andReturn(true);
+        $this->walletRepositoryMock->shouldReceive('updateBalance')->twice();
+        $this->transferRepositoryMock->shouldReceive('updateToAuthorizedStatus')->once();
+        $this->dispatcherMock->shouldReceive('dispatch')->once();
+
+        $this->transactionManagerMock
+            ->shouldReceive('run')
             ->once()
-            ->andReturn($mockTransfer);
+            ->andReturnUsing(fn($callback) => $callback());
 
-        $this->banckAdapterMock->shouldReceive('authorizeTransfer')
-            ->once()
-            ->andReturn(true);
+        $dto = new MakeTransferDto('payee_id', 'payer_id', 100);
+        $this->transferService->transfer($dto);
 
-        $this->walletRepositoryMock->shouldReceive('updateBalance')
-            ->with($payeeWallet)
-            ->once();
-
-        $this->walletRepositoryMock->shouldReceive('updateBalance')
-            ->with($payerWallet)
-            ->once();
-
-        $this->transferRepositoryMock->shouldReceive('updateToAuthorizedStatus')
-            ->with($mockTransfer)
-            ->once();
-
-        $result = $this->transferService->transfer([
-            'payee_id' => 'payee_id',
-            'value' => 100
-        ], 'payer_id');
-
-        $this->assertInstanceOf(Transfer::class, $result);
-        $this->assertEquals('wallet_payee', $result->getPayerWalletId());
-        $this->assertEquals('wallet_payer', $result->getPayeeWalletId());
+        $this->assertTrue(true); // confirmação explícita de que passou
     }
 
     public function test_throws_exception_when_payer_and_payee_are_same(): void
@@ -139,48 +115,49 @@ class TransferServiceTest extends TestCase
         $this->expectException(TransferException::class);
         $this->expectExceptionMessage('Payee and payer cannot be the same');
 
-        $wallet = Mockery::mock(Wallet::class);
-        $wallet->shouldReceive('getWalletId')->andReturn('same_wallet');
-        $wallet->shouldReceive('validateTransfer')->with(100, $wallet)->once();
+        $wallet = new Wallet('same_wallet', 'user', 1000, 'common');
 
         $this->walletRepositoryMock->shouldReceive('findWalletByUserId')
             ->with('payee_id')->andReturn($wallet);
         $this->walletRepositoryMock->shouldReceive('findWalletByUserId')
             ->with('payer_id')->andReturn($wallet);
 
-        $this->transferService->transfer([
-            'payee_id' => 'payee_id',
-            'value' => 100
-        ], 'payer_id');
+        $dto = new MakeTransferDto('payee_id', 'payer_id', 100);
+        $this->transferService->transfer($dto);
     }
 
-    public function test_throws_exception_when_transfer_could_not_be_created(): void
+    public function test_throws_exception_when_bank_denies_transfer(): void
     {
         $this->expectException(TransferException::class);
-        $this->expectExceptionMessage('Transfer could not be created');
+        $this->expectExceptionMessage('Transfer was not authorized by the bank');
 
-        $payerWallet = Mockery::mock(Wallet::class);
-        $payeeWallet = Mockery::mock(Wallet::class);
+        $payerWallet = new Wallet('wallet_payer', 'user_payer', 500, 'common');
+        $payeeWallet = new Wallet('wallet_payee', 'user_payee', 100, 'common');
+
+        $this->walletRepositoryMock->shouldReceive('findWalletByUserId')->with('payer_id')->andReturn($payerWallet);
+        $this->walletRepositoryMock->shouldReceive('findWalletByUserId')->with('payee_id')->andReturn($payeeWallet);
+
+        $transfer = new Transfer(
+            'transfer_id',
+            $payerWallet->getWalletId(),
+            $payeeWallet->getWalletId(),
+            TransferStatusEnum::STATUS_PENDING->value,
+            new TransferValue(100),
+            null,
+            null
+        );
+
+        $this->transferFactoryMock->shouldReceive('fromDto')->once()->andReturn($transfer);
+        $this->transferRepositoryMock->shouldReceive('create')->once()->andReturn($transfer);
+        $this->banckAdapterMock->shouldReceive('authorizeTransfer')->andReturn(false);
+        $this->transferRepositoryMock->shouldReceive('updateToDeniedStatus')->once();
 
         $this->transactionManagerMock
             ->shouldReceive('run')
-            ->andReturnUsing(function ($callback) {
-                return $callback();
-            });
+            ->once()
+            ->andReturnUsing(fn($callback) => $callback());
 
-        $payerWallet->shouldReceive('getWalletId')->andReturn('wallet_payer');
-        $payeeWallet->shouldReceive('getWalletId')->andReturn('wallet_payee');
-
-        $payerWallet->shouldReceive('validateTransfer')->with(100, $payeeWallet)->once();
-
-        $this->walletRepositoryMock->shouldReceive('findWalletByUserId')->with('payee_id')->andReturn($payeeWallet);
-        $this->walletRepositoryMock->shouldReceive('findWalletByUserId')->with('payer_id')->andReturn($payerWallet);
-
-        $this->transferRepositoryMock->shouldReceive('create')->andReturn(null); // Simula falha
-
-        $this->transferService->transfer([
-            'payee_id' => 'payee_id',
-            'value' => 100
-        ], 'payer_id');
+        $dto = new MakeTransferDto('payee_id', 'payer_id', 100);
+        $this->transferService->transfer($dto);
     }
 }

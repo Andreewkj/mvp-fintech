@@ -4,7 +4,7 @@ namespace App\Application\Services;
 
 use App\Domain\Contracts\Adapters\NotifyAdapterInterface;
 
-readonly class NotifyUserService
+class NotifyUserService
 {
     public function __construct(
         private NotifyAdapterInterface  $notifyAdapter

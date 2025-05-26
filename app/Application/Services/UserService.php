@@ -12,7 +12,7 @@ use App\Domain\VO\Cnpj;
 use App\Domain\VO\Cpf;
 use App\Domain\VO\Email;
 
-readonly class UserService
+class UserService
 {
     public function __construct(
         private UserRepositoryInterface $userRepository,
