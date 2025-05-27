@@ -12,12 +12,12 @@ collection:
       modified: 1743733897041
       sortKey: -1743733881034
     children:
-      - url: http://localhost/api/transfer/create
+      - url: http://localhost:8080/api/transfer/create
         name: Transfer
         meta:
           id: req_35c2562a3cd844e797fea78b23b095da
           created: 1743733930002
-          modified: 1743987262926
+          modified: 1748300959376
           isPrivate: false
           sortKey: -1743733933606
         method: POST
@@ -25,8 +25,8 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"value": 5000,
-            	"payee_id": "01jr6vqyf825nx0hyxpg037hpt"
+            	"value": 500,
+            	"payee_id": "01JW4SH5PCNXZ1B4J07477TP0J"
             }
         headers:
           - name: Content-Type
@@ -59,12 +59,12 @@ collection:
       modified: 1743733906150
       sortKey: -1743733906151
     children:
-      - url: http://localhost/api/user/create
+      - url: http://localhost:8080/api/user/create
         name: Register
         meta:
           id: req_f1dcd069de144f009e52df50dcebca31
           created: 1743653314760
-          modified: 1743996364612
+          modified: 1748312625888
           isPrivate: false
           sortKey: -1743733923822
         method: POST
@@ -72,9 +72,9 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"full_name": "Andreew Kennedy",
-            	"email": "ak@gmail.com",
-            	"cpf": "01822850657",
+            	"full_name": "scorpion mkt",
+            	"email": "scorpion@gmail.com",
+            	"cpf": "34538629022",
             	"phone": "31993920011",
             	"password": "123456"
             }
@@ -95,12 +95,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost/api/user/login
+      - url: http://localhost:8080/api/user/login
         name: Login
         meta:
           id: req_81e5009c13ba415d90f3e0d11d23e1cf
           created: 1743813698942
-          modified: 1743995775511
+          modified: 1748300939885
           isPrivate: false
           sortKey: -1743733923922
         method: POST
@@ -108,7 +108,7 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"email": "ak@gmail.com",
+            	"email": "zefira@gmail.com",
             	"password": "123456"
             }
         headers:
@@ -141,12 +141,12 @@ collection:
       modified: 1743734922716
       sortKey: -1743734922716
     children:
-      - url: http://localhost/api/wallet/create
+      - url: http://localhost:8080/api/wallet/create
         name: Create
         meta:
           id: req_fad79fbfe3aa4c2dbd659deadb930b80
           created: 1743734927734
-          modified: 1743987235675
+          modified: 1748203430874
           isPrivate: false
           sortKey: -1743734949528
         method: POST
@@ -157,12 +157,11 @@ collection:
             	"type": "common"
             }
         headers:
-          - name: Content-Type
+          - id: pair_fee0bb25a7bb4842b6ecc6287833b19c
+            name: Content-Type
             value: application/json
-          - name: User-Agent
-            value: insomnia/11.0.1
-            id: pair_04e1a5f8d7e44859a45a145b760be1ef
-          - id: pair_d8f55994f567411a89b6f144d7b9ad15
+            disabled: false
+          - id: pair_e809cbb83920447990bf969843b53d85
             name: Accept
             value: application/json
             disabled: false
