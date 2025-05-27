@@ -2,47 +2,57 @@
 
 ## Sobre o projeto
 
-O principal UseCase do projeto é a transferência entre dois usuários, no caso serão um usuário comum e um logista, antes de finalizar a transferência, deve ser consultado um serviço externo e verificar se podemos aprovar a transferência.
-Caso a transferência seja aprovada, é feito um envio de notificação por email e por sms.
+O principal use case do projeto é a transferência entre dois usuários, um usuário comum e um lojista. 
 
-Em caso de erro na transferência, deve ser registrado um log de erro e também a transferência deve ser cancelada.
+Antes de finalizar a transferência, um serviço externo deve ser consultado para verificar se ela pode ser aprovada.
+
+Caso a transferência seja autorizada, é feito o envio de notificação por e-mail e por SMS.
+
+Em caso de erro na transferência, um log de erro deve ser registrado e a operação deve ser cancelada.
 
 ## Sobre o Projeto
 
-O objetivo do projeto é criar algo mais agnóstico ao framework possível.
+O objetivo do projeto é criar algo o mais agnóstico possível ao framework.
 
-Optei pelo uso do DDD, utilizando muito do Objects calisthenics, linguagem ubiqua, utilizei os Value Objects para ajudar com a obsessão por tipos primitivos e tratamento de requests fora do framework.
+Optei pelo uso de DDD, utilizando bastante os Object Calisthenics e linguagem ubíqua. Usei também Value Objects para usar a obsessão por tipos primitivos e realizei o tratamento das requisições fora do framework.
 
-Optei por utilizar o ORM do laravel para agilizar o desenvolvimento, mas tomei o cuidado de deixar de uma forma onde caso fosse alterado o ORM no futuro, o desacoplamento deixaria a implementação mais fácil.
+Decidi usar o ORM do Laravel para agilizar o desenvolvimento, mas tomei o cuidado de deixá-lo desacoplado, facilitando a troca do ORM futuramente, caso necessário.
 
-Para a chamada dos provedores de autenticação, e envio de notificação, foi feito três tentativas e caso falhe, será registrado um log de erro juntamento com o envio da mensagem para uma Dead letter queue, almentando a resilência.
+Para as chamadas dos provedores de autenticação e envio de notificação, implementei uma lógica com três tentativas. Caso todas falhem, é registrado um log de erro e a mensagem é enviada para uma Dead Letter Queue, aumentando a resiliência do sistema.
 
-Em alguns trechos do código usei chamadas estáticas, principalmente com Log, DB, Event, Auth e nos mappers. Fiz isso de forma intencional, sempre dentro da camada de infraestrutura, onde essas chamadas fazem mais sentido.
+Em alguns trechos do código, utilizei chamadas estáticas, principalmente com Log, DB, Event, Auth e nos mappers. Fiz isso de forma intencional e restrita à camada de infraestrutura, onde esse tipo de acesso faz mais sentido.
 
-No caso das facades do Laravel, elas estão encapsuladas dentro de classes adapter (como LaravelLoggerAdapter ou LaravelTransactionManager), justamente para manter o restante da aplicação desacoplado do framework.
+No caso das facades do Laravel, elas estão encapsuladas dentro de classes adaptadoras (como LaravelLoggerAdapter ou LaravelTransactionManager), garantindo que o restante da aplicação continue desacoplado do framework.
 
-Já nos mappers, o uso de métodos estáticos foi uma escolha prática, pois eles não têm estado e servem apenas para converter dados.
+Já nos mappers, o uso de métodos estáticos foi uma escolha prática, pois eles não mantêm estado e servem apenas para converter dados.
 
-Caso o projeto cresça ou surja a necessidade, dá pra trocar esses usos por injeções sem impacto no restante do sistema, já que está tudo bem isolado.
+Caso o projeto cresça ou surja a necessidade, é possível substituir essas chamadas por injeções de dependência sem impactos, já que tudo está bem isolado.
 
 ## Regras de negócio da implementação
 
- - Um usuário precisa ter Nome Completo, CPF/CNPJ (unico), EMAIL (unico), Telefone, Senha (Min 6 Caracteres).
- - Após o utilizador ser criado ele deve chamar a rota de criação da carteira(Create/Wallet) passando o tipo de carteira desejada.
- - O que difere um lojista de um utilizador comum é a sua carteira, já que hoje é possível fazer operações como lojista apenas com o CPF.
- - Não há rota de saldo mas basta ir até a tabela 'wallets' na coluna 'balance' para adicionar (no seeder deixei um usuário comum com saldo).
- - A principal regra da transferência é que o Logista só pode receber valores, e o usuário comum recebe e envia.
- - Para fazer a transferência o usuário precisa apenas passar o id do usuário que irá receber, pois é necessário que o pagador esteja logado, pois com o usuário logado, já possuímos as suas informações.
- - Caso a transferência não tenha sucesso não deve ser debitado o valor da conta do pagador e também não deve ser enviado a notificação para o recebedor.
- - A tranferência é feita de forma sincrona mas as notificações são enviadas através do evento disparado ao obter sucesso, onde são enviadas para o producer no rabbitmq e ao serem consumidas, a validação do provedor é executada e caso não seja autorizada, a mensagem da notificação vai para uma DLQ.
+- Um usuário precisa ter nome completo, CPF ou CNPJ (único), e-mail (único), telefone e senha (mínimo de 6 caracteres).
+
+- Após o usuário ser criado, ele deve chamar a rota de criação de carteira (Create/Wallet) passando o tipo desejado.
+
+- O que diferencia um lojista de um usuário comum é sua carteira, já que hoje é possível realizar operações como lojista apenas com o CPF.
+
+- Não há rota de saldo, mas é possível editar diretamente a coluna balance da tabela wallets (no seeder, deixei um usuário comum com saldo).
+
+- A principal regra da transferência é que o lojista só pode receber valores, enquanto o usuário comum pode enviar e receber.
+
+- Para fazer uma transferência, o usuário precisa apenas passar o ID do recebedor. O pagador precisa estar logado, pois suas informações já estarão disponíveis.
+
+- Caso a transferência não seja autorizada, o valor não deve ser debitado da conta do pagador, e nenhuma notificação deve ser enviada.
+
+- A transferência é feita de forma síncrona, mas as notificações são enviadas via evento. Esse evento envia as mensagens para o producer no RabbitMQ. Ao serem consumidas, o provedor de notificação é validado e, se houver falha, a mensagem é enviada para a DLQ.
 
 ## Fluxo de transferência
 
-1. criação dos usuários
-2. criação dasd wallets dos usuários
-3. tranferência entre wallets através do Id do usuário
-4. ativação das filas para ativar a notificação
-5. ativação do consumer ```bash consumer:notify ``` para o envio das notificações
+1. Criação dos usuários
+2. Criação das wallets dos usuários
+3. Transferência entre wallets passando o ID do recebedor
+4. Ativação das filas para envio das notificações
+5. Ativação do consumer ```bash consumer:notify ``` para o consumo das notificações
 
 ![img_1.png](img_1.png)
 
@@ -66,8 +76,8 @@ Assim que o projeto estiver pronto, basta acessar:
 ```bash
 http://localhost:8080/docs/api/
 ```
-A documentação foi feita com a lib Scramble e nela temo um exemplo de request body para cada endpoint, onde é possivel copiar e colar o curl.
-Mas tambem deixo um arquivo na raiz do projeto com o nome de 'Dev' onde está o arquivo de exportação do insominia.
+A documentação foi feita com a lib Scramble e nela tem um exemplo de request body para cada endpoint, onde é possível copiar e colar o curl.
+Mas também deixo um arquivo na raiz do projeto dentro da pasta 'Dev' onde está o arquivo de exportação do insominia.
 
 ![img_2.png](img_2.png)
 
@@ -135,4 +145,4 @@ docker exec -it app php artisan consumer:notify
 - Melhoraria a observabilidade com o monolog e talvez um sentry/newrelic
 - Usaria swoole em um projeto de microserviços atuando como consumer
 - Se o volume de mensagens alterar, seria melhor utilizar o kafka
-- Elevaria o nivel do PhpStan para no minimo 6
+- Elevaria o nível do PhpStan para no mínimo 6
