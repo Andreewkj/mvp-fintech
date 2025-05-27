@@ -29,8 +29,6 @@ readonly class TransferRepository implements TransferRepositoryInterface
             'status' => TransferStatusEnum::STATUS_DENIED->value,
             'denied_at' => now()->format('Y-m-d H:i:s'),
         ]);
-
-        $this->model->refresh();
     }
 
     public function updateToAuthorizedStatus(Transfer $transfer): void
@@ -39,7 +37,5 @@ readonly class TransferRepository implements TransferRepositoryInterface
             'status' => TransferStatusEnum::STATUS_AUTHORIZED->value,
             'authorized_at' => now()->format('Y-m-d H:i:s'),
         ]);
-
-        $this->model->refresh();
     }
 }

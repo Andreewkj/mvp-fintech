@@ -6,21 +6,20 @@ use App\Domain\Contracts\EventDispatcherInterface;
 use App\Events\TransferWasCompleted;
 use App\Infra\LaravelEventDispatcher;
 use App\Listeners\NotifyPayee;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
+    public bool $shouldDiscoverEvents = false;
+
     public function register(): void
     {
         $this->app->bind(EventDispatcherInterface::class, LaravelEventDispatcher::class);
     }
 
-    public function boot(): void
-    {
-        Event::listen(
-            TransferWasCompleted::class,
+    protected array $listen = [
+        TransferWasCompleted::class => [
             NotifyPayee::class,
-        );
-    }
+        ],
+    ];
 }

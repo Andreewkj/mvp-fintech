@@ -70,7 +70,6 @@ class TransferService
 
         if (!$transferWasCompleted) {
             throw new TransferException('Transfer was not authorized by the bank');
-
         }
     }
 
