@@ -11,7 +11,7 @@ use Illuminate\Console\Command;
 class RunNotifyConsumer extends Command
 {
     protected $signature = 'consumer:notify';
-    protected $description = 'Inicia o consumer da fila notify_queue';
+    protected $description = 'Init consumer to notify users';
 
     public function __construct(
         protected NotifyConsumer $notifyConsumer,
