@@ -19,7 +19,7 @@ class UltraBankAdapter implements BankAdapterInterface
     )
     {
         $this->client = new Client();
-        $this->url = env('ULTRA_API_URL');
+        $this->url = config('services.ultra_bank.api_url');
     }
 
     public function authorizeTransfer(Transfer $transfer): bool

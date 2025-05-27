@@ -28,6 +28,7 @@ class TransferController extends Controller
 
     /**
      * Make transfer
+     * @response array{message: string}
      */
     #[BodyParameter(name: 'value',description: 'Value of the transfer',required: true,type: 'integer',example: 500)]
     #[BodyParameter(name: 'payee_id',description: 'Id of the payee on Ulid format',required: true,type: 'string',example: '01jw4rev2kn48wgyk31f2475nq')]

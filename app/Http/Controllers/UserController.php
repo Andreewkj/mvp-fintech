@@ -28,6 +28,7 @@ class UserController extends Controller
 
     /**
      * Login User
+     * @response array{message: string}
      */
     #[BodyParameter(name: 'email', description: 'User email address', required: true, type: 'string', example: 'user@example.com')]
     #[BodyParameter(name: 'password', description: 'User password', required: true, type: 'string', example: '123456')]
@@ -58,6 +59,7 @@ class UserController extends Controller
 
     /**
      * Create User
+     * @response array{message: string}
      */
     #[BodyParameter(name: 'full_name', description: 'User full name', required: true, type: 'string', example: 'Andreew Januário')]
     #[BodyParameter(name: 'email', description: 'User email address', required: true, type: 'string', example: 'andreew@example.com')]

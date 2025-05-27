@@ -27,6 +27,7 @@ class WalletController extends Controller
 
     /**
      * Create Wallet
+     * @response array{message: string}
      */
     #[BodyParameter(name: 'type', description: 'Type of the wallet (common, shop_keeper)', required: true, type: 'string', example: 'common')]
     public function createWallet(Request $request): JsonResponse
