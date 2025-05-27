@@ -60,9 +60,10 @@ Caso o projeto cresça ou surja a necessidade, é possível substituir essas cha
 
 ## Configuração Docker
 
-Permissão para executar o script de setup
+Permissão para executar os scripts
 ```bash
 chmod +x setup.sh
+chmod +x docker/wait-for-it.sh
 ```
 
 Automação com os passos necessários para subir o projeto
