@@ -48,11 +48,11 @@ Caso o projeto cresça ou surja a necessidade, é possível substituir essas cha
 
 ## Fluxo de transferência
 
-1. Criação dos usuários
-2. Criação das wallets dos usuários
-3. Transferência entre wallets passando o ID do recebedor
-4. Ativação das filas para envio das notificações
-5. Ativação do consumer ```bash consumer:notify ``` para o consumo das notificações
+1. Criação dos usuários.
+2. Criação das wallets dos usuários.
+3. Transferência entre wallets passando o ID do recebedor.
+4. Ativação das filas para envio das notificações.
+5. Ativação do consumer ```consumer:notify ``` para o consumo das notificações.
 
 ![img_1.png](img_1.png)
 
@@ -78,7 +78,11 @@ Assim que o projeto estiver pronto, basta acessar:
 http://localhost:8080/docs/api/
 ```
 A documentação foi feita com a lib Scramble e nela tem um exemplo de request body para cada endpoint, onde é possível copiar e colar o curl.
-Mas também deixo um arquivo na raiz do projeto dentro da pasta 'Dev' onde está o arquivo de exportação do insominia.
+
+Mas também deixo um arquivo na raiz do projeto dentro da pasta 'Dev' onde está o arquivo de exportação do insominia em dois formatos.
+
+O insominia costuma a remover as automações, mas basta inserir em Auth:
+![img.png](img.png)
 
 ![img_2.png](img_2.png)
 
@@ -143,7 +147,8 @@ docker exec -it app php artisan consumer:notify
 
 ## O que eu faria para melhorar o projeto no futuro
 
-- Melhoraria a observabilidade com o monolog e talvez um sentry/newrelic
-- Usaria swoole em um projeto de microserviços atuando como consumer
-- Se o volume de mensagens alterar, seria melhor utilizar o kafka
-- Elevaria o nível do PhpStan para no mínimo 6
+- Melhoraria a observabilidade com o monolog e talvez um sentry/newrelic.
+- Usaria swoole em um projeto de microserviços atuando como consumer.
+- Se o volume de mensagens alterar, seria melhor utilizar o kafka.
+- Elevaria o nível do PhpStan para no mínimo 6.
+- Utilizar a lib https://github.com/brick/money para ter mais confiabilidade nas operações matemáticas.
