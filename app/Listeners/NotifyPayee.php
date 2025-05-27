@@ -2,12 +2,12 @@
 
 namespace App\Listeners;
 
+use App\Domain\Contracts\LoggerInterface;
 use App\Domain\Contracts\Repositories\UserRepositoryInterface;
 use App\Events\TransferWasCompleted;
 use App\Infra\Messaging\MessageBusPublisher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class NotifyPayee implements ShouldQueue
@@ -17,7 +17,8 @@ class NotifyPayee implements ShouldQueue
     public int $tries = 3;
 
     public function __construct(
-        private readonly MessageBusPublisher $messageBusPublisher
+        private readonly MessageBusPublisher $messageBusPublisher,
+        private readonly LoggerInterface $logger
     ) {}
 
     /**
@@ -30,20 +31,20 @@ class NotifyPayee implements ShouldQueue
         $payee = $userRepository->findUserByWalletId($event->transfer->getPayeeWalletId());
 
         if (is_null($payee)) {
-            Log::warning("Payee ID not found on transfer id: {$event->transfer->getTransferId()}");
+            $this->logger->warning("Payee ID not found on transfer id: {$event->transfer->getTransferId()}");
             return;
         }
 
         try {
             $this->messageBusPublisher->publishMessage($payee);
         } catch (Throwable $exception) {
-            Log::error("Failed to notify payee ID {$payee->getUserId()}: {$exception->getMessage()}");
+            $this->logger->error("Failed to notify payee ID {$payee->getUserId()}: {$exception->getMessage()}");
         }
     }
 
     public function failed(TransferWasCompleted $event, Throwable $exception): void
     {
-        Log::error("Error sending notification to payee wallet id: {$event->transfer->getPayeeWalletId()}, error: {$exception->getMessage()}");
+        $this->logger->error("Error sending notification to payee wallet id: {$event->transfer->getPayeeWalletId()}, error: {$exception->getMessage()}");
         //maybe store notification on some queue or db to try again later
     }
 }

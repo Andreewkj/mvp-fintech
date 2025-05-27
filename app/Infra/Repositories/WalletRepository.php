@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infra\Repositories;
 
+use App\Domain\Contracts\LoggerInterface;
 use App\Domain\Contracts\Repositories\WalletRepositoryInterface;
 use App\Domain\Contracts\TransactionManagerInterface;
 use App\Domain\Entities\Wallet;
@@ -11,14 +12,14 @@ use App\Domain\Exceptions\WalletException;
 use App\Infra\Mappers\WalletMapper;
 use App\Models\WalletModel;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Log;
 use Exception;
 
 readonly class WalletRepository implements WalletRepositoryInterface
 {
     public function __construct(
         private WalletModel                 $model,
-        private TransactionManagerInterface $transactionManager
+        private TransactionManagerInterface $transactionManager,
+        private LoggerInterface             $logger
     )
     {}
 
@@ -70,7 +71,7 @@ readonly class WalletRepository implements WalletRepositoryInterface
             }
         }
 
-        Log::critical("Update balance for wallet: {$wallet->getWalletId()}, balance: {$wallet->getBalance()} failed after {$maxAttempts} attempts");
+        $this->logger->critical("Update balance for wallet: {$wallet->getWalletId()}, balance: {$wallet->getBalance()} failed after {$maxAttempts} attempts");
         throw new Exception('Transaction failed after multiple attempts due to deadlock');
     }
 

@@ -17,6 +17,14 @@ Optei por utilizar o ORM do laravel para agilizar o desenvolvimento, mas tomei o
 
 Para a chamada dos provedores de autenticação, e envio de notificação, foi feito três tentativas e caso falhe, será registrado um log de erro juntamento com o envio da mensagem para uma Dead letter queue, almentando a resilência.
 
+Em alguns trechos do código usei chamadas estáticas, principalmente com Log, DB, Event, Auth e nos mappers. Fiz isso de forma intencional, sempre dentro da camada de infraestrutura, onde essas chamadas fazem mais sentido.
+
+No caso das facades do Laravel, elas estão encapsuladas dentro de classes adapter (como LaravelLoggerAdapter ou LaravelTransactionManager), justamente para manter o restante da aplicação desacoplado do framework.
+
+Já nos mappers, o uso de métodos estáticos foi uma escolha prática, pois eles não têm estado e servem apenas para converter dados.
+
+Caso o projeto cresça ou surja a necessidade, dá pra trocar esses usos por injeções sem impacto no restante do sistema, já que está tudo bem isolado.
+
 ## Regras de negócio da implementação
 
  - Um usuário precisa ter Nome Completo, CPF/CNPJ (unico), EMAIL (unico), Telefone, Senha (Min 6 Caracteres).
@@ -61,7 +69,7 @@ http://localhost:8080/docs/api/
 A documentação foi feita com a lib Scramble e nela temo um exemplo de request body para cada endpoint, onde é possivel copiar e colar o curl.
 Mas tambem deixo um arquivo na raiz do projeto com o nome de 'Dev' onde está o arquivo de exportação do insominia.
 
-![img.png](img.png)
+![img_2.png](img_2.png)
 
 
 #### Usuários do seeder
