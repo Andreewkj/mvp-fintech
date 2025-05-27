@@ -10,6 +10,7 @@ use App\Domain\Contracts\LoggerInterface;
 use App\Domain\Enums\HttpStatusCodeEnum;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\LoginUserRequest;
+use Dedoc\Scramble\Attributes\BodyParameter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +25,12 @@ class UserController extends Controller
         private readonly LoginUserRequest $createLoginRequest,
         private readonly LoggerInterface $logger
     ) {}
+
+    /**
+     * Login User
+     */
+    #[BodyParameter(name: 'email', description: 'User email address', required: true, type: 'string', example: 'user@example.com')]
+    #[BodyParameter(name: 'password', description: 'User password', required: true, type: 'string', example: '123456')]
     public function login(Request $request): JsonResponse
     {
         try {
@@ -49,6 +56,15 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * Create User
+     */
+    #[BodyParameter(name: 'full_name', description: 'User full name', required: true, type: 'string', example: 'Andreew Januário')]
+    #[BodyParameter(name: 'email', description: 'User email address', required: true, type: 'string', example: 'andreew@example.com')]
+    #[BodyParameter(name: 'phone', description: 'User phone number', required: true, type: 'string', example: '31993920011')]
+    #[BodyParameter(name: 'password', description: 'User password', required: true, type: 'string', example: '123456')]
+    #[BodyParameter(name: 'cpf', description: 'Brazilian CPF document (optional if CNPJ is provided)', required: false, type: 'string', example: '123.456.789-09')]
+    #[BodyParameter(name: 'cnpj', description: 'Brazilian CNPJ document (optional if CPF is provided)', required: false, type: 'string', example: '12.345.678/0001-99')]
     public function store(Request $request): JsonResponse
     {
         try {

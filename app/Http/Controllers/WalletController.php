@@ -10,6 +10,7 @@ use App\Domain\Contracts\LoggerInterface;
 use App\Domain\Enums\HttpStatusCodeEnum;
 use App\Domain\Exceptions\WalletException;
 use App\Http\Requests\CreateWalletRequest;
+use Dedoc\Scramble\Attributes\BodyParameter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -23,6 +24,11 @@ class WalletController extends Controller
     )
     {}
 
+
+    /**
+     * Create Wallet
+     */
+    #[BodyParameter(name: 'type', description: 'Type of the wallet (common, shop_keeper)', required: true, type: 'string', example: 'common')]
     public function createWallet(Request $request): JsonResponse
     {
         $data = $request->all();

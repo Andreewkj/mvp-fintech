@@ -9,10 +9,13 @@ use App\Domain\Contracts\LoggerInterface;
 use App\Domain\Enums\HttpStatusCodeEnum;
 use App\Domain\Exceptions\TransferException;
 use App\Http\Requests\CreateTransferRequest;
+use Dedoc\Scramble\Attributes\BodyParameter;
+use Dedoc\Scramble\Attributes\Example;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Exception;
+
 
 class TransferController extends Controller
 {
@@ -23,6 +26,11 @@ class TransferController extends Controller
     )
     {}
 
+    /**
+     * Make transfer
+     */
+    #[BodyParameter(name: 'value',description: 'Value of the transfer',required: true,type: 'integer',example: 500)]
+    #[BodyParameter(name: 'payee_id',description: 'Id of the payee on Ulid format',required: true,type: 'string',example: '01jw4rev2kn48wgyk31f2475nq')]
     public function makeTransfer(Request $request): JsonResponse
     {
         try {
