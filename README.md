@@ -121,3 +121,10 @@ Para consumir as notificações basta rodar o comando abaixo
 ```bash
 docker exec -it app php artisan consumer:notify
 ```
+
+## O que eu faria para melhorar o projeto no futuro
+
+- Melhoraria a observabilidade com o monolog e talvez um sentry/newrelic
+- Usaria swoole em um projeto de microserviços atuando como consumer
+- Se o volume de mensagens alterar, seria melhor utilizar o kafka
+- Elevaria o nivel do PhpStan para no minimo 6
