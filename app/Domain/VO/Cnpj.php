@@ -27,10 +27,6 @@ class Cnpj
         $this->cnpj = $cnpj;
     }
 
-    /**
-     * @param string $cnpj
-     * @return void
-     */
     private function validateCheckDigits(string $cnpj): void
     {
         $length = strlen($cnpj) - 2;
@@ -69,9 +65,6 @@ class Cnpj
         }
     }
 
-    /**
-     * @return string
-     */
     public function getValue(): string
     {
         return $this->cnpj;

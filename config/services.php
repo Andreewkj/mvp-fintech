@@ -34,5 +34,11 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'ultra_notify' => [
+        'url' => env('ULTRA_NOTIFY_API_URL', 'https://util.devi.tools/api/v1/notify'),
+    ],
+    'ultra_bank' => [
+        'api_url' => env('ULTRA_API_URL', 'https://util.devi.tools/api/v2/authorize'),
+    ],
 
 ];
